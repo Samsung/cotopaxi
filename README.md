@@ -3,6 +3,11 @@
 
 Set of tools for security testing of Internet of Things devices using protocols like: CoAP, DTLS, mDNS, MQTT.
 
+## License:
+
+Cotopaxi uses GNU General Public License, version 2:
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+
 ## Requirements:
 
 Currently Cotopaxi works only with Python 2.7.x, but future versions will work also with Python 3. 
@@ -237,6 +242,9 @@ optional arguments:
                         Turn on verbose/debug mode (more messages)
   --protocol {CoAP,mDNS,MQTT,DTLS}, -P {CoAP,mDNS,MQTT,DTLS}
                         protocol to be tested
+  --hide-disclaimer, -HD
+                        hides legal disclaimer (shown before starting
+                        intrusive tools)
   --src-ip SRC_IP, -SI SRC_IP
                         source IP address (return result will not be
                         received!)
@@ -248,7 +256,9 @@ optional arguments:
   --corpus-dir CORPUS_DIR, -C CORPUS_DIR
                         path to directory with fuzzing payloads (corpus) (each
                         payload in separated file)
-
+  --delay-after-crash DELAY_AFTER_CRASH, -DAC DELAY_AFTER_CRASH
+                        path to directory with fuzzing payloads (corpus) (each
+                        payload in separated file)
 
 ```
 
@@ -277,10 +287,20 @@ optional arguments:
                         number of retries
   --timeout TIMEOUT, -T TIMEOUT
                         timeout in seconds
+  --protocol {UDP,TCP,CoAP,mDNS,MQTT,DTLS,ALL}, -P {UDP,TCP,CoAP,mDNS,MQTT,DTLS,ALL}
+                        protocol to be tested (UDP includes CoAP, mDNS and
+                        DTLS, TCP includes CoAP and MQTT, ALL includes all
+                        supported protocols)
+  --hide-disclaimer, -HD
+                        hides legal disclaimer (shown before starting
+                        intrusive tools)
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --cve {ALL,CVE-2018-19417,...}, --vulns {ALL,CVE-2018-19417, ...}, -V {ALL,CVE-2018-19417,...}
-                        list of vulnerabilities to be tested
+  --cve {ALL,CVE-2018-19417,...}
+                        list of vulnerabilities to be tested (by CVE id)
+  --vuln {ALL,BOTAN_000,COAPTHON3_000,...} 
+                        list of vulnerabilities to be tested (by SOFT_NUM id)
+
   --list, -L            display lists of all vulnerabilities supported by this
                         tool with detailed description
   --src-port SRC_PORT, -SP SRC_PORT
@@ -318,11 +338,11 @@ optional arguments:
 
 ## Known issues / limitations
 
-There are some known issues or limitations caused by using scapy as network library.
+There are some known issues or limitations caused by using scapy as network library:
 
-* testing services running on the same machine can results in issues occurred by not delivering some packets
+* testing services running on the same machine can results in issues occurred by not delivering some packets,
 * multiple tools running against the same target can result in interference between them 
-(packets may be indicated as a response to another request) 
+(packets may be indicated as a response to another request).
 
 
 See more at:
@@ -337,6 +357,3 @@ To run all unit tests use (from directory upper than cotopaxi dir):
 Most of tests are performed against remote tests servers and requires preparing test environment, providing settings in test_config.ini.
 ```
 
-## Releases
-
-Source code of Cotopaxi will be released before Black Hat Asia 2019 conference. 
