@@ -1,0 +1,5 @@
+_services._dns-sd._udp.local
+_http._tcp.local
+_coap._udp.local
+_nfs._tcp.local
+_ssh._tcp.local
