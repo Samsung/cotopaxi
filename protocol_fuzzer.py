@@ -23,9 +23,9 @@
 import os
 import sys
 import time
+import struct
 from scapy.all import Raw
-from scapy.contrib.coap import CoAP
-from .common_utils import CotopaxiTester, print_verbose, sr1_file
+from .common_utils import CotopaxiTester, print_verbose, sr1_file, proto_mapping
 from .service_ping import service_ping
 from .vulnerability_tester import Vulnerability
 
@@ -53,7 +53,7 @@ class FuzzingCase(Vulnerability):
                   "    (use --ignore-ping-check if you want to continue anyway)!"
                   .format(test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port))
             return False
-        print_verbose(test_params, 60*"-" + "\nRequest:")
+        print_verbose(test_params, 60 * "-" + "\nRequest:")
         payload_sent_time = time.time()
         test_result = sr1_file(test_params, self.payload_file, test_params.verbose)
         print_verbose(test_params, 60 * "-")
@@ -62,15 +62,17 @@ class FuzzingCase(Vulnerability):
             test_timeouts.append((time.time()-payload_sent_time, self.payload_file, test_result))
             print(60 * "-" + "\nResponse:")
             try:
-                CoAP(test_result[Raw].load).show()
-                print(60 * "-")
-            except TypeError:
-                print(60 * "-")
+                proto_handler = proto_mapping(test_params.protocol)
+                packet = proto_handler(test_result[Raw].load)
+                packet.show()
+            except (TypeError, IndexError, struct.error):
+                pass
+            print(60 * "-")
         else:
             print("Received no response from server")
             print(60 * "-")
         alive_after = service_ping(test_params)
-        if not alive_after and alive_before:
+        if not alive_after and alive_before and not test_params.ignore_ping_check:
             print("[+] Server {}:{} is dead after sending payload"
                   .format(test_params.dst_endpoint.ip_addr,
                           test_params.dst_endpoint.port))
@@ -87,7 +89,7 @@ class FuzzingCase(Vulnerability):
                     return False
                 else:
                     print("Server is alive again (after 2 waits)!")
-        if alive_after:
+        if alive_after and not test_params.ignore_ping_check:
             print_verbose(test_params, "[+] Server {}:{} is alive after sending payload {}"
                           .format(test_params.dst_endpoint.ip_addr,
                                   test_params.dst_endpoint.port,
@@ -147,6 +149,10 @@ def main(args):
     for root, _, files in os.walk(corpus_dir_path):
         for file_name in files:
             testcases.append(FuzzingCase(os.path.join(root, file_name)))
+    if not testcases:
+        print("Cannot load testcases from provided path: {}\n"
+              "Testing stopped!".format(corpus_dir_path))
+        exit(-1)
 
     tester.perform_testing("protocol fuzzing", perform_protocol_fuzzing, testcases)
 

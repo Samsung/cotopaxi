@@ -25,7 +25,7 @@ import time
 import argparse
 from scapy.all import sniff, IP, UDP
 from .common_utils import check_caps, amplification_factor, argparser_add_verbose, \
-    argparser_add_dest, argparser_add_number, parse_port, scrap_packet
+    argparser_add_dest, argparser_add_number, parse_port, scrap_packet, check_non_negative_float
 from .mdns_utils import DNS_SD_MULTICAST_IPV4, DNS_SD_MULTICAST_IPV6
 
 UNICAST_ADDRESSES = [
@@ -116,13 +116,6 @@ class ReflectorSniffer(object):
         """Displays results of sniffing."""
         if self.stats.packet_record_desc:
             print(self.stats.packet_record_desc)
-
-def check_non_negative_float(value):
-    """Checks whether provided string value converts to non-negative float value"""
-    ivalue = float(value)
-    if ivalue < 0:
-        raise argparse.ArgumentTypeError("{} is an invalid non-negative value".format(value))
-    return ivalue
 
 
 def amplifier_parse_args(args):

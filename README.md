@@ -8,9 +8,22 @@ Set of tools for security testing of Internet of Things devices using protocols 
 Cotopaxi uses GNU General Public License, version 2:
 https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 
+## Installation:
+
+Simply clone code from git:
+    https://github.com/Samsung/cotopaxi
+
 ## Requirements:
 
 Currently Cotopaxi works only with Python 2.7.x, but future versions will work also with Python 3. 
+
+All required packages can be installed using requirements.txt file:
+```
+    cd cotopaxi
+    pip install -r requirements.txt
+```
+
+Manual installation of dependencies:
 
 1. scapy (latest development version)
 ```
@@ -67,11 +80,6 @@ Make sure you have permission from the owners of tested devices or servers befor
  
 Make sure you check with your local laws before running these tools! 
   
-
-## Installation:
-
-Simply clone code from git:
-    https://github.com/Samsung/cotopaxi
 
 ## Tools in this package:
 
@@ -348,12 +356,4 @@ There are some known issues or limitations caused by using scapy as network libr
 See more at:
 https://scapy.readthedocs.io/en/latest/troubleshooting.html#
 
-## Unit tests
-
-```
-To run all unit tests use (from directory upper than cotopaxi dir):
-    sudo python -m unittest discover
-    
-Most of tests are performed against remote tests servers and requires preparing test environment, providing settings in test_config.ini.
-```
 

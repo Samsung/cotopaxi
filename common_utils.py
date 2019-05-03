@@ -47,7 +47,7 @@ INPUT_BUFFER_SIZE = 10000
 # Number of characters in line of separator
 SEPARATOR_LINE_SIZE = 80
 
-# Time in sec to be deleayed to show disclaimer
+# Time in sec to be delayed to show disclaimer
 SLEEP_TIME_ON_DISCLAIMER = 1
 
 
@@ -193,7 +193,7 @@ def create_basic_argparser():
                              "(e.g. '1000-2000') or both")
     parser.add_argument('--retries', '-R', action='store', type=int, default=0,
                         help='number of retries')
-    parser.add_argument('--timeout', '-T', action='store', type=int, default=1,
+    parser.add_argument('--timeout', '-T', action='store', type=check_non_negative_float, default=1,
                         help='timeout in seconds')
     parser.add_argument("--verbose", "-V", '--debug', '-D', action="store_true",
                         help="Turn on verbose/debug mode (more messages)")
@@ -227,6 +227,14 @@ def check_caps():
                " or add CAP_NET_ADMIN, CAP_NET_RAW manually!\n"
                "On Windows run as Administrator.\n")
         exit(-1)
+
+
+def check_non_negative_float(value):
+    """Checks whether provided string value converts to non-negative float value"""
+    ivalue = float(value)
+    if ivalue < 0:
+        raise argparse.ArgumentTypeError("{} is an invalid non-negative value".format(value))
+    return ivalue
 
 
 class TestStatistics(object):
@@ -330,9 +338,8 @@ class TestParams(object):
             if proto_results:
                 print("    For {}: {}".format(proto, proto_results))
                 active_endpoints.update(set(proto_results))
-        print("Total nr of {}: {}".format(self.positive_result_name.lower(),
-                                          len(active_endpoints)))
-
+        print("Total number of {}: {}".format(self.positive_result_name.lower(),
+                                              len(active_endpoints)))
         if self.potential_result_name:
             for proto in self.test_stats.inactive_endpoints:
                 inactive_endpoints.update(set(self.test_stats.inactive_endpoints[proto]))
@@ -419,6 +426,7 @@ class CotopaxiTester(object):
     def get_test_params(self):
         """Returns parametrs of single test"""
         return self.test_params
+
 
     def parse_args(self, args):
         """Parses all parameters based on provided argparser options"""
@@ -604,6 +612,8 @@ def udp_sr1(test_params, udp_test, dtls_wrap=False):
         del udp_test_packet[UDP].chksum
         # if test_params.verbose:
         #     udp_test_packet.show()
+        if test_params.timeout_sec == 0:
+            test_params.timeout_sec = 0.0001
         response = sr1(udp_test_packet, verbose=test_params.verbose,
                        timeout=test_params.timeout_sec,
                        retry=test_params.nr_retries)
