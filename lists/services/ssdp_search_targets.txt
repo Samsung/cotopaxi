@@ -1,0 +1,5 @@
+ssdp:all
+upnp:rootdevice
+urn:dial-multiscreen-org:service:dial:1
+urn:schemas-upnp-org:device:InternetGatewayDevice:1
+urn:test:test:1
