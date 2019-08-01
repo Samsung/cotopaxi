@@ -19,25 +19,25 @@ Currently Cotopaxi works only with Python 2.7.x, but future versions will work a
 
 If you have previous installation of scapy without scapy-ssl_tls, please remove it or use venv. 
 
-Manual installation of main libraries:
+Installation of main libraries:
 
 1. scapy-ssl_tls (this will install also scapy in 2.4.2)
 ```
     pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
 ```
-If you encounter error: `error: [Errno 2] No such file or directory: 'LICENSE'`, try repeating command - surprisingly it works.
 
-If you encounter error: `NameError: name 'os' is not defined` - add missing `import os` to `scapy/layers/ssl_tls.py`.
+Common problems:
+* If you encounter error: `error: [Errno 2] No such file or directory: 'LICENSE'`, try repeating command - surprisingly it works.
+* If you encounter error: `NameError: name 'os' is not defined` - add missing `import os` to `scapy/layers/ssl_tls.py`.
 
 All other required packages can be installed using requirements.txt file:
 ```
-    cd cotopaxi
-    pip install -r requirements.txt
+    pip install -r cotopaxi/requirements.txt
 ```
 
 Manual installation of other required packages:
 ```
-    pip install dnslib IPy hexdump pyyaml psutil enum34
+    pip install dnslib IPy hexdump pyyaml psutil enum34 configparser
 ```
 
 
@@ -415,6 +415,6 @@ To run all unit tests use (from directory upper than cotopaxi dir):
     sudo python -m unittest discover
 ```
 
-Most of tests are performed against remote tests servers and requires preparing test environment, 
+Most of tests are performed against remote tests servers and require preparing test environment, 
 providing settings in tests/test_config.ini and tests/test_servers.yaml.
 
