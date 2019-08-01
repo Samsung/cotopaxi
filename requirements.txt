@@ -1,7 +1,8 @@
+configparser
 dnslib>=0.9.7
+enum34
 hexdump>=3.3
 IPy>=0.83
 psutil>=3.4.2
 PyYAML>=3.12
-scapy>=2.4.0.dev611
-scapy-ssl-tls>=2.0.0
+scapy-ssl-tls==2.0.0

@@ -1,0 +1,12 @@
+M-SEARCH * HTTP/1.1
+NT: H
+N *1
+NT:TTT1
+NT: *1
+NT:T1.1
+NT:s
+ÿs
+NT: *1
+NT:T1.1
+NT:s
+ÿs

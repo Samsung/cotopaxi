@@ -1,0 +1,25 @@
+M-SEARCH * HTTP/1.1
+LM_ID:%P/1.char1
+SM_ID:%s * HTTP/1.1
+0:/-SEARCH * HTTP/1.1
+OM_ID:%s 1.1H * HTTP/1.1
+SM_ID:%s * HTTH * HTTP/1.1
+OM_ID:%s * HTTP/1.1H * HTTPš1.1
+SM_ID:%s * HTTP/1.1
+0:/1.1
+0:1.1
+0:/
+0://1.1H * HTTPš1.1
+SM_ID:%s * HTTP/1.1
+0:/1.1
+0:1.1
+0:/
+0:/1.1
+0:1.1
+01.1
+0:1.1
+0:/
+0:/1.1
+0:1.1
+0:/1.1
+0:M.

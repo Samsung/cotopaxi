@@ -1,0 +1,28 @@
+M-SEARCH * HTTP/1.1
+USN:ds.1
+USN:%s
+1.1
+USN:%s.1
+TP/1
+USN:%s.r
+USN5%s
+ÿ! * HTTP/EARCH * HTTP/1.1
+USN:%s.1
+USN:%s
+ÿ! * HTT1.1
+USN:1
+USN:ds.1
+USN:%s
+1.1
+USN:%s.1
+TP/1
+USN:%s.r
+USN5%s
+ÿ! * HTTP/EARCS * HTTP/1.1
+USN:%s.1
+USN:%s
+ÿ! * HTT1.1
+USN:%s1.1
+USN:%s
+%s1.1
+USN:%s

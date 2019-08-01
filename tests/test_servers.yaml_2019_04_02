@@ -1,0 +1,163 @@
+coap_aiocoap:
+  cmd: 'python3 ./coap_sandbox/aiocoap-0.3/server.py'
+  finger: false
+  ping: true
+  port: 20000
+  protocol: CoAP
+  version: 0.3
+coap_cantcoap:
+  cmd: './coap_sandbox/cantcoap_server 0.0.0.0 20001'
+  finger: false
+  ping: true
+  port: 20001
+  protocol: CoAP
+coap_coapthon:
+  cmd: 'python ./coap_sandbox/CoAPthon-master/coapserver.py -p 20002'
+  finger: false
+  ping: true
+  port: 20002
+  protocol: CoAP
+coap_coapthon3:
+  cmd: 'python3 ./coap_sandbox/CoAPthon3-master/coapserver.py -p 20003'
+  finger: false
+  ping: true
+  port: 20003
+  protocol: CoAP
+coap_ecoap:
+  cmd: './coap_sandbox/ecoap-master/test-srv'
+  finger: false
+  ping: true
+  port: 20004
+  protocol: CoAP
+coap_freecoap:
+  cmd: './coap_sandbox/FreeCoAP_reg_server 0.0.0.0 20005'
+  finger: false
+  ping: true
+  port: 20005
+  protocol: CoAP
+coap_libcoap:
+  cmd: '/home/ubuntu/coap_sandbox/libcoap/examples/.libs/lt-coap-server'
+  finger: false
+  ping: true
+  port: 20006
+  protocol: CoAP
+coap_wakaama:
+  cmd: './coap_sandbox/wakaama-master/build/lwm2mserver -4 -l 20007'
+  finger: false
+  ping: true
+  port: 20007
+  protocol: CoAP
+coap_microcoap:
+  cmd: './coap_sandbox/microcoap-master/coap'
+  finger: false
+  ping: true
+  port: 20008
+  protocol: CoAP
+coap_mongoose:
+  cmd: 'coap_sandbox/mongoose-master/examples/coap_server/coap_server'
+  finger: false
+  ping: true
+  port: 20009
+  protocol: CoAP
+coap_iotivity:
+  cmd: './coap_sandbox/iotivity_examples/simpleserver'
+  finger: false
+  ping: true
+  port: 5683
+  protocol: CoAP
+dtls_botan:
+  cmd: './dtls_sandbox/botan-2.9.0/botan tls_server dtls_sandbox/server-cert.pem dtls_sandbox/server-key.pem --port=10000 --type=udp'
+  finger: false
+  ping: false
+  port: 10000
+  protocol: DTLS
+  version: 2.9.0
+dtls_gnutls:
+  cmd: './gnutls-3.5.19/doc/examples/ex-serv-dtls'
+  cwd: 'dtls_sandbox'
+  finger: false
+  ping: false
+  port: 10001
+  protocol: DTLS
+dtls_goldy:
+  cmd: './dtls_sandbox/goldy -l 0.0.0.0:10002 -b localhost:10000 -c ./dtls_sandbox/server-cert.pem -k ./dtls_sandbox/server-key.pem'
+  finger: false
+  ping: false
+  port: 10002
+  protocol: DTLS
+  version: 0.2
+dtls_libressl:
+  cmd: '/home/ubuntu/dtls_sandbox/libressl-2.8.3/apps/openssl/.libs/lt-openssl s_server -cert ./dtls_sandbox/server-cert.pem  -key ./dtls_sandbox/server-key.pem -dtls1 -accept 10003'
+  finger: false
+  ping: false
+  port: 10003
+  protocol: DTLS
+  version: 2.8.3
+dtls_matrixssl:
+  cmd: './dtls_sandbox/matrixssl-master/apps/dtls/dtlsServer -p 10004'
+  finger: false
+  ping: false
+  port: 10004
+  protocol: DTLS
+  version: 2.8.3
+dtls_mbedtls:
+  cmd: './dtls_sandbox/mbedtls-2.16.0/build/programs/ssl/dtls_server'
+  finger: false
+  ping: false
+  port: 10005
+  protocol: DTLS
+  version: 2.16.0
+dtls_openssl:
+  cmd: 'openssl s_server -cert ./dtls_sandbox/server-cert.pem -key ./dtls_sandbox/server-key.pem -dtls -accept 10006 -listen'
+  finger: false
+  ping: false
+  port: 10006
+  protocol: DTLS
+  version: 1.1.0j
+dtls_tinydtls:
+  cmd: './dtls_sandbox/tinydtls_0.9_develop/tests/dtls-server'
+  finger: false
+  ping: false
+  port: 10007
+  protocol: DTLS
+  version: 0
+dtls_wolfssl:
+  cmd: '/home/ubuntu/dtls_sandbox/wolfssl-3.15.7/examples/server/.libs/lt-server -i -u -p 10008 -b'
+  cwd: 'dtls_sandbox/wolfssl-3.15.7'
+  finger: false
+  ping: false
+  port: 10008
+  protocol: DTLS
+  version: 3.15.7
+mqtt_mosquitto:
+  cmd: '/usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf'
+  finger: false
+  ping: true
+  port: 30000
+  protocol: MQTT
+  version: 1.4.8
+mqtt_fluent-bit:
+  cmd: 'mqtt_sandbox/fluent-bit-1.0.4/build/bin/fluent-bit -i mqtt -t data -o stdout -m "*" --config=mqtt_sandbox/fluent-bit-1.0.4/conf/in_mqtt.conf'
+  finger: false
+  ping: true
+  port: 30002
+  protocol: MQTT
+  version: 1.0.4
+dtls_libcoap:
+  cmd: '/home/ubuntu/dtls_sandbox/libcoap_dtls/examples/coap-server -A 0.0.0.0 -v 9 -p 50000 -c dtls_sandbox/server-cert.pem'
+  finger: false
+  ping: true
+  port: 50000
+  protocol: DTLS
+mdns_avahi:
+  cmd: 'avahi-publish-service light _coap._udp 5683 "/mylight" --sub _floor1._sub._coap._udp -vv'
+  finger: false
+  ping: true
+  port: 5683
+  protocol: mDNS
+mdns_tinysvcmdns:
+  cmd: 'mdns_sandbox/tinysvcmdns_ASAN/testmdnsd'
+  finger: false
+  ping: true
+  port: 5353
+  protocol: mDNS

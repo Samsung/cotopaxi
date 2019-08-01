@@ -1,0 +1,24 @@
+ns:  kawa:kfe:W
+okawa:otns:  
+-J W
+-J W kawa:kfe:W1*0
+A-e:
+:0
+:ot
+Acc		W:pokawa:ot
+Acons:
+-J W kawa:kfe:W
+-J W kawa:kfe:W1*0
+A-e:
+:0
+:ot
+Accept-Additions: uc d
+-Jkawa:kfe:W
+-kawa:kfe:W1*0
+A-e:
+:0
+:ot
+Accept-Additions: uc d
+:
+:epot
+Ac

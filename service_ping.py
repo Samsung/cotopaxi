@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Tool for checking availability of network service at given IP and port ranges."""
+"""
+Tool for checking availability of network service at given IP and port ranges.
+"""
 #
 #    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz (Samsung R&D Poland),
+#                Michał Radwański (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
 #
@@ -21,31 +24,49 @@
 #
 
 import sys
-from .common_utils import Protocol, protocol_enabled, CotopaxiTester, print_verbose
+
 from .coap_utils import coap_ping
+from .common_utils import CotopaxiTester, Protocol, print_verbose, protocol_enabled
 from .dtls_utils import dtls_ping
+from .htcpcp_utils import htcpcp_ping
 from .mdns_utils import mdns_ping
 from .mqtt_utils import mqtt_ping
+# from .rtsp_utils import rtsp_ping
+from .ssdp_utils import ssdp_ping
 
 
 def endpoint_string(test_params):
     """Returns endpoint description in form of string"""
-    return "{}:{}".format(test_params.dst_endpoint.ip_addr,
-                          test_params.dst_endpoint.port)
+    return "{}:{}".format(
+        test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
+    )
 
 
 def service_ping(test_params, show_result=False):
-    """Checks service availability by sending 'ping' packet and waiting for response."""
+    """
+    Checks service availability by sending 'ping' packet and waiting for
+    response.
+    """
 
-    protocol_handlers = {Protocol.CoAP: coap_ping,
-                         Protocol.DTLS: dtls_ping,
-                         Protocol.mDNS: mdns_ping,
-                         Protocol.MQTT: mqtt_ping}
+    protocol_handlers = {
+        Protocol.CoAP: coap_ping,
+        Protocol.DTLS: dtls_ping,
+        Protocol.mDNS: mdns_ping,
+        Protocol.SSDP: ssdp_ping,
+        Protocol.MQTT: mqtt_ping,
+        # Protocol.RTSP: rtsp_ping,
+        Protocol.HTCPCP: htcpcp_ping,
+    }
 
-    ping_protocol_handlers = {Protocol.CoAP: "CoAP ping (Empty CON)",
-                              Protocol.DTLS: "DTLS ping (Client Hello)",
-                              Protocol.mDNS: "mDNS ping",
-                              Protocol.MQTT: "MQTT ping (Connect)"}
+    ping_protocol_handlers = {
+        Protocol.CoAP: "CoAP ping (Empty CON)",
+        Protocol.DTLS: "DTLS ping (Client Hello)",
+        Protocol.mDNS: "mDNS ping",
+        Protocol.SSDP: "SSDP M-SEARCH",
+        Protocol.MQTT: "MQTT ping (Connect)",
+        # Protocol.RTSP: "RTSP DESCRIBE",
+        Protocol.HTCPCP: "HTCPCP BREW",
+    }
     try:
         ping_result = ""
         for protocol in ping_protocol_handlers:
@@ -56,16 +77,18 @@ def service_ping(test_params, show_result=False):
                     ping_result = "does NOT respond"
                 if show_result:
                     if ping_result == "responds":
-                        test_params.test_stats.active_endpoints[protocol].append(
-                            endpoint_string(test_params))
+                        endpoints = test_params.test_stats.active_endpoints
                     else:
-                        test_params.test_stats.inactive_endpoints[protocol].append(
-                            endpoint_string(test_params))
-                    print("[+] Host {0}:{1} {2} to {3} message"
-                          .format(test_params.dst_endpoint.ip_addr,
-                                  test_params.dst_endpoint.port,
-                                  ping_result,
-                                  ping_protocol_handlers[protocol]))
+                        endpoints = test_params.test_stats.inactive_endpoints
+                    endpoints[protocol].append(endpoint_string(test_params))
+                    print (
+                        "[+] Host {0}:{1} {2} to {3} message".format(
+                            test_params.dst_endpoint.ip_addr,
+                            test_params.dst_endpoint.port,
+                            ping_result,
+                            ping_protocol_handlers[protocol],
+                        )
+                    )
         if ping_result == "responds":
             return True
     except TypeError as type_exception:
@@ -75,7 +98,10 @@ def service_ping(test_params, show_result=False):
 
 
 def perform_service_ping(test_params):
-    """Checks service availability by sending 'ping' packet and waiting for response."""
+    """
+    Checks service availability by sending 'ping' packet and waiting for
+    response.
+    """
     return service_ping(test_params, True)
 
 

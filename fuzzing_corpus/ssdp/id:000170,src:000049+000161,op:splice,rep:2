@@ -1,0 +1,6 @@
+M-SEARCH * HTTP/1.1
+ST:1
+HTTP/1.1
+ST:1
+ST:HTTP/1.%s
+ÿÿ

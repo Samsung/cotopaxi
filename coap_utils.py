@@ -2,7 +2,8 @@
 """Set of common utils for CoAP protocol handling."""
 #
 #    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz (Samsung R&D Poland),
+#                Michał Radwański (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
 #
@@ -20,11 +21,13 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
 import random
+import sys
+
 from hexdump import dehex
 from scapy.all import IP, UDP
-from scapy.contrib.coap import CoAP # , coap_codes
+from scapy.contrib.coap import CoAP  # , coap_codes
+
 from .common_utils import amplification_factor, print_verbose, show_verbose, udp_sr1
 
 try:
@@ -32,15 +35,10 @@ try:
 except ImportError:
     from io import StringIO
 
-COAP_PING_1_RAW = '40000001'
-COAP_PING_2_RAW = '420184a77675b56261736963'
+COAP_PING_1_RAW = "40000001"
+COAP_PING_2_RAW = "420184a77675b56261736963"
 
-COAP_REV_CODES = {
-    "GET": 1,
-    "POST": 2,
-    "PUT": 3,
-    "DELETE": 4,
-}
+COAP_REV_CODES = {"GET": 1, "POST": 2, "PUT": 3, "DELETE": 4}
 
 
 def coap_scrap_response(resp_packet):
@@ -51,13 +49,11 @@ def coap_scrap_response(resp_packet):
         del resp_packet[IP].id
     if resp_packet.haslayer(UDP):
         del resp_packet[UDP].chksum
-        capture = StringIO()
-        save_stdout = sys.stdout
-        sys.stdout = capture
+        save_stdout, sys.stdout = sys.stdout, StringIO()
         coap = CoAP(resp_packet[UDP].load)
         coap.show()
-        sys.stdout = save_stdout
-        parsed_response = capture.getvalue()
+        sys.stdout, save_stdout = save_stdout, sys.stdout
+        parsed_response = save_stdout.getvalue()
     return parsed_response
 
 
@@ -71,8 +67,10 @@ def coap_ping(test_params):
             for response_packet in response:
                 coap_response = coap_scrap_response(response_packet)
                 print_verbose(test_params, coap_response)
-                if "ver       = 1" in coap_response and \
-                        coap_convert_type(coap_response) != "Empty":
+                if (
+                    "ver       = 1" in coap_response
+                    and coap_convert_type(coap_response) != "Empty"
+                ):
                     return True
     return False
 
@@ -87,9 +85,9 @@ def coap_check_url(test_params, method, url):
     if method in COAP_REV_CODES:
         packet[CoAP].code = COAP_REV_CODES[method]
     else:
-        packet[CoAP].code = 1 # GET
+        packet[CoAP].code = 1  # GET
     packet[CoAP].msg_id = random.randint(0, 32768)
-    packet[CoAP].options = [('Uri-Path', url)]
+    packet[CoAP].options = [("Uri-Path", url)]
 
     print_verbose(test_params, "\n" + 30 * "-" + "Request:\n")
     show_verbose(test_params, packet)
@@ -105,8 +103,13 @@ def coap_check_url(test_params, method, url):
         print_verbose(test_params, parsed_response)
 
         if code != "Empty":
-            print("SENT size:{} RECV size:{} AMPLIFICATION FACTOR:{:0.2f}%" \
-                .format(len(packet), len(answer), amplification_factor(len(packet), len(answer))))
+            print (
+                "SENT size:{} RECV size:{} AMPLIFICATION FACTOR:{:0.2f}%".format(
+                    len(packet),
+                    len(answer),
+                    amplification_factor(len(packet), len(answer)),
+                )
+            )
             return code
     else:
         print_verbose(test_params, "\n" + 30 * "-" + "\n No response\n")
@@ -119,7 +122,7 @@ def coap_convert_type(response):
     """Converts CoAP server response to attribute type used by classifier"""
     types = {"ACK", "RST", "CON", "NON"}
     for type_in in types:
-        if "type      = "+type_in in response:
+        if "type      = " + type_in in response:
             return type_in
     return "Empty"
 
@@ -161,13 +164,16 @@ def coap_convert_options(response):
 
 class CoAPResults(object):
     """Wrapper for all CoAP results"""
+
     def __init__(self):
         self.type = "No"
         self.code = "No"
         self.options = "No"
 
     def __str__(self):
-        return "type = {} code = {} options = {}".format(self.type, self.code, self.options)
+        return "type = {} code = {} options = {}".format(
+            self.type, self.code, self.options
+        )
 
     def fill(self, type_name, code, options):
         """Test method"""

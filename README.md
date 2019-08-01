@@ -1,7 +1,7 @@
 
 # Cotopaxi
 
-Set of tools for security testing of Internet of Things devices using protocols like: CoAP, DTLS, mDNS, MQTT.
+Set of tools for security testing of Internet of Things devices using protocols like: CoAP, DTLS, HTCPCP, mDNS, MQTT, SSDP.
 
 ## License:
 
@@ -17,57 +17,29 @@ Simply clone code from git:
 
 Currently Cotopaxi works only with Python 2.7.x, but future versions will work also with Python 3. 
 
-All required packages can be installed using requirements.txt file:
+If you have previous installation of scapy without scapy-ssl_tls, please remove it or use venv. 
+
+Manual installation of main libraries:
+
+1. scapy-ssl_tls (this will install also scapy in 2.4.2)
+```
+    pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
+```
+If you encounter error: `error: [Errno 2] No such file or directory: 'LICENSE'`, try repeating command - surprisingly it works.
+
+If you encounter error: `NameError: name 'os' is not defined` - add missing `import os` to `scapy/layers/ssl_tls.py`.
+
+All other required packages can be installed using requirements.txt file:
 ```
     cd cotopaxi
     pip install -r requirements.txt
 ```
 
-Manual installation of dependencies:
-
-1. scapy (latest development version)
+Manual installation of other required packages:
 ```
-    git clone https://github.com/secdev/scapy
-    cd scapy
-    sudo python setup.py install
+    pip install dnslib IPy hexdump pyyaml psutil enum34
 ```
 
-(if you encounter error: "ImportError: No module named coap" - it means that older version of Scapy is used - check your installation, paths and in case the problem continues - remove the older version)
-
-2. scapy-ssl_tls (latest development version)
-```
-    git clone https://github.com/tintinweb/scapy-ssl_tls.git
-    cd scapy-ssl_tls
-    sudo python setup.py install
-```
-(if you encounter error: "ImportError: No module named ssl_tls" - it means that older version of scapy-ssl_tls is used)
-
-(if you encounter error: NameError: name 'os' is not defined - add missing 'import os' to scapy/layers/ssl_tls.py)
-
-3. IPy
-```
-    sudo pip install IPy
-```
-
-4. hexdump
-```
-    sudo pip install hexdump
-```
-
-5. dnslib
-```
-    sudo pip install dnslib
-```
-
-6. pyyaml (only for preparing test environment)
-```
-    sudo pip install pyyaml
-```
-
-7. psutil (only for preparing test environment)
-```
-    sudo pip install psutil
-```
 
 ## Disclaimer
 
@@ -82,6 +54,30 @@ Make sure you check with your local laws before running these tools!
   
 
 ## Tools in this package:
+
+* service_ping
+* server_fingerprinter
+* resource_listing
+* server_fingerprinter
+* protocol_fuzzer (for fuzzing servers)
+* client_proto_fuzzer (for fuzzing clients)
+* vulnerability_tester (for testing servers)
+* client_vuln_tester (for testing clients)
+* amplifier_detector
+
+Protocols supported by different tools: 
+
+Tool                 | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | SSDP    
+---------------------|-------|-------|--------|-------|-------|----
+service_ping         |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;    
+server_fingerprinter |&#9745;|&#9745;|        |       |       |
+resource_listing     |&#9745;|       |        |&#9745;|       |&#9745;
+protocol_fuzzer      |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
+client_proto_fuzzer  |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
+vulnerability_tester |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
+client_vuln_tester   |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
+amplifier_detector   |&#9745;|&#9745;|        |&#9745;|       |&#9745;
+
 
 **cotopaxi.service_ping**
 
@@ -107,10 +103,10 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {UDP,TCP,CoAP,MQTT,DTLS,ALL}, -P {UDP,TCP,CoAP,MQTT,DTLS,ALL}
-                        protocol to be tested (UDP includes CoAP and DTLS, TCP
-                        includes CoAP and MQTT, ALL includes all supported
-                        protocols)
+  --protocol {UDP,TCP,CoAP,mDNS,SSDP,MQTT,DTLS,ALL,HTCPCP}, -P {UDP,TCP,CoAP,mDNS,SSDP,MQTT,DTLS,ALL,HTCPCP}
+                        protocol to be tested (UDP includes CoAP, DTLS, mDNS,
+                        and SSDP, TCP includes CoAP, HTCPCP, and MQTT, ALL
+                        includes all supported protocols)
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
@@ -138,13 +134,10 @@ Currently supported servers:
     *  mbed TLS,
     *  OpenSSL,
     *  TinyDTLS
-* MQTT:
-    * (work in progress)
-
 ```
 usage: sudo python -m cotopaxi.server_fingerprinter [-h] [--retries RETRIES] [--timeout TIMEOUT]
                                [--verbose]
-                               [--protocol {UDP,TCP,CoAP,MQTT,DTLS,ALL}]
+                               [--protocol {CoAP,DTLS}]
                                [--src-port SRC_PORT]
                                dest_ip dest_port
 
@@ -164,10 +157,8 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {UDP,TCP,CoAP,MQTT,DTLS,ALL}, -P {UDP,TCP,CoAP,MQTT,DTLS,ALL}
-                        protocol to be tested (UDP includes CoAP and DTLS, TCP
-                        includes CoAP and MQTT, ALL includes all supported
-                        protocols)
+  --protocol {CoAP,DTLS}, -P {CoAP,DTLS}
+                        protocol to be tested
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
@@ -206,9 +197,8 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,ALL}, -P {CoAP,ALL}
-                        protocol to be tested (ALL includes all supported
-                        protocols: CoAP)
+  --protocol {CoAP,mDNS,SSDP}, -P {CoAP,mDNS,SSDP}
+                        protocol to be tested
   --method {GET,POST,PUT,DELETE,ALL}, -M {GET,POST,PUT,DELETE,ALL}
                         methods to be tested (ALL includes all supported
                         methods)
@@ -248,7 +238,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,mDNS,MQTT,DTLS}, -P {CoAP,mDNS,MQTT,DTLS}
+  --protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}, -P {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}
                         protocol to be tested
   --hide-disclaimer, -HD
                         hides legal disclaimer (shown before starting
@@ -265,6 +255,34 @@ optional arguments:
                         path to directory with fuzzing payloads (corpus) (each
                         payload in separated file)
   --delay-after-crash DELAY_AFTER_CRASH, -DAC DELAY_AFTER_CRASH
+                        number of seconds that fuzzer will wait after crash
+                        for respawning tested server
+
+```
+
+-------------------------------------------------------------------------------
+
+**cotopaxi.client_proto_fuzzer**
+
+Black-box fuzzer for testing protocol clients
+
+```
+usage: sudo client_proto_fuzzer.py [-h] [--server-ip SERVER_IP]
+                              [--server-port SERVER_PORT]
+                              [--protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}]
+                              [--verbose] [--corpus-dir CORPUS_DIR]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --server-ip SERVER_IP, -SI SERVER_IP
+                        IP address, that will be used to set up tester server
+  --server-port SERVER_PORT, -SP SERVER_PORT
+                        port that will be used to set up server
+  --protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}, -P {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}
+                        protocol to be tested
+  --verbose, -V, --debug, -D
+                        Turn on verbose/debug mode (more messages)
+  --corpus-dir CORPUS_DIR, -C CORPUS_DIR
                         path to directory with fuzzing payloads (corpus) (each
                         payload in separated file)
 
@@ -319,6 +337,40 @@ optional arguments:
 ```
 -------------------------------------------------------------------------------
 
+**cotopaxi.client_vuln_tester**
+
+Tool for checking vulnerability of network clients connecting to server provided by this tool
+
+```
+usage: sudo client_vuln_tester.py [-h] [--server-ip SERVER_IP]
+                             [--server-port SERVER_PORT]
+                             [--protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}]
+                             [--verbose]
+                             [--vuln {ALL,BOTAN_000,COAPTHON3_000,...} [{ALL,BOTAN_000,COAPTHON3_000,...} ...]]
+                             [--cve {ALL,CVE-2017-12087,...} [{ALL,CVE-2017-12087,...} ...]]
+                             [--list]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --server-ip SERVER_IP, -SI SERVER_IP
+                        IP address, that will be used to set up tester server
+  --server-port SERVER_PORT, -SP SERVER_PORT
+                        port that will be used to set up server
+  --protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}, -P {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}
+                        protocol to be tested
+  --verbose, -V, --debug, -D
+                        Turn on verbose/debug mode (more messages)
+  --vuln {ALL,BOTAN_000,COAPTHON3_000,...} [{ALL,BOTAN_000,COAPTHON3_000,...} ...]
+                        list of vulnerabilities to be tested (by SOFT_NUM id)
+  --cve {ALL,CVE-2017-12087,CVE-2017-12130,...} [{ALL,CVE-2017-12087,CVE-2017-12130,...} ...]
+                        list of vulnerabilities to be tested (by CVE id)
+  --list, -L            display lists of all vulnerabilities supported by this
+                        tool with detailed description
+
+```
+
+-------------------------------------------------------------------------------
+
 **cotopaxi.amplifier_detector**
 
 Tool for detection of network devices amplifying reflected traffic
@@ -356,4 +408,13 @@ There are some known issues or limitations caused by using scapy as network libr
 See more at:
 https://scapy.readthedocs.io/en/latest/troubleshooting.html#
 
+## Unit tests
+
+To run all unit tests use (from directory upper than cotopaxi dir):
+```
+    sudo python -m unittest discover
+```
+
+Most of tests are performed against remote tests servers and requires preparing test environment, 
+providing settings in tests/test_config.ini and tests/test_servers.yaml.
 

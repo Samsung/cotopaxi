@@ -2,7 +2,8 @@
 """Tool for detection of network traffic reflectors."""
 #
 #    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz (Samsung R&D Poland),
+#                Michał Radwański (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
 #
@@ -20,17 +21,25 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import argparse
 import sys
 import time
-import argparse
-from scapy.all import sniff, IP, UDP
-from .common_utils import check_caps, amplification_factor, argparser_add_verbose, \
-    argparser_add_dest, argparser_add_number, parse_port, scrap_packet, check_non_negative_float
+
+from scapy.all import IP, UDP, sniff
+
+from .common_utils import (
+    amplification_factor,
+    argparser_add_dest,
+    argparser_add_number,
+    argparser_add_verbose,
+    check_caps,
+    check_non_negative_float,
+    parse_port,
+    scrap_packet,
+)
 from .mdns_utils import DNS_SD_MULTICAST_IPV4, DNS_SD_MULTICAST_IPV6
 
-UNICAST_ADDRESSES = [
-    DNS_SD_MULTICAST_IPV4, DNS_SD_MULTICAST_IPV6
-    ]
+UNICAST_ADDRESSES = [DNS_SD_MULTICAST_IPV4, DNS_SD_MULTICAST_IPV6]
 
 
 class ReflectorSniffer(object):
@@ -56,6 +65,20 @@ class ReflectorSniffer(object):
                 self.packets_out_nr += 1
                 self.packets_out_size += len(packet)
 
+        def update_record_amplify(self, from_target, to_target, ampl_factor):
+            """Updates packet with highest amplify factor."""
+            self.packet_record_amplify = ampl_factor
+            desc = [
+                "Highest amplify packet factor: {}".format(ampl_factor),
+                "TO TARGET",
+                scrap_packet(to_target),
+                "FROM TARGET",
+                scrap_packet(from_target),
+                80 * "-",
+            ]
+            self.packet_record_desc = "\n".join(desc)
+            return self.packet_record_desc
+
     def __init__(self, options):
         self.input_options = options
         self.stats = self.Statistics()
@@ -73,49 +96,60 @@ class ReflectorSniffer(object):
             observed_port = None
 
         if IP in packet and UDP in packet:
-            if packet[IP].src == observed_ip_addr and packet[IP].dst not in UNICAST_ADDRESSES:
+            if (
+                packet[IP].src == observed_ip_addr
+                and packet[IP].dst not in UNICAST_ADDRESSES
+            ):
                 self.stats.count_packet(packet, False)
-                if (self.last_packet_in and self.last_packet_in[IP].src == packet[IP].dst and
-                        self.last_packet_in[UDP].sport == packet[UDP].dport):
-                    ampl_factor = amplification_factor(len(self.last_packet_in), len(packet))
+                if (
+                    self.last_packet_in
+                    and self.last_packet_in[IP].src == packet[IP].dst
+                    and self.last_packet_in[UDP].sport == packet[UDP].dport
+                ):
+                    ampl_factor = amplification_factor(
+                        len(self.last_packet_in), len(packet)
+                    )
                     if self.input_options.verbose:
-                        print("Amplification factor of current packet: {:0.2f}%"
-                              .format(ampl_factor))
+                        print (
+                            "Amplification factor of current packet: "
+                            "{:0.2f}%".format(ampl_factor)
+                        )
                     if ampl_factor > self.stats.packet_record_amplify:
-                        self.stats.packet_record_amplify = ampl_factor
-                        record_desc = "Highest amplify packet factor: {}%\n"\
-                            .format(self.stats.packet_record_amplify)
-                        record_desc += "\nTO TARGET:\n"
-                        record_desc += scrap_packet(self.last_packet_in)
-                        record_desc += "\n" + 80 * "-"
-                        record_desc += "\nFROM TARGET:\n"
-                        record_desc += scrap_packet(packet)
-                        record_desc += "\n" + 80 * "-"
-                        self.stats.packet_record_desc = record_desc
-                        print(record_desc)
-            else:
-                if packet[IP].dst == observed_ip_addr:
-                    self.stats.count_packet(packet, True)
-                    self.last_packet_in = packet
+                        print (
+                            self.stats.update_record_amplify(
+                                packet, self.last_packet_in, ampl_factor
+                            )
+                        )
+
+            elif packet[IP].dst == observed_ip_addr:
+                self.stats.count_packet(packet, True)
+                self.last_packet_in = packet
         if time.time() - self.time_displayed > self.input_options.interval:
             self.time_displayed = time.time()
             if observed_port:
                 target = "{}:{}".format(observed_ip_addr, observed_port)
             else:
                 target = observed_ip_addr
-            return (('TARGET: {} | TO TARGET packets: {}, bytes: {} | FROM TARGET '
-                     'packets: {}, bytes: {} | AMPLIF FACTOR: {:0.2f}%')
-                    .format(
-                        target, self.stats.packets_in_nr, self.stats.packets_in_size,
-                        self.stats.packets_out_nr, self.stats.packets_out_size,
-                        amplification_factor(self.stats.packets_in_size,
-                                             self.stats.packets_out_size)))
+            return (
+                "TARGET: {} | TO TARGET packets: {}, bytes: {} | FROM TARGET "
+                "packets: {}, bytes: {} | AMPLIF FACTOR: {:0.2f}%"
+            ).format(
+                target,
+                self.stats.packets_in_nr,
+                self.stats.packets_in_size,
+                self.stats.packets_out_nr,
+                self.stats.packets_out_size,
+                amplification_factor(
+                    self.stats.packets_in_size, self.stats.packets_out_size
+                ),
+            )
         return None
 
-    def print_results(self):
+    def __str__(self):
         """Displays results of sniffing."""
         if self.stats.packet_record_desc:
-            print(self.stats.packet_record_desc)
+            return self.stats.packet_record_desc
+        return ""
 
 
 def amplifier_parse_args(args):
@@ -124,9 +158,15 @@ def amplifier_parse_args(args):
     parser = argparser_add_verbose(parser)
     parser = argparser_add_dest(parser)
     parser = argparser_add_number(parser)
-    parser.add_argument("--interval", "-I", action="store", default=1,
-                        type=check_non_negative_float, help="minimal interval in sec "
-                        "between displayed status messages (default: 1 sec)")
+    parser.add_argument(
+        "--interval",
+        "-I",
+        action="store",
+        default=1,
+        type=check_non_negative_float,
+        help="minimal interval in sec "
+        "between displayed status messages (default: 1 sec)",
+    )
     return parser.parse_args(args)
 
 
@@ -146,17 +186,17 @@ def main(args):
     if dest_port is not None and dest_port > 0:
         filter_string += " and port " + str(dest_port)
 
-    print("[.] Starting sniffing with filter: {}".format(filter_string))
+    print ("[.] Starting sniffing with filter: {}".format(filter_string))
 
     try:
         if options.nr > 0:
-            print("Press CTRL-C to finish")
+            print ("Press CTRL-C to finish")
             sniff(filter=filter_string, prn=sniffer.filter_action, count=options.nr)
-        print("[.] Finished sniffing")
+        print ("[.] Finished sniffing")
     except KeyboardInterrupt:
-        print("\nExiting...")
+        print ("\nExiting...")
     finally:
-        sniffer.print_results()
+        print (sniffer)
 
 
 if __name__ == "__main__":

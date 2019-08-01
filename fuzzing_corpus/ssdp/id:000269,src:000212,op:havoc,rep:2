@@ -1,0 +1,17 @@
+M-SEARCH * HTTP/1.1
+ST:1
+ST:%s1.1
+ST:/1RCH * HTTP/1.1
+ST:1
+ST:%s1.1
+ST:/1.1
+ST:1
+ST:%
+ST:1
+ST:H
+ST:LT%s.1
+ST:1
+ST:%
+ST:1
+ST:H
+ST:LT%s

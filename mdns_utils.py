@@ -2,7 +2,8 @@
 """Set of common utils for mDNS protocol handling."""
 #
 #    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz (Samsung R&D Poland),
+#                Michał Radwański (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
 #
@@ -24,8 +25,10 @@ import copy
 import socket
 import threading
 import time
-from scapy.all import Raw, UDP, DNS, DNSQR, sniff
+
 from dnslib import DNSRecord
+from scapy.all import DNS, DNSQR, UDP, Raw, sniff
+
 from .common_utils import print_verbose, udp_sr1
 
 DNS_SD_QUERY = "_services._dns-sd._udp.local"
@@ -36,9 +39,7 @@ DNS_SD_MULTICAST_PORT = 5353
 
 def convert_dns_ans(dns_ans, ancount):
     """Converts list of DNS answers to list of rrnames."""
-    ans_tab = []
-    for index in range(0, ancount):
-        ans_tab.append(dns_ans[index].rrname.strip('.'))
+    ans_tab = [dns_ans[index].rrname.strip(".") for index in range(ancount)]
     return ans_tab
 
 
@@ -55,42 +56,64 @@ class MulticastDNSSniffer(object):
     def filter_string(self):
         """Creates filter string for scapy sniff() function."""
         if self.test_params.ip_version == 4:
-            return "udp and (dst host " + DNS_SD_MULTICAST_IPV4 + " or dst host " \
-                   + str(self.test_params.src_endpoint.ip_addr) + ") and (src host " \
-                   + str(self.test_params.dst_endpoint.ip_addr) \
-                   + ") and (dst port 5353 or src port 5353)"
+            return (
+                "udp and (dst host "
+                + DNS_SD_MULTICAST_IPV4
+                + " or dst host "
+                + str(self.test_params.src_endpoint.ip_addr)
+                + ") and (src host "
+                + str(self.test_params.dst_endpoint.ip_addr)
+                + ") and (dst port 5353 or src port 5353)"
+            )
         elif self.test_params.ip_version == 6:
-            return "udp and (dst host " + DNS_SD_MULTICAST_IPV6 + " or dst host " \
-                   + str(self.test_params.src_endpoint.ipv6_addr) + ") and (src host " \
-                   + str(self.test_params.dst_endpoint.ip_addr) \
-                   + ") and (dst port 5353 or src port 5353)"
+            return (
+                "udp and (dst host "
+                + DNS_SD_MULTICAST_IPV6
+                + " or dst host "
+                + str(self.test_params.src_endpoint.ipv6_addr)
+                + ") and (src host "
+                + str(self.test_params.dst_endpoint.ip_addr)
+                + ") and (dst port 5353 or src port 5353)"
+            )
         return None
 
     def filter_action(self, packet):
         """Counts size of sniffed packet"""
         if UDP in packet:
             try:
-                print("[-] Received UDP packet")
+                print ("[-] Received UDP packet")
                 packet.show()
                 # show_verbose(self.test_params, packet[IP])
                 dns_resp_rrname = ""
                 if DNS in packet:
                     dns_response = packet[DNS]
-                    print("[-] DNS packet parsed by scapy")
-                    print("dns_response[DNS].ancount = {}".format(dns_response[DNS].ancount))
+                    print ("[-] DNS packet parsed by scapy")
+                    print (
+                        "dns_response[DNS].ancount = {}".format(
+                            dns_response[DNS].ancount
+                        )
+                    )
                     if dns_response[DNS].ancount > 0:
-                        print("dns_response[DNS].an = {}".format(dns_response[DNS].an))
-                        print("dns_response[DNS].an[0].rrname = {}"
-                              .format(dns_response[DNS].an[0].rrname))
-                        dns_resp_rrname = convert_dns_ans(dns_response[DNS].an,
-                                                          dns_response[DNS].ancount)
-                        print dns_resp_rrname
+                        print ("dns_response[DNS].an = {}".format(dns_response[DNS].an))
+                        print (
+                            "dns_response[DNS].an[0].rrname = {}".format(
+                                dns_response[DNS].an[0].rrname
+                            )
+                        )
+                        dns_resp_rrname = convert_dns_ans(
+                            dns_response[DNS].an, dns_response[DNS].ancount
+                        )
+                        print (dns_resp_rrname)
                 if Raw in packet:
                     dns_response = DNSRecord.parse(packet[Raw].load)
-                    print("[-] DNS Packet parsed by dnslib")
+                    print ("[-] DNS Packet parsed by dnslib")
                     if self.test_params.verbose:
-                        print("Received DNS message: {}".format(dns_response))
-                        print("DNS message contains answer: {}".format(dns_response.get_a()))
+                        print ("Received DNS message: {}".format(dns_response))
+                        print (
+                            "DNS message contains answer: {}".format(
+                                dns_response.get_a()
+                            )
+                        )
                         dns_resp_rrname = str(dns_response.get_a())
                         self.server_response = dns_response.rr
                 if self.query in dns_resp_rrname or self.query == dns_resp_rrname:
@@ -104,7 +127,7 @@ class MulticastDNSSniffer(object):
 
 def mdns_send_query(test_params, query, send_multicast=True):
     """Sends mDNS query to normal and multicast address."""
-    dns_sd_query = str(DNS(rd=1, qd=DNSQR(qname=query, qtype='PTR')))
+    dns_sd_query = str(DNS(rd=1, qd=DNSQR(qname=query, qtype="PTR")))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     time.sleep(1)
     udp_sr1(test_params, dns_sd_query)
@@ -112,19 +135,23 @@ def mdns_send_query(test_params, query, send_multicast=True):
         multicast_test_params = copy.deepcopy(test_params)
         if test_params.ip_version == 4:
             multicast_test_params.dst_endpoint.ip_addr = DNS_SD_MULTICAST_IPV4
-            sock.sendto(str(dns_sd_query), (DNS_SD_MULTICAST_IPV4,
-                                            multicast_test_params.dst_endpoint.port))
+            sock.sendto(
+                str(dns_sd_query),
+                (DNS_SD_MULTICAST_IPV4, multicast_test_params.dst_endpoint.port),
+            )
         elif test_params.ip_version == 6:
             multicast_test_params.dst_endpoint.ip_addr = DNS_SD_MULTICAST_IPV6
-            sock.sendto(str(dns_sd_query), (DNS_SD_MULTICAST_IPV6,
-                                            multicast_test_params.dst_endpoint.port))
+            sock.sendto(
+                str(dns_sd_query),
+                (DNS_SD_MULTICAST_IPV6, multicast_test_params.dst_endpoint.port),
+            )
         else:
             return
 
 
 def mdns_send_query_old(test_params, query, send_multicast=True):
     """Sends mDNS query to normal and multicast address."""
-    dns_sd_query = DNS(rd=1, qd=DNSQR(qname=query, qtype='PTR'))
+    dns_sd_query = DNS(rd=1, qd=DNSQR(qname=query, qtype="PTR"))
 
     if test_params.ip_version == 4:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -136,27 +163,37 @@ def mdns_send_query_old(test_params, query, send_multicast=True):
         time.sleep(1)
         if send_multicast:
             sock.sendto(str(dns_sd_query), (DNS_SD_MULTICAST_IPV6, 5353))
-    sock.sendto(str(dns_sd_query),
-                (test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port))
+    sock.sendto(
+        str(dns_sd_query),
+        (test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port),
+    )
 
 
 def mdns_query(test_params, query):
     """Performs mDNS query and returns response."""
     mdns_sniffer = MulticastDNSSniffer(test_params, query)
-    thread = threading.Thread(target=mdns_send_query, args=(test_params, query, ))
+    thread = threading.Thread(target=mdns_send_query, args=(test_params, query))
     thread.start()
-    sniff(filter=mdns_sniffer.filter_string(),
-          prn=mdns_sniffer.filter_action, count=10000, timeout=test_params.timeout_sec+2)
+    sniff(
+        filter=mdns_sniffer.filter_string(),
+        prn=mdns_sniffer.filter_action,
+        count=10000,
+        timeout=test_params.timeout_sec + 2,
+    )
     if mdns_sniffer.server_alive:
-        print("[+] Server {}:{} responded for query: {} with following records:"
-              .format(test_params.dst_endpoint.ip_addr,
-                      test_params.dst_endpoint.port, query))
+        print (
+            "[+] Server {}:{} responded for query: {} with following records:".format(
+                test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, query
+            )
+        )
         for response in mdns_sniffer.server_response:
-            print("\t{}".format(response))
+            print ("\t{}".format(response))
     else:
-        print("[-] Server {}:{} is not responding for query: {}"
-              .format(test_params.dst_endpoint.ip_addr,
-                      test_params.dst_endpoint.port, query))
+        print (
+            "[-] Server {}:{} is not responding for query: {}".format(
+                test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, query
+            )
+        )
     return mdns_sniffer.server_response
 
 
@@ -164,10 +201,16 @@ def mdns_ping(test_params):
     """Checks mDNS service availability by sending ping packet and waiting for response."""
     query = DNS_SD_QUERY
     mdns_sniffer = MulticastDNSSniffer(test_params, query)
-    thread = threading.Thread(target=mdns_send_query, args=(test_params, query, ))
+    thread = threading.Thread(target=mdns_send_query, args=(test_params, query))
     thread.start()
     print_verbose(test_params, "filter: {}".format(mdns_sniffer.filter_string()))
-    sniff(filter=mdns_sniffer.filter_string(),
-          prn=mdns_sniffer.filter_action, count=10000, timeout=test_params.timeout_sec+2)
-    print_verbose(test_params, "received mDNS response: {}".format(mdns_sniffer.server_alive))
+    sniff(
+        filter=mdns_sniffer.filter_string(),
+        prn=mdns_sniffer.filter_action,
+        count=10000,
+        timeout=test_params.timeout_sec + 2,
+    )
+    print_verbose(
+        test_params, "received mDNS response: {}".format(mdns_sniffer.server_alive)
+    )
     return mdns_sniffer.server_alive

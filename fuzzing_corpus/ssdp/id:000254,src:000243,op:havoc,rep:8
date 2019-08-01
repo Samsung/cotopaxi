@@ -1,0 +1,37 @@
+M-SEARCH * HTTP/1.1
+STV"EV_TYPE:%s
+ÿTYPE:%s
+ÿDP/1.1
+STV_TAPE:%s.1-SEARCH * HTTP/1.1
+STV_TYPE:%s.1
+"EV_TYPE:%s
+ÿTYPE:%s
+ÿDP/1.1
+STV_TAPE:%s.1-SEARCH * HTTP/1.1
+STV_TYPE:%s.1
+"EV_TYPE:%s
+ÿTYPE:%s
+ÿDP/1.1
+STV_TAPE:%s.1
+"EV_TYPE:%s
+ÿD"V_TYPE:%P/1.1
+STV_TYPE:%s.1
+"EV_TYPE:%s
+ÿDEV_TYPE:%:%s
+"EV_TYPE:%s
+ÿDEV_TYPE:%P/1.1
+Ss.1
+"EV_TYoE:%s
+ÿTYPE:%s
+ÿDP/1.1
+STV_TAPE:%s.1
+"EV_TYPE:%s
+ÿDEV_TYPE:%P/1.1
+STV_TYPE:%s.1
+"EV_TYPE:%
+ÿDEV_TYPE:%:%s
+"EV_TYPE:%s
+ÿDEV_TYPE:%P/1.1
+STV_TYPE:%s.1
+"EVeTYPE:%s
+ÿDEV_TYPE:%:%s

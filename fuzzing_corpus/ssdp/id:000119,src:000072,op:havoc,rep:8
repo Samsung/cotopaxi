@@ -1,0 +1,7 @@
+M-SEARCH * HTTP/1.1
+sdi1
+ * ÿTP/1.1
+O0:M1.1
+ * ÿTP/1.
+O0:M.1.1
+sR]coverERRM-
