@@ -178,9 +178,9 @@ def protocol_enabled(protocol, proto_mask):
     ]:
         return True
     if proto_mask == Protocol.UDP and protocol in [
-        Protocol.MQTT,
-        Protocol.HTCPCP,
-        Protocol.RTSP,
+        Protocol.CoAP,
+        Protocol.DTLS,
+        Protocol.mDNS,
         Protocol.SSDP,
     ]:
         return True
