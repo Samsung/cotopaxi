@@ -64,24 +64,26 @@ Make sure you check with your local laws before running these tools!
 * vulnerability_tester (for testing servers)
 * client_vuln_tester (for testing clients)
 * amplifier_detector
+* active_scanner
 
 Protocols supported by different tools: 
 
-Tool                 | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | SSDP    
----------------------|-------|-------|--------|-------|-------|----
-service_ping         |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;    
-server_fingerprinter |&#9745;|&#9745;|        |       |       |
-resource_listing     |&#9745;|       |        |&#9745;|       |&#9745;
-protocol_fuzzer      |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
-client_proto_fuzzer  |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
-vulnerability_tester |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
-client_vuln_tester   |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;
-amplifier_detector   |&#9745;|&#9745;|        |&#9745;|       |&#9745;
+Tool                 | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | RTSP  | SSDP    
+---------------------|-------|-------|--------|-------|-------|-------|-----
+service_ping         |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;    
+server_fingerprinter |&#9745;|&#9745;|        |       |       |       |
+resource_listing     |&#9745;|  N/A  |        |&#9745;|       |       |&#9745;
+protocol_fuzzer      |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;
+client_proto_fuzzer  |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;
+vulnerability_tester |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;
+client_vuln_tester   |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;
+amplifier_detector   |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |  N/A  |&#9745;
+active_scanner       |       |&#9745;|        |       |       |       |
 
 
 **cotopaxi.service_ping**
 
-Tool for checking availability of network service at given IP and port ranges
+Tool for checking availability of network endpoints at given IP and port ranges
 ```
 usage: sudo python -m cotopaxi.service_ping [-h] [-v] [--protocol {UDP,TCP,CoAP,MQTT,DTLS,ALL}]
                        [--src-port SRC_PORT]
@@ -115,7 +117,7 @@ optional arguments:
 
 **cotopaxi.server_fingerprinter**
 
-Tool for software fingerprinting of network servers at given IP and port ranges
+Tool for software fingerprinting of network endpoints at given IP and port ranges
 
 Currently supported servers:
 * CoAP:
@@ -292,7 +294,7 @@ optional arguments:
 
 **cotopaxi.vulnerability_tester**
 
-Tool for checking vulnerability of network service at given IP and port ranges
+Tool for checking vulnerability of network endpoints at given IP and port ranges
 ```
 usage: sudo python -m cotopaxi.vulnerability_tester [-h] [-v]
                                [--cve {ALL,CVE-2018-19417,...}]
@@ -393,6 +395,48 @@ optional arguments:
                         turn on verbose/debug mode (more messages)
 
 ```
+
+-------------------------------------------------------------------------------
+
+**cotopaxi.active_scanner**
+
+Tool for checking security properties of network endpoints at given IP and port ranges
+
+```
+usage: sudo python -m cotopaxi.active_scanner [-h] [--retries RETRIES] [--timeout TIMEOUT]
+                         [--verbose] [--protocol {DTLS}] [--src-ip SRC_IP]
+                         [--src-port SRC_PORT] [--ignore-ping-check]
+                         dest_ip dest_port
+
+positional arguments:
+  dest_ip               destination IP address or multiple IPs separated by
+                        coma (e.g. '1.1.1.1,2.2.2.2') or given by CIDR netmask
+                        (e.g. '10.0.0.0/22') or both
+  dest_port             destination port or multiple ports given by list
+                        separated by coma (e.g. '8080,9090') or port range
+                        (e.g. '1000-2000') or both
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --retries RETRIES, -R RETRIES
+                        number of retries
+  --timeout TIMEOUT, -T TIMEOUT
+                        timeout in seconds
+  --verbose, -V, --debug, -D
+                        Turn on verbose/debug mode (more messages)
+  --protocol {DTLS}, -P {DTLS}
+                        protocol to be tested
+  --src-ip SRC_IP, -SI SRC_IP
+                        source IP address (return result will not be
+                        received!)
+  --src-port SRC_PORT, -SP SRC_PORT
+                        source port (if not specified random port will be
+                        used)
+  --ignore-ping-check, -Pn
+                        ignore ping check (treat all ports as alive)
+
+```
+
 
 -------------------------------------------------------------------------------
 

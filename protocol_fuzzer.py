@@ -28,7 +28,12 @@ import time
 
 from scapy.all import Raw
 
-from .common_utils import CotopaxiTester, print_verbose, proto_mapping, sr1_file
+from .common_utils import (
+    CotopaxiTester,
+    print_verbose,
+    proto_mapping_response,
+    sr1_file,
+)
 from .service_ping import service_ping
 from .vulnerability_tester import Vulnerability
 
@@ -82,7 +87,7 @@ class FuzzingCase(Vulnerability):
             )
             print (60 * "-" + "\nResponse:")
             try:
-                proto_handler = proto_mapping(test_params.protocol)
+                proto_handler = proto_mapping_response(test_params.protocol)
                 packet = proto_handler(test_result[Raw].load)
                 packet.show()
             except (TypeError, IndexError, struct.error):

@@ -31,7 +31,7 @@ from .dtls_utils import dtls_ping
 from .htcpcp_utils import htcpcp_ping
 from .mdns_utils import mdns_ping
 from .mqtt_utils import mqtt_ping
-# from .rtsp_utils import rtsp_ping
+from .rtsp_utils import rtsp_ping
 from .ssdp_utils import ssdp_ping
 
 
@@ -54,7 +54,7 @@ def service_ping(test_params, show_result=False):
         Protocol.mDNS: mdns_ping,
         Protocol.SSDP: ssdp_ping,
         Protocol.MQTT: mqtt_ping,
-        # Protocol.RTSP: rtsp_ping,
+        Protocol.RTSP: rtsp_ping,
         Protocol.HTCPCP: htcpcp_ping,
     }
 
@@ -64,7 +64,7 @@ def service_ping(test_params, show_result=False):
         Protocol.mDNS: "mDNS ping",
         Protocol.SSDP: "SSDP M-SEARCH",
         Protocol.MQTT: "MQTT ping (Connect)",
-        # Protocol.RTSP: "RTSP DESCRIBE",
+        Protocol.RTSP: "RTSP DESCRIBE",
         Protocol.HTCPCP: "HTCPCP BREW",
     }
     try:

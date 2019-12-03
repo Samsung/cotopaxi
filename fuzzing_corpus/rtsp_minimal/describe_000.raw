@@ -1,0 +1,5 @@
+DESCRIBE rtsp://127.0.0.1:554/test/movie.mp4 RTSP/1.0
+CSeq: 1
+User-Agent: LibVLC/2.1.0-git (LIVE555 Streaming Media v2011.12.23)
+Accept: application/sdp
+

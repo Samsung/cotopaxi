@@ -131,7 +131,7 @@ def main(args):
 
     if tester.test_params.protocol in [Protocol.CoAP, Protocol.DTLS, Protocol.mDNS]:
         udp_server(tester.test_params, testcases)
-    elif tester.test_params.protocol in [Protocol.MQTT]:
+    elif tester.test_params.protocol in [Protocol.MQTT, Protocol.RTSP]:
         tcp_server(tester.test_params, testcases)
     else:
         print (

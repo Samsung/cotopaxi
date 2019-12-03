@@ -33,6 +33,7 @@ from enum import Enum
 from IPy import IP as IPY_IP
 from scapy.all import DNS as mDNS
 from scapy.all import IP, TCP, UDP, IPv6, Raw, sniff, sr1
+from scapy.layers.http import HTTPRequest, HTTPResponse
 from scapy.contrib.coap import CoAP
 from scapy.contrib.mqtt import MQTT
 from scapy.error import Scapy_Exception
@@ -95,7 +96,7 @@ def show_verbose(test_params, packet, protocol=None):
     """Parses response packet and scraps response from stdout."""
     if protocol:
         try:
-            proto_handler = proto_mapping(protocol)
+            proto_handler = proto_mapping_request(protocol)
             packet = proto_handler(packet)
         except KeyError:
             return "Response is not parsable!"
@@ -150,7 +151,7 @@ def default_port(protocol):
     }[protocol]
 
 
-def proto_mapping(protocol):
+def proto_mapping_request(protocol):
     """Provides mapping of enum values to implementation classes."""
     return {
         Protocol.ALL: IP,
@@ -160,8 +161,25 @@ def proto_mapping(protocol):
         Protocol.mDNS: mDNS,
         Protocol.MQTT: MQTT,
         Protocol.DTLS: DTLS,
-        Protocol.SSDP: TCP,
-        Protocol.HTCPCP: TCP,
+        Protocol.RTSP: HTTPRequest,
+        Protocol.SSDP: HTTPRequest,
+        Protocol.HTCPCP: HTTPRequest,
+    }[protocol]
+
+
+def proto_mapping_response(protocol):
+    """Provides mapping of enum values to implementation classes."""
+    return {
+        Protocol.ALL: IP,
+        Protocol.UDP: UDP,
+        Protocol.TCP: TCP,
+        Protocol.CoAP: CoAP,
+        Protocol.mDNS: mDNS,
+        Protocol.MQTT: MQTT,
+        Protocol.DTLS: DTLS,
+        Protocol.RTSP: HTTPResponse,
+        Protocol.SSDP: HTTPResponse,
+        Protocol.HTCPCP: HTTPResponse,
     }[protocol]
 
 
@@ -554,7 +572,7 @@ def add_highlevel_proto(parser):
         "--protocol",
         "-P",
         action="store",
-        choices=("CoAP", "mDNS", "MQTT", "DTLS", "SSDP", "HTCPCP"),
+        choices=("CoAP", "HTCPCP", "mDNS", "MQTT", "DTLS", "RTSP", "SSDP"),
         default="CoAP",
         help="protocol to be tested",
     )
@@ -596,11 +614,12 @@ class CotopaxiTester(object):
                     "UDP",
                     "TCP",
                     "CoAP",
+                    "HTCPCP",
                     "mDNS",
+                    "RTSP",
                     "SSDP",
                     "MQTT",
                     "DTLS",
-                    "HTCPCP",
                 ),
                 default="ALL",
                 help="protocol to be tested (UDP includes CoAP, mDNS and DTLS,"
@@ -924,7 +943,7 @@ def sr1_file(test_params, test_filename, display_packet=False):
     if display_packet:
         # print("Protocol: {}".format(proto_mapping(test_params.protocol)))
         try:
-            out_packet = proto_mapping(test_params.protocol)(test_packet)
+            out_packet = proto_mapping_request(test_params.protocol)(test_packet)
             out_packet.show()
             print_verbose(test_params, 60 * "-")
         except (TypeError, struct.error, RuntimeError, ValueError, Scapy_Exception):

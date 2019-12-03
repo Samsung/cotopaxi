@@ -3,6 +3,7 @@
 #
 #    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
+#                tintinweb@oststrom.com <github.com/tintinweb>
 #                Michał Radwański (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -22,33 +23,175 @@
 #
 
 import codecs
+import os
 import sys
 import socket
 import struct
+import time
 
-from scapy.all import ICMP, Raw, bind_layers
-from scapy_ssl_tls.ssl_tls import (
-    DTLSRecord,
-    TLS_VERSIONS,
-    TLS_CONTENT_TYPES,
-    TLSDecryptablePacket,
+from scapy.all import (
+    bind_layers,
     ByteEnumField,
-    TLSAlertLevel,
-    DTLSClientHello,
-    TLS_ALERT_LEVELS,
-    TLS_ALERT_DESCRIPTIONS,
-    TLSAlertDescription,
-    TLSContentType,
-    DTLSHandshake,
-    TLS_HANDSHAKE_TYPES,
+    IntField,
+    ICMP,
+    Packet,
+    PacketListField,
+    Raw,
+    StrFixedLenField,
+    StrLenField,
+    XShortEnumField,
 )
+
+from scapy_ssl_tls.ssl_tls import (
+    DTLSClientHello,
+    DTLSRecord,
+    DTLSHandshake,
+    DTLSHelloVerify,
+    EnumStruct,
+    StrConditionalField,
+    TLS_CIPHER_SUITES,
+    TLSDecryptablePacket,
+    PacketListFieldContext,
+    PacketNoPayload,
+    TLSAlert,
+    TLSPlaintext,
+    TLS_HANDSHAKE_TYPES,
+    TLSCompressionMethod,
+    TLSContentType,
+    TLSAlertLevel,
+    TLSAlertDescription,
+    TLSExtension,
+    TLSCipherSuite,
+    TLS_ALERT_DESCRIPTIONS,
+    TLS_ALERT_LEVELS,
+    TLS_COMPRESSION_METHODS,
+    TLS_CONTENT_TYPES,
+    TLS_VERSIONS,
+    TypedPacketListField,
+    XFieldLenField,
+)
+
+import scapy_ssl_tls.ssl_tls_registry as registry
 from IPy import IP as IPY_IP
-from .common_utils import print_verbose, show_verbose, INPUT_BUFFER_SIZE, udp_sr1
+from .common_utils import (
+    print_verbose,
+    show_verbose,
+    INPUT_BUFFER_SIZE,
+    udp_sr1,
+    get_local_ip,
+    get_random_high_port,
+)
 
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
+
+DTLS_VERSIONS = {
+    # DTLS
+    0xFEFF: "DTLS_1_0",
+    0xFEFD: "DTLS_1_1",
+}
+
+ENUM_DTLS_VERSIONS = EnumStruct(DTLS_VERSIONS)
+DTLS_COMPRESSION_METHODS = registry.TLS_COMPRESSION_METHOD_IDENTIFIERS
+DTLS_CIPHER_SUITES = TLS_CIPHER_SUITES
+
+
+class DTLSHandshakes(TLSDecryptablePacket):
+    """ Representation of DTLS Handshake """
+
+    name = "DTLS Handshakes"
+    fields_desc = [PacketListFieldContext("handshakes", None, DTLSHandshake)]
+
+
+class DTLS(Packet):
+    """Representation of DTLS message"""
+
+    name = "DTLS"
+    fields_desc = [PacketListField("records", None, DTLSRecord)]
+    CONTENT_TYPE_MAP = {0x15: TLSAlert, 0x16: DTLSHandshakes, 0x17: TLSPlaintext}
+
+    def __init__(self, *args, **fields):
+        self.tls_ctx = fields.pop("ctx", None)
+        self._origin = fields.pop("_origin", None)
+        self.guessed_next_layer = DTLSRecord
+        Packet.__init__(self, *args, **fields)
+
+    @classmethod
+    def from_records(cls, records, ctx=None):
+        """Merges record into object"""
+        pkt_str = "".join(list(map(str, records)))
+        return cls(pkt_str, ctx)
+
+    def pre_dissect(self, raw_bytes):  # pylint: disable=arguments-differ
+        self.fields_desc = [PacketListField("records", None, self.guessed_next_layer)]
+        return raw_bytes
+
+    def do_dissect(self, raw_bytes):  # pylint: disable=arguments-differ
+        pos = 0
+        record = self.guessed_next_layer
+        record_header_len = len(record())
+
+        records = []
+        # Consume all bytes passed to us by the underlayer. We're expecting no
+        # further payload on top of us. If there is additional data on top of our layer
+        # We will incorrectly parse it
+        while pos < len(raw_bytes) - record_header_len:
+            payload_len = record(raw_bytes[pos : pos + record_header_len]).length
+            if self.tls_ctx is not None:
+                payload = record(
+                    raw_bytes[pos : pos + record_header_len + payload_len],
+                    ctx=self.tls_ctx,
+                )
+                # Perform inline decryption if required
+                # payload = self.do_decrypt_payload(payload)
+                self.tls_ctx.insert(payload, origin=self._origin)
+            else:
+                payload = record(raw_bytes[pos : pos + record_header_len + payload_len])
+            # Populate our list of found records
+            records.append(payload)
+            # Move to the next record
+            pos += record_header_len + payload.length
+        self.fields["records"] = records
+        # This will always be empty (equivalent to returning "")
+        return raw_bytes[pos:]
+
+
+class DTLSServerHello(PacketNoPayload):
+    """Representation of DTLSServerHello message"""
+
+    name = "DTLS Server Hello"
+    fields_desc = [
+        XShortEnumField("version", ENUM_DTLS_VERSIONS.DTLS_1_1, DTLS_VERSIONS),
+        IntField("gmt_unix_time", int(time.time())),
+        StrFixedLenField("random_bytes", os.urandom(28), 28),
+        XFieldLenField("session_id_length", None, length_of="session_id", fmt="B"),
+        StrLenField(
+            "session_id", os.urandom(20), length_from=lambda x: x.session_id_length
+        ),
+        XShortEnumField(
+            "cipher_suite", TLSCipherSuite.RSA_WITH_AES_128_CBC_SHA, TLS_CIPHER_SUITES
+        ),
+        ByteEnumField(
+            "compression_method", TLSCompressionMethod.NULL, TLS_COMPRESSION_METHODS
+        ),
+        StrConditionalField(
+            XFieldLenField("extensions_length", None, length_of="extensions", fmt="H"),
+            lambda pkt, s, val: True
+            if val
+            or pkt.extensions
+            or (s and struct.unpack("!H", s[:2])[0] == len(s) - 2)
+            else False,
+        ),
+        TypedPacketListField(
+            "extensions",
+            None,
+            TLSExtension,
+            length_from=lambda x: x.extensions_length,
+            type_="DTLSServerHello",
+        ),
+    ]
 
 
 def scrap_dtls_response(resp_packet):
@@ -73,6 +216,109 @@ class DTLSAlert(TLSDecryptablePacket):
             "description", TLSAlertDescription.CLOSE_NOTIFY, TLS_ALERT_DESCRIPTIONS
         ),
     ]
+
+
+class DTLSClient(object):
+    """Interface for using DTLS as client"""
+
+    def __init__(
+        self,
+        target,
+        dtls_version=ENUM_DTLS_VERSIONS.DTLS_1_1,
+        confirm_hello_verify=True,
+        starttls=None,
+        test_params=None,
+    ):
+        last_exception = Exception()
+        self.target = target
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.local_port = get_random_high_port()
+        self._sock.bind((get_local_ip(), self.local_port))
+        self.cookie = None
+        self.cookie_length = 0
+        self.test_params = test_params
+
+        if confirm_hello_verify:
+
+            pkt = DTLSRecord(
+                version=dtls_version, sequence=0, content_type=TLSContentType.HANDSHAKE
+            ) / DTLSHandshakes(
+                handshakes=[
+                    DTLSHandshake(fragment_offset=0)
+                    / DTLSClientHello(
+                        version=dtls_version,
+                        compression_methods=0,
+                        cipher_suites=list(range(0xFE))[::-1],
+                    )
+                ]
+            )
+            sent_time = self.test_params.report_sent_packet()
+            self.sendall(pkt)
+            resp = DTLSRecord(self.recv(timeout=1))
+            self.test_params.report_received_packet(sent_time)
+
+            print_verbose(
+                self.test_params, "------------- START response --------------"
+            )
+            show_verbose(self.test_params, resp)
+            print_verbose(
+                self.test_params, "------------- STOP response --------------"
+            )
+
+            # if resp and resp.haslayer(DTLSRecord) and resp[DTLSRecord].type ==
+            # ENUM_DTLS_HANDSHAKE_TYPES.HELLO_VERIFY_REQUEST:
+            if resp and resp.haslayer(DTLSHelloVerify):
+                print_verbose(self.test_params, "Found DTLSHelloVerify")
+                self.cookie = resp[DTLSHelloVerify].cookie
+                self.cookie_length = resp[DTLSHelloVerify].cookie_length
+                # pkt[DTLSClientHello].cookie = dtls_client_hello.cookie
+                # pkt[DTLSClientHello].cookie_length = dtls_client_hello.cookie_length
+                # self.sendall(pkt)
+                # print("------------- START ClientHello with cookie --------------")
+                # pkt.show()
+                # print("------------- STOP ClientHello with cookie --------------")
+
+        if not self._sock:
+            raise last_exception
+        if starttls:
+            self.sendall(starttls.replace("\\r", "\r").replace("\\n", "\n"))
+            self.recvall(timeout=2)
+
+    def sendall(self, pkt, timeout=None):
+        """ Sends packet via DTLS connection """
+        if timeout:
+            self._sock.settimeout(timeout)
+        # print("sendto: %s to %s" % (str(pkt), str(self.target)))
+        self._sock.sendto(str(pkt), self.target)
+
+    def recv(self, size=8192 * 4, timeout=None):
+        """ Receives currently available data from DTLS connection """
+        if timeout:
+            self._sock.settimeout(timeout)
+        while True:
+            try:
+                data = self._sock.recvfrom(size)
+                if not data:
+                    break
+                return data[0]
+            except socket.timeout:
+                break
+        return None
+
+    def recvall(self, size=8192 * 4, timeout=None):
+        """ Receives all data available during timeout from DTLS connection """
+        resp = []
+        if timeout:
+            self._sock.settimeout(timeout)
+        while True:
+            try:
+                data = self._sock.recvfrom(size)
+                if not data:
+                    break
+                resp.append(data[0])
+            except socket.timeout:
+                break
+        return DTLS("".join(resp))
 
 
 bind_layers(DTLSRecord, DTLSAlert, {"content_type": TLSContentType.ALERT})
