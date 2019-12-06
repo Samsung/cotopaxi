@@ -28,7 +28,13 @@ from scapy.contrib.mqtt import CONTROL_PACKET_TYPE, MQTT, RETURN_CODE, MQTTConna
 
 from .common_utils import print_verbose, show_verbose, tcp_sr1
 
-MQTT_CONN = (
+# MQTT message
+# message type = CONNECT
+# protocol name = MQTT
+# protocol version = 3.1.1
+# client ID = 1
+MQTT_CONN_MQTT = "100d00044d5154540402003c000131"
+MQTT_CONN_MQISDP = (
     "102400064d51497364700302003c000233000000000000000000000000000000000000000000"
 )
 MQTT_CONN_REJECT = (
@@ -39,17 +45,24 @@ MQTT_CONN_REJECT = (
 def mqtt_ping(test_params):
     """Checks MQTT service availability by sending ping packet and waiting for response."""
     # MQTT ping is using Connect message
-    packet_data = dehex(MQTT_CONN)
-    out_packet = MQTT(packet_data)
+    for packet_hex in [MQTT_CONN_MQTT, MQTT_CONN_MQISDP]:
+        packet_data = dehex(packet_hex)
+        out_packet = MQTT(packet_data)
+        if mqtt_request(test_params, out_packet):
+            return True
+    return False
+
+
+def mqtt_request(test_params, out_packet):
+    """Sends MQTT request to broker and waiting for response."""
     try:
         for i in range(1 + test_params.nr_retries):
             in_data = tcp_sr1(test_params, out_packet)
             in_packet = MQTT(in_data)
             show_verbose(test_params, in_packet)
-            if (
-                in_packet[MQTT].type in CONTROL_PACKET_TYPE
-                and CONTROL_PACKET_TYPE[in_packet[MQTT].type] == "CONNACK"
-            ):
+            if (in_packet[MQTT].type in CONTROL_PACKET_TYPE
+                    and CONTROL_PACKET_TYPE[in_packet[MQTT].type] == "CONNACK"
+               ):
                 print_verbose(
                     test_params,
                     "MQTT ping {}: in_packet[MQTTConnack].retcode: {}".format(
