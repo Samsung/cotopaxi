@@ -54,7 +54,7 @@ def main(args):
 
     if tester.test_params.protocol in [Protocol.CoAP, Protocol.DTLS, Protocol.mDNS]:
         udp_server(tester.test_params, test_vulns)
-    elif tester.test_params.protocol in [Protocol.MQTT, Protocol.HTCPCP]:
+    elif tester.test_params.protocol in [Protocol.MQTT, Protocol.HTCPCP, Protocol.RTSP]:
         tcp_server(tester.test_params, test_vulns)
     else:
         print (

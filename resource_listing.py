@@ -30,9 +30,11 @@ from .common_utils import (
     prepare_names,
     print_verbose,
     ssdp_send_query,
+    tcp_sr1,
 )
 from .mdns_utils import mdns_query
 from .ssdp_utils import SSDP_MULTICAST_IPV4, SSDP_QUERY
+from .rtsp_utils import build_rtsp_query
 
 
 def perform_resource_listing_coap(test_params, tuple_url_methods):
@@ -116,9 +118,36 @@ def perform_resource_listing_ssdp(test_params, list_services):
             )
 
 
+def perform_resource_listing_rtsp(test_params, list_streams):
+    """Checks whether listed RTSP streams are available on server."""
+    for stream_name in list_streams:
+        print_verbose(test_params, "Testing stream: {}".format(stream_name))
+        query = build_rtsp_query(test_params, "DESCRIBE", stream_name)
+        print_verbose(
+            test_params, "Prepared request: \n=\n{}\n=\n".format(query.strip())
+        )
+        response = tcp_sr1(test_params, query)
+        if response:
+            print_verbose(
+                test_params, "Received response: \n=\n{}\n=\n".format(response.strip())
+            )
+        ip_port_and_url = "{}:{}/{}".format(
+            test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, stream_name
+        )
+
+        if response and stream_name in response and "RTSP/1.0 200 OK" in response:
+            test_params.test_stats.active_endpoints[Protocol.RTSP].append(
+                ip_port_and_url
+            )
+        else:
+            test_params.test_stats.inactive_endpoints[Protocol.RTSP].append(
+                ip_port_and_url
+            )
+
+
 def main(args):
     """Lists resources on remote service based on command line parameters"""
-    supported_protocols = ("CoAP", "mDNS", "SSDP")
+    supported_protocols = ("CoAP", "mDNS", "SSDP", "RTSP")
     tester = CotopaxiTester(
         check_ignore_ping=True,
         show_disclaimer=False,
@@ -163,8 +192,15 @@ def main(args):
         if options.method != "GET":
             print ("Methods are not supported for SSDP protocol!")
         list_services = prepare_names(options.names_filepath)
+        print_verbose(test_params, list_services)
         tester.perform_testing(
             "resource listing", perform_resource_listing_ssdp, list_services
+        )
+    elif test_params.protocol == Protocol.RTSP:
+        list_services = prepare_names(options.names_filepath)
+        print_verbose(test_params, list_services)
+        tester.perform_testing(
+            "resource listing", perform_resource_listing_rtsp, list_services
         )
     elif test_params.protocol == Protocol.mDNS:
         if options.method != "GET":

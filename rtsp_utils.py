@@ -22,31 +22,42 @@
 #
 
 import socket
+from random import randint
 
 from .common_utils import print_verbose, tcp_sr1
 
-RTSP_DESCRIBE = "DESCRIBE rtsp://{} RTSP/1.0\r\n" "Cseq: 1\r\n" "\r\n"
+RTSP_QUERY = "{} rtsp://{}/{} RTSP/1.0\r\n" "CSeq:{}\r\n" "\r\n"
+
+
+def build_rtsp_query(test_params, method="DESCRIBE", path="", cseq=None):
+    """Creates RTSP query string based on provided data."""
+    if not cseq:
+        cseq = randint(0, 10000)
+    return RTSP_QUERY.format(method, test_params.dst_endpoint.ip_addr, path, cseq)
 
 
 def rtsp_ping(test_params):
     """Checks RTSP service availability by sending DESCRIBE message and waiting for response."""
 
-    rtsp_describe_message = RTSP_DESCRIBE.format(test_params.dst_endpoint.ip_addr)
-
+    rtsp_describe_message = build_rtsp_query(test_params, "DESCRIBE")
+    rtsp_options_message = build_rtsp_query(test_params, "OPTIONS")
     try:
         for _ in range(1 + test_params.nr_retries):
-            in_data = tcp_sr1(test_params, rtsp_describe_message)
-            if in_data:
-                print_verbose(
-                    test_params,
-                    "\n".join(["Received response:", 50 * "=", in_data, 50 * "="]),
-                )
-                if "HTTP/1." in in_data and "400 Bad Request" in in_data:
-                    print_verbose(test_params, "Tested server is HTTP server.")
-                    return False
-                if "RTSP/1.0" in in_data:
-                    print_verbose(test_params, "RTSP DESCRIBE : SUCCESS")
-                    return True
+            for test_message in [rtsp_options_message, rtsp_describe_message]:
+                in_data = tcp_sr1(test_params, test_message)
+                if in_data:
+                    print_verbose(
+                        test_params,
+                        "\n".join(
+                            ["Received response:", 50 * "=", in_data.strip(), 50 * "="]
+                        ),
+                    )
+                    if "HTTP/1." in in_data and "400 Bad Request" in in_data:
+                        print_verbose(test_params, "Tested server is HTTP server.")
+                        return False
+                    if "RTSP/1.0" in in_data:
+                        print_verbose(test_params, "RTSP DESCRIBE : SUCCESS")
+                        return True
     except (socket.timeout, socket.error) as error:
         print_verbose(test_params, error)
     return False

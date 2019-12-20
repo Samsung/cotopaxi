@@ -42,7 +42,7 @@ class FuzzingCase(Vulnerability):
     """Object representing crash vulnerability."""
 
     def __init__(self, payload_file):
-        Vulnerability.__init__(self, "", "", payload_file, "", "")
+        Vulnerability.__init__(self, payload_file=payload_file)
 
     def verify(self, test_params):
         """Verifies whether remote host is vulnerable to this vulnerability."""

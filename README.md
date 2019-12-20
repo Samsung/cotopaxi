@@ -68,17 +68,18 @@ Make sure you check with your local laws before running these tools!
 
 Protocols supported by different tools: 
 
-Tool                 | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | RTSP  | SSDP    
----------------------|-------|-------|--------|-------|-------|-------|-----
-service_ping         |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;    
-server_fingerprinter |&#9745;|&#9745;|        |       |       |       |
-resource_listing     |&#9745;|  N/A  |        |&#9745;|       |       |&#9745;
-protocol_fuzzer      |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;
-client_proto_fuzzer  |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;
-vulnerability_tester |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;
-client_vuln_tester   |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;
-amplifier_detector   |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |  N/A  |&#9745;
-active_scanner       |       |&#9745;|        |       |       |       |
+Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | QUIC  | RTSP  | SSDP
+---------------------|-------|-------|-------|-------|--------|-------|-------|-------|-----
+service_ping         |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
+server_fingerprinter |       |&#9745;|&#9745;|        |       |       |       |       |
+credential_cracker   |       |       |       |        |       |       |       |       |
+resource_listing     |       |&#9745;|  N/A  |        |&#9745;|       |       |&#9745;|&#9745;
+protocol_fuzzer      |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
+client_proto_fuzzer  |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
+vulnerability_tester |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
+client_vuln_tester   |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
+amplifier_detector   |       |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |       |  N/A  |&#9745;
+active_scanner       |       |       |&#9745;|        |       |       |       |       |
 
 
 **cotopaxi.service_ping**
@@ -199,7 +200,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,mDNS,SSDP}, -P {CoAP,mDNS,SSDP}
+  --protocol {CoAP,mDNS,SSDP}, -P {CoAP,mDNS,SSDP,RTSP}
                         protocol to be tested
   --method {GET,POST,PUT,DELETE,ALL}, -M {GET,POST,PUT,DELETE,ALL}
                         methods to be tested (ALL includes all supported
