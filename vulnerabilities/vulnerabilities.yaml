@@ -198,3 +198,13 @@
   url: https://www.exploit-db.com/exploits/45632
   payload_file: rtsp/payload_cve-2018-18428.raw
   response_file: rtsp/response_cve-2018-18428.raw
+- name: FOSCAM_000
+  type: Crash
+  cve_id: CVE-2018-19077
+  description: The Foscam camera RTSP service (RtspServer) has an implementation flaw when 
+    processing the 'Content-Length' header. Negative numbers are processed incorrectly and
+    lead to either RtspServer crash due to out of bound memory read or to a busy loop where
+    the single request is processed forever in a tight loop.
+  credit: Harry Sintonen / F-Secure Corporation
+  url: https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt
+  payload_file: rtsp/payload_cve-2018-19077.raw
