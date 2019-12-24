@@ -205,6 +205,58 @@
     processing the 'Content-Length' header. Negative numbers are processed incorrectly and
     lead to either RtspServer crash due to out of bound memory read or to a busy loop where
     the single request is processed forever in a tight loop.
-  credit: Harry Sintonen / F-Secure Corporation
+  credit: Harry Sintonen (F-Secure Corporation)
   url: https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt
   payload_file: rtsp/payload_cve-2018-19077.raw
+- name: FOSCAM_001
+  type: InformationDisclosure
+  cve_id: CVE-2018-19067
+  description: All Foscam models have hidden and hard-coded credentials that allow 
+    access to the device regardless of the currently configured users.
+    The username factory~ and password Ak47@99 enable access to some of the device
+    web user interface functionalities. The functionalities allowed vary depending on
+    the model of the device.
+  credit: Harry Sintonen (F-Secure Corporation)
+  url: https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt
+  payload_file: rtsp/payload_cve-2018-19067.raw
+  response_file: rtsp/response_cve-2018-19067.raw
+- name: HIKVISION_000
+  type: Crash
+  cve_id: CVE-2014-4878
+  description: Hikvision DVRs and derivative products are vulnerable to a buffer overflow in 
+    the handling of RTSP request bodies, allowing for remote code execution or denial of service.
+    The RTSP request handler uses a fixed size buffer of 2048 bytes for consuming the RTSP request
+    body, which leads to a buffer overflow condition when sending a larger body.
+  credit: Mark Schloesser (Rapid7 Labs)
+  url: https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/
+  payload_file: rtsp/payload_cve-2014-4878.raw
+- name: HIKVISION_001
+  type: Crash
+  cve_id: CVE-2014-4879
+  description: Hikvision DVRs and derivative products are vulnerable to a buffer overflow in 
+    the handling of RTSP request bodies, allowing for remote code execution or denial of service.
+    The RTSP request handler uses fixed size buffers when parsing the HTTP headers, which leads
+    to a buffer overflow condition when sending a large header key.
+  credit: Mark Schloesser (Rapid7 Labs)
+  url: https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/
+  payload_file: rtsp/payload_cve-2014-4879.raw
+- name: HIKVISION_002
+  type: Crash
+  cve_id: CVE-2014-4880
+  description: Hikvision DVRs and derivative products are vulnerable to a buffer overflow in 
+    the handling of RTSP request bodies, allowing for remote code execution or denial of service.
+    The RTSP request handler uses fixed size buffers when parsing the "Basic Auth" header 
+    of a RTSP transaction.
+  credit: Mark Schloesser (Rapid7 Labs)
+  url: https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/
+  payload_file: rtsp/payload_cve-2014-4880.raw
+- name: UBIQUITTI_000
+  type: Crash
+  cve_id: CVE-2019-12727
+  description: On Ubiquiti airCam 3.1.4 devices, a Denial of Service vulnerability exists 
+    in the RTSP Service provided by the ubnt-streamer binary. The issue can be triggered via
+    malformed RTSP requests that lead to an invalid memory read. To exploit the vulnerability,
+    an attacker must craft an RTSP request with a large number of headers.
+  credit: Juan Manuel Fernández 'X-C3LL' (Ka0labs)
+  url: https://github.com/X-C3LL/PoC-CVEs/blob/master/Aircam-DoS/Aircam-DoS.py
+  payload_file: rtsp/payload_cve-2019-12727.raw

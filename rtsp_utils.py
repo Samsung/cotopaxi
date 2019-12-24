@@ -26,14 +26,14 @@ from random import randint
 
 from .common_utils import print_verbose, tcp_sr1
 
-RTSP_QUERY = "{} rtsp://{}/{} RTSP/1.0\r\n" "CSeq:{}\r\n" "\r\n"
+RTSP_QUERY = "{} rtsp://{}:{}/{} RTSP/1.0\r\n" "CSeq:{}\r\n" "\r\n"
 
 
-def build_rtsp_query(test_params, method="DESCRIBE", path="", cseq=None):
+def build_rtsp_query(test_params, method="DESCRIBE", path="", cseq=None, port=554):
     """Creates RTSP query string based on provided data."""
     if not cseq:
         cseq = randint(0, 10000)
-    return RTSP_QUERY.format(method, test_params.dst_endpoint.ip_addr, path, cseq)
+    return RTSP_QUERY.format(method, test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, path, cseq)
 
 
 def rtsp_ping(test_params):
