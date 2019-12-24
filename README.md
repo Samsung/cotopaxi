@@ -72,7 +72,7 @@ Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | QUIC  | 
 ---------------------|-------|-------|-------|-------|--------|-------|-------|-------|-----
 service_ping         |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
 server_fingerprinter |       |&#9745;|&#9745;|        |       |       |       |       |
-credential_cracker   |       |       |       |        |       |       |       |       |
+credential_cracker   |       |  N/A  |  N/A  |  N/A   |  N/A  |       |  N/A  |  N/A  |  N/A  
 resource_listing     |       |&#9745;|  N/A  |        |&#9745;|       |       |&#9745;|&#9745;
 protocol_fuzzer      |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
 client_proto_fuzzer  |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
@@ -86,8 +86,10 @@ active_scanner       |       |       |&#9745;|        |       |       |       | 
 
 Tool for checking availability of network endpoints at given IP and port ranges
 ```
-usage: sudo python -m cotopaxi.service_ping [-h] [-v] [--protocol {UDP,TCP,CoAP,MQTT,DTLS,ALL}]
-                       [--src-port SRC_PORT]
+usage: sudo python -m cotopaxi.service_ping.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+                       [--verbose]
+                       [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}]
+                       [--src-ip SRC_IP] [--src-port SRC_PORT]
                        dest_ip dest_port
 
 positional arguments:
@@ -106,10 +108,10 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {UDP,TCP,CoAP,mDNS,SSDP,MQTT,DTLS,ALL,HTCPCP}, -P {UDP,TCP,CoAP,mDNS,SSDP,MQTT,DTLS,ALL,HTCPCP}
-                        protocol to be tested (UDP includes CoAP, DTLS, mDNS,
-                        and SSDP, TCP includes CoAP, HTCPCP, and MQTT, ALL
-                        includes all supported protocols)
+  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}, -P {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}
+                        protocol to be tested (UDP includes CoAP, mDNS and
+                        DTLS, TCP includes CoAP and MQTT, ALL includes all
+                        supported protocols)
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
@@ -177,10 +179,12 @@ Tool for checking availability of resource named url on server at given IP and p
 Sample URL lists are available in the _urls_ directory
 
 ```
-usage: sudo python -m cotopaxi.resource_listing [-h] [-v] [--protocol {CoAP,ALL}]
-                           [--method {GET,POST,PUT,DELETE,ALL}]
-                           [--src-port SRC_PORT]
-                           dest_ip dest_port url_filepath
+usage: sudo python -m cotopaxi.resource_listing.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+                           [--verbose] [--protocol {CoAP,mDNS,SSDP,RTSP}]
+                           [--src-ip SRC_IP] [--src-port SRC_PORT]
+                           [--ignore-ping-check]
+                           [--method {GET,POST,PUT,DELETE,ALL} [{GET,POST,PUT,DELETE,ALL} ...]]
+                           dest_ip dest_port names_filepath
 
 positional arguments:
   dest_ip               destination IP address or multiple IPs separated by
@@ -200,7 +204,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,mDNS,SSDP}, -P {CoAP,mDNS,SSDP,RTSP}
+  --protocol {CoAP,mDNS,SSDP,RTSP}, -P {CoAP,mDNS,SSDP,RTSP}
                         protocol to be tested
   --method {GET,POST,PUT,DELETE,ALL}, -M {GET,POST,PUT,DELETE,ALL}
                         methods to be tested (ALL includes all supported
@@ -218,11 +222,13 @@ optional arguments:
 Black-box fuzzer for testing protocol servers
 
 ```
-usage: sudo python -m cotopaxi.protocol_fuzzer 
-                          [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                          [--verbose] [--protocol {CoAP,mDNS,MQTT,DTLS}]
-                          [--src-ip SRC_IP] [--src-port SRC_PORT]
-                          [--ignore-ping-check] [--corpus-dir CORPUS_DIR]
+usage: sudo python -m cotopaxi.protocol_fuzzer.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+                          [--verbose]
+                          [--protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}]
+                          [--hide-disclaimer] [--src-ip SRC_IP]
+                          [--src-port SRC_PORT] [--ignore-ping-check]
+                          [--corpus-dir CORPUS_DIR]
+                          [--delay-after-crash DELAY_AFTER_CRASH]
                           dest_ip dest_port
 
 positional arguments:
@@ -241,7 +247,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}, -P {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}
+  --protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}, -P {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}
                         protocol to be tested
   --hide-disclaimer, -HD
                         hides legal disclaimer (shown before starting
@@ -281,7 +287,7 @@ optional arguments:
                         IP address, that will be used to set up tester server
   --server-port SERVER_PORT, -SP SERVER_PORT
                         port that will be used to set up server
-  --protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}, -P {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}
+  --protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}, -P {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}
                         protocol to be tested
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
@@ -316,7 +322,7 @@ optional arguments:
                         number of retries
   --timeout TIMEOUT, -T TIMEOUT
                         timeout in seconds
-  --protocol {UDP,TCP,CoAP,mDNS,MQTT,DTLS,ALL}, -P {UDP,TCP,CoAP,mDNS,MQTT,DTLS,ALL}
+  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}, -P {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}
                         protocol to be tested (UDP includes CoAP, mDNS and
                         DTLS, TCP includes CoAP and MQTT, ALL includes all
                         supported protocols)
@@ -359,7 +365,7 @@ optional arguments:
                         IP address, that will be used to set up tester server
   --server-port SERVER_PORT, -SP SERVER_PORT
                         port that will be used to set up server
-  --protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}, -P {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}
+  --protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}, -P {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}
                         protocol to be tested
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
