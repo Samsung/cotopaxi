@@ -260,3 +260,11 @@
   credit: Juan Manuel Fernández 'X-C3LL' (Ka0labs)
   url: https://github.com/X-C3LL/PoC-CVEs/blob/master/Aircam-DoS/Aircam-DoS.py
   payload_file: rtsp/payload_cve-2019-12727.raw
+- name: GSTREAMER_000
+  type: Crash
+  cve_id: CVE-2019-9928
+  description: GStreamer before 1.16.0 has a heap-based buffer overflow in the RTSP connection 
+    parser via a crafted response from a server.
+  credit: BullGuard
+  url: https://gstreamer.freedesktop.org/security/sa-2019-0001.html
+  payload_file: rtsp/payload_cve-2019-9928.raw
