@@ -234,8 +234,8 @@
     the model of the device.
   credit: Harry Sintonen (F-Secure Corporation)
   url: https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt
-  payload_file: rtsp/payload_cve-2018-19067.raw
-  response_file: rtsp/response_cve-2018-19067.raw
+  payload_file: http/payload_cve-2018-19067.raw
+  response_file: http/response_cve-2018-19067.raw
 - name: HIKVISION_000
   type: Crash
   cve_id: CVE-2014-4878
