@@ -1,0 +1,3 @@
+DESCRIBE rtsp://a/mpeg4 RTSP/1.0
+CSeq: 5492
+
