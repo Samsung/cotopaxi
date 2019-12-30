@@ -668,11 +668,8 @@ class DTLSScanner(object):
         #     print("Test packet = ")
         #     print(test_packet)
         #     print("==============")
-
-	test_packet = "123123123"
-
+        test_packet = "123123123"
         # print("_scan_certificates")
-
         pkt_hello = DTLSRecord(
             sequence=0,
             content_type=TLSContentType.HANDSHAKE,
@@ -697,12 +694,12 @@ class DTLSScanner(object):
                 / TLSCertificateList()
                 / TLS13Certificate(
                     certificates=[TLSCertificate(data=X509_Cert(test_packet))],
-                    length=600
+                    length=600,
                 )
             ]
         )
         # show_verbose(test_params, pkt)
-        print(pkt)
+        print (pkt)
         try:
             client = DTLSClient(target, starttls=starttls, test_params=test_params)
             pkt_hello[DTLSClientHello].cookie = client.cookie

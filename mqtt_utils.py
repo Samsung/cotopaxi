@@ -60,9 +60,10 @@ def mqtt_request(test_params, out_packet):
             in_data = tcp_sr1(test_params, out_packet)
             in_packet = MQTT(in_data)
             show_verbose(test_params, in_packet)
-            if (in_packet[MQTT].type in CONTROL_PACKET_TYPE
-                    and CONTROL_PACKET_TYPE[in_packet[MQTT].type] == "CONNACK"
-               ):
+            if (
+                in_packet[MQTT].type in CONTROL_PACKET_TYPE
+                and CONTROL_PACKET_TYPE[in_packet[MQTT].type] == "CONNACK"
+            ):
                 print_verbose(
                     test_params,
                     "MQTT ping {}: in_packet[MQTTConnack].retcode: {}".format(
