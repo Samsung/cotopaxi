@@ -198,6 +198,22 @@
   url: https://www.exploit-db.com/exploits/45632
   payload_file: rtsp/payload_cve-2018-18428.raw
   response_file: rtsp/response_cve-2018-18428.raw
+- name: TP-LINK_001
+  type: Crash
+  cve_id:
+  description: The TP-Link WR740N Wireless N Router network device is exposed to a remote
+    denial of service vulnerability when processing a HTTP request.
+  credit: Gjoko 'LiquidWorm' Krstic @zeroscience
+  url: https://www.zeroscience.mk/en/vulnerabilities/ZSL-2013-5135.php
+  payload_file: http/payload_tplink-001.raw
+- name: FLIR_000
+  type: InformationDisclosure
+  cve_id:
+  description: The FLIR AX8 thermal sensor camera suffers an unauthenticated and unauthorized live RTSP video stream access.
+  credit: Gjoko 'LiquidWorm' Krstic @zeroscience
+  url: https://www.zeroscience.mk/en/vulnerabilities/ZSL-2018-5492.php
+  payload_file: rtsp/payload_flir_000.raw
+  response_file: rtsp/response_flir_000.raw
 - name: FOSCAM_000
   type: Crash
   cve_id: CVE-2018-19077
@@ -268,3 +284,19 @@
   credit: ???
   url: https://gstreamer.freedesktop.org/security/sa-2019-0001.html
   payload_file: rtsp/payload_cve-2019-9928.raw
+- name: NETFLIX_000
+  type: Crash
+  cve_id: CVE-2019-10028
+  description: Netflix DIAL reference server allows to perform arbitrary length read of a memory location
+    when processing crafted request.
+  credit: For All Secure, Zion Basque, Paul Emge
+  url: https://blog.forallsecure.com/forallsecure-uncovers-vulnerability-in-netflix-dial-software
+  payload_file: http/payload_cve-2019-10028.raw
+- name: BEWARD_000
+  type: InformationDisclosure
+  cve_id:
+  description: BEWARD N100 camera suffers from an unauthenticated and unauthorized live RTSP video stream access.
+  credit: Gjoko 'LiquidWorm' Krstic @zeroscience
+  url: https://www.zeroscience.mk/en/vulnerabilities/ZSL-2019-5509.php
+  payload_file: http/payload_beward_000_request.raw
+  response_file: http/payload_beward_000_response.raw

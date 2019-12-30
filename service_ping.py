@@ -29,6 +29,7 @@ from .coap_utils import coap_ping
 from .common_utils import CotopaxiTester, Protocol, print_verbose, protocol_enabled
 from .dtls_utils import dtls_ping
 from .htcpcp_utils import htcpcp_ping
+from .http_utils import http_ping
 from .mdns_utils import mdns_ping
 from .mqtt_utils import mqtt_ping
 from .rtsp_utils import rtsp_ping
@@ -51,21 +52,23 @@ def service_ping(test_params, show_result=False):
     protocol_handlers = {
         Protocol.CoAP: coap_ping,
         Protocol.DTLS: dtls_ping,
+        Protocol.HTCPCP: htcpcp_ping,
+        Protocol.HTTP: http_ping,
         Protocol.mDNS: mdns_ping,
         Protocol.SSDP: ssdp_ping,
         Protocol.MQTT: mqtt_ping,
         Protocol.RTSP: rtsp_ping,
-        Protocol.HTCPCP: htcpcp_ping,
     }
 
     ping_protocol_handlers = {
         Protocol.CoAP: "CoAP ping (Empty CON)",
         Protocol.DTLS: "DTLS ping (Client Hello)",
+        Protocol.HTCPCP: "HTCPCP BREW",
+        Protocol.HTTP: "HTTP GET",
         Protocol.mDNS: "mDNS ping",
         Protocol.SSDP: "SSDP M-SEARCH",
         Protocol.MQTT: "MQTT ping (Connect)",
         Protocol.RTSP: "RTSP DESCRIBE",
-        Protocol.HTCPCP: "HTCPCP BREW",
     }
     try:
         ping_result = ""

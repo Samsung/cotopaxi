@@ -133,6 +133,8 @@ class Protocol(Enum):
     SSDP = 7
     HTCPCP = 8
     RTSP = 9
+    HTTP = 10
+    FTP = 11
 
 
 def default_port(protocol):
@@ -142,12 +144,13 @@ def default_port(protocol):
         Protocol.UDP: 0,
         Protocol.TCP: 0,
         Protocol.CoAP: 5683,
+        Protocol.HTCPCP: 554,
+        Protocol.HTTP: 80,
         Protocol.mDNS: 5353,
         Protocol.MQTT: 1883,
         Protocol.DTLS: 4433,
         Protocol.SSDP: 1900,
         Protocol.RTSP: 554,
-        Protocol.HTCPCP: 554,
     }[protocol]
 
 
@@ -164,6 +167,7 @@ def proto_mapping_request(protocol):
         Protocol.RTSP: HTTPRequest,
         Protocol.SSDP: HTTPRequest,
         Protocol.HTCPCP: HTTPRequest,
+        Protocol.HTTP: HTTPRequest,
     }[protocol]
 
 
@@ -180,6 +184,7 @@ def proto_mapping_response(protocol):
         Protocol.RTSP: HTTPResponse,
         Protocol.SSDP: HTTPResponse,
         Protocol.HTCPCP: HTTPResponse,
+        Protocol.HTTP: HTTPResponse,
     }[protocol]
 
 
@@ -191,6 +196,7 @@ def protocol_enabled(protocol, proto_mask):
         return True
     if proto_mask == Protocol.TCP and protocol in [
         Protocol.MQTT,
+        Protocol.HTTP,
         Protocol.HTCPCP,
         Protocol.RTSP,
     ]:
@@ -615,6 +621,7 @@ class CotopaxiTester(object):
                     "TCP",
                     "CoAP",
                     "HTCPCP",
+                    "HTTP",
                     "mDNS",
                     "RTSP",
                     "SSDP",
@@ -951,7 +958,12 @@ def sr1_file(test_params, test_filename, display_packet=False):
     test_result = None
     if test_params.protocol in [Protocol.CoAP, Protocol.DTLS, Protocol.mDNS]:
         test_result = udp_sr1(test_params, test_packet)
-    if test_params.protocol in [Protocol.MQTT, Protocol.HTCPCP, Protocol.RTSP]:
+    if test_params.protocol in [
+        Protocol.MQTT,
+        Protocol.HTCPCP,
+        Protocol.HTTP,
+        Protocol.RTSP,
+    ]:
         test_result = tcp_sr1(test_params, test_packet)
     if test_params.protocol in [Protocol.SSDP]:
         test_result = ssdp_send_query(test_params, test_packet)
