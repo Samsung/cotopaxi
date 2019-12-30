@@ -25,7 +25,7 @@ import socket
 from .common_utils import print_verbose, tcp_sr1
 
 HTCPCP_BREW = (
-    "BREW kafo:/pot-0 HTCPCP/1.0\r\n" "Content-Type: message/coffeepot\r\n" "\r\n"
+    "BREW kafo://pot-0 HTCPCP/1.0\r\n" "Content-Type: message/coffeepot\r\n" "\r\n"
 )
 
 
