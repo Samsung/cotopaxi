@@ -97,30 +97,36 @@ class FuzzingCase(Vulnerability):
             print ("Received no response from server")
             print (60 * "-")
         alive_after = service_ping(test_params)
-        if not alive_after and alive_before and not test_params.ignore_ping_check:
-            print (
-                "[+] Server {}:{} is dead after sending payload".format(
-                    test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
-                )
-            )
-            test_params.test_stats.active_endpoints[test_params.protocol].append(
-                "{}:{} - payload: {}".format(
-                    test_params.dst_endpoint.ip_addr,
-                    test_params.dst_endpoint.port,
-                    self.payload_file,
-                )
-            )
-            print ("Waiting {} seconds for the server to start again.".format(60))
-            time.sleep(60)
-            if not service_ping(test_params):
-                print ("Server did not respawn (wait 1)!")
+        flag = True
+        if not alive_after:
+            alive_after = service_ping(test_params)
+            flag = False
+            if not alive_after and alive_before and not test_params.ignore_ping_check:
+                print (
+                    "[+] Server {}:{} is dead after sending payload".format(
+                        test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
+		    )
+		)
+                test_params.test_stats.active_endpoints[test_params.protocol].append(
+		    "{}:{} - payload: {}".format(
+			test_params.dst_endpoint.ip_addr,
+			test_params.dst_endpoint.port,
+			self.payload_file,
+		    )
+		)
+                print ("Waiting {} seconds for the server to start again.".format(60))
                 time.sleep(60)
                 if not service_ping(test_params):
-                    print ("Server did not respawn (wait 2)!\nExiting!")
-                    return False
-                else:
-                    print ("Server is alive again (after 2 waits)!")
-        elif alive_after and not test_params.ignore_ping_check:
+                    print ("Server did not respawn (wait 1)!")
+                    time.sleep(60)
+                    if not service_ping(test_params):
+                        print ("Server did not respawn (wait 2)!\nExiting!")
+                        return False
+                    else:
+                        print ("Server is alive again (after 2 waits)!")
+            else:
+                flag = True
+        if flag and alive_after and not test_params.ignore_ping_check:
             print_verbose(
                 test_params,
                 "[+] Server {}:{} is alive after sending payload {}".format(
