@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for client vulnerability_tester."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -21,17 +21,34 @@
 #
 
 import sys
+import threading
 import unittest
+import timeout_decorator
 
 sys.path.append("..")
-
-from .common_test_utils import scrap_output, load_test_servers
+from ..client_vuln_tester import main
+from ..common_utils import get_random_high_port
 from .common_runner import TimerTestRunner
+from .common_test_utils import CotopaxiToolClientTester, poke_tcp_server, scrap_output
 
 
-class TestClientVulnTester(unittest.TestCase):
-    def test_get_local_ip(self):
-        pass
+class TestClientVulnTester(CotopaxiToolClientTester, unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        CotopaxiToolClientTester.__init__(self, *args, **kwargs)
+        unittest.TestCase.__init__(self, *args, **kwargs)
+        self.main = main
+
+    @timeout_decorator.timeout(5)
+    def test_main_basic_params(self):
+        server_port = get_random_high_port()
+        poke_thread = threading.Thread(target=poke_tcp_server, args=[server_port])
+        poke_thread.start()
+        output = scrap_output(
+            main, ["-V", "-P", "RTSP", "-SP", str(server_port), "--vuln", "TP-LINK_000"]
+        )
+        poke_thread.join()
+        self.assertIn("Loaded 1 vulnerabilities for test", output)
+        self.assertIn("Finished vulnerability testing", output)
 
 
 if __name__ == "__main__":

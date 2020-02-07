@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool for detection of network traffic reflectors."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -27,15 +27,14 @@ import time
 
 from scapy.all import IP, UDP, sniff
 
-from .common_utils import (
-    amplification_factor,
+from .common_utils import amplification_factor, scrap_packet
+from .cotopaxi_tester import (
     argparser_add_dest,
     argparser_add_number,
     argparser_add_verbose,
     check_caps,
     check_non_negative_float,
     parse_port,
-    scrap_packet,
 )
 from .mdns_utils import DNS_SD_MULTICAST_IPV4, DNS_SD_MULTICAST_IPV6
 

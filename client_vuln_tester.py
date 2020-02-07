@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool for vulnerability testing of network clients."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland)
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -23,9 +23,10 @@
 
 
 import sys
+from scapy.all import TCP, UDP
 
 from .client_proto_fuzzer import tcp_server, udp_server
-from .common_utils import CotopaxiClientTester, Protocol
+from .cotopaxi_tester import CotopaxiClientTester, protocols_using
 from .vulnerability_tester import VULNS, bypass_list, select_vulnerabilities
 
 
@@ -52,9 +53,9 @@ def main(args):
 
     print ("Loaded {} vulnerabilities for test".format(len(test_vulns)))
 
-    if tester.test_params.protocol in [Protocol.CoAP, Protocol.DTLS, Protocol.mDNS]:
+    if tester.test_params.protocol in protocols_using(UDP):
         udp_server(tester.test_params, test_vulns)
-    elif tester.test_params.protocol in [Protocol.MQTT, Protocol.HTCPCP, Protocol.RTSP]:
+    elif tester.test_params.protocol in protocols_using(TCP):
         tcp_server(tester.test_params, test_vulns)
     else:
         print (

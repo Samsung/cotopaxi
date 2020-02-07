@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for MQTT protocol handling."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -22,11 +22,12 @@
 #
 
 import socket
-
 from hexdump import dehex
-from scapy.contrib.mqtt import CONTROL_PACKET_TYPE, MQTT, RETURN_CODE, MQTTConnack
+from scapy.all import TCP
+from scapy.contrib.mqtt import CONTROL_PACKET_TYPE, MQTT, MQTTConnack, RETURN_CODE
 
 from .common_utils import print_verbose, show_verbose, tcp_sr1
+from .protocol_tester import ProtocolTester
 
 # MQTT message
 # message type = CONNECT
@@ -40,17 +41,6 @@ MQTT_CONN_MQISDP = (
 MQTT_CONN_REJECT = (
     "102400064d51497364700302003c000200000000000000000000000000000000000000000000"
 )
-
-
-def mqtt_ping(test_params):
-    """Checks MQTT service availability by sending ping packet and waiting for response."""
-    # MQTT ping is using Connect message
-    for packet_hex in [MQTT_CONN_MQTT, MQTT_CONN_MQISDP]:
-        packet_data = dehex(packet_hex)
-        out_packet = MQTT(packet_data)
-        if mqtt_request(test_params, out_packet):
-            return True
-    return False
 
 
 def mqtt_request(test_params, out_packet):
@@ -74,3 +64,81 @@ def mqtt_request(test_params, out_packet):
     except (socket.timeout, socket.error) as error:
         print_verbose(test_params, error)
     return False
+
+
+class MQTTTester(ProtocolTester):
+    """Tester of MQTT protocol"""
+
+    def __init__(self):
+        ProtocolTester.__init__(self)
+
+    @staticmethod
+    def protocol_short_name():
+        """Provides short (abbreviated) name of protocol"""
+        return "MQTT"
+
+    @staticmethod
+    def protocol_full_name():
+        """Provides full (not abbreviated) name of protocol"""
+        return "MQ Telemetry Transport"
+
+    @staticmethod
+    def default_port():
+        """Provides default port used by implemented protocol"""
+        return 1883
+
+    @staticmethod
+    def transport_protocol():
+        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        return TCP
+
+    @staticmethod
+    def request_parser():
+        """Provides Scapy class implementing parsing of protocol requests"""
+        return MQTT
+
+    @staticmethod
+    def response_parser():
+        """Provides Scapy class implementing parsing of protocol responses"""
+        return MQTT
+
+    @staticmethod
+    def implements_service_ping():
+        """Returns True if this tester implements service_ping for this protocol"""
+        return True
+
+    @staticmethod
+    def ping(test_params, show_result=False):
+        """Checks MQTT service availability by sending ping packet and waiting for response."""
+        # MQTT ping is using Connect message
+        for packet_hex in [MQTT_CONN_MQTT, MQTT_CONN_MQISDP]:
+            packet_data = dehex(packet_hex)
+            out_packet = MQTT(packet_data)
+            if mqtt_request(test_params, out_packet):
+                return True
+        return False
+
+    @staticmethod
+    def implements_fingerprinting():
+        """Returns True if this tester implements fingerprinting for this protocol"""
+        return False
+
+    @staticmethod
+    def implements_resource_listing():
+        """Returns True if this tester implements resource for this protocol"""
+        return False
+
+    @staticmethod
+    def implements_server_fuzzing():
+        """Returns True if this tester implements server fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_client_fuzzing():
+        """Returns True if this tester implements clients fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_vulnerability_testing():
+        """Returns True if this tester implements vulnerability testing for this protocol"""
+        return True

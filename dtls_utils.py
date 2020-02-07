@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for DTLS protocol handling."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                tintinweb@oststrom.com <github.com/tintinweb>
 #                Michał Radwański (Samsung R&D Poland)
@@ -39,9 +39,9 @@ from scapy.all import (
     Raw,
     StrFixedLenField,
     StrLenField,
+    UDP,
     XShortEnumField,
 )
-
 from scapy_ssl_tls.ssl_tls import (
     DTLSClientHello,
     DTLSRecord,
@@ -70,9 +70,9 @@ from scapy_ssl_tls.ssl_tls import (
     TypedPacketListField,
     XFieldLenField,
 )
-
 import scapy_ssl_tls.ssl_tls_registry as registry
 from IPy import IP as IPY_IP
+
 from .common_utils import (
     print_verbose,
     show_verbose,
@@ -81,6 +81,7 @@ from .common_utils import (
     get_local_ip,
     get_random_high_port,
 )
+from .protocol_tester import ProtocolTester
 
 try:
     from StringIO import StringIO
@@ -526,31 +527,6 @@ def scrap_response(test_params, packet):
     return None
 
 
-def dtls_ping(test_params):
-    """Checks DTLS service availability by sending ping packet and waiting for response."""
-
-    ping_packets = [
-        DTLS_1_0_HELLO_NMAP,
-        DTLS_1_0_HELLO_BOTAN_CLIENT,
-        DTLS_1_2_HELLO_OPENSSL_CLIENT,
-    ]
-
-    for ping_packet in ping_packets:
-        ping_data = codecs.decode(ping_packet, "hex")
-
-        response = udp_sr1(test_params, ping_data)
-        if not response:
-            continue
-        if ICMP in response and response[ICMP].type == 3:
-            print_verbose(test_params, "Received ICMP dest-unreachable")
-            continue
-        parsed_response = scrap_response(test_params, response)
-        if check_dtls_response(test_params, parsed_response):
-            return True
-
-    return False
-
-
 def prepare_dtls_test_packets():
     """Prepares list of packets to perform server fingerprinting."""
     test_packets = [
@@ -704,3 +680,93 @@ class DTLSResults(object):
         self.type = dtls_convert_type(response)
         self.description = dtls_convert_description(response)
         self.length = dtls_convert_length(response)
+
+
+class DTLSTester(ProtocolTester):
+    """Tester of DTLS protocol"""
+
+    def __init__(self):
+        ProtocolTester.__init__(self)
+
+    @staticmethod
+    def protocol_short_name():
+        """Provides short (abbreviated) name of protocol"""
+        return "DTLS"
+
+    @staticmethod
+    def protocol_full_name():
+        """Provides full (not abbreviated) name of protocol"""
+        return "Datagram Transport Layer Security"
+
+    @staticmethod
+    def default_port():
+        """Provides default port used by implemented protocol"""
+        return 443
+
+    @staticmethod
+    def transport_protocol():
+        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        return UDP
+
+    @staticmethod
+    def request_parser():
+        """Provides Scapy class implementing parsing of protocol requests"""
+        return DTLSRecord
+
+    @staticmethod
+    def response_parser():
+        """Provides Scapy class implementing parsing of protocol responses"""
+        return DTLSRecord
+
+    @staticmethod
+    def implements_service_ping():
+        """Returns True if this tester implements service_ping for this protocol"""
+        return True
+
+    @staticmethod
+    def ping(test_params, show_result=False):
+        """Checks DTLS service availability by sending ping packet and waiting for response."""
+        ping_packets = [
+            DTLS_1_0_HELLO_NMAP,
+            DTLS_1_0_HELLO_BOTAN_CLIENT,
+            DTLS_1_2_HELLO_OPENSSL_CLIENT,
+        ]
+
+        for ping_packet in ping_packets:
+            ping_data = codecs.decode(ping_packet, "hex")
+
+            response = udp_sr1(test_params, ping_data)
+            if not response:
+                continue
+            if ICMP in response and response[ICMP].type == 3:
+                print_verbose(test_params, "Received ICMP dest-unreachable")
+                continue
+            parsed_response = scrap_response(test_params, response)
+            if check_dtls_response(test_params, parsed_response):
+                return True
+        return False
+
+    @staticmethod
+    def implements_fingerprinting():
+        """Returns True if this tester implements fingerprinting for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_resource_listing():
+        """Returns True if this tester implements resource for this protocol"""
+        return False
+
+    @staticmethod
+    def implements_server_fuzzing():
+        """Returns True if this tester implements server fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_client_fuzzing():
+        """Returns True if this tester implements clients fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_active_scanning():
+        """Returns True if this tester implements active scanning for this protocol"""
+        return True

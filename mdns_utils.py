@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for mDNS protocol handling."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -30,6 +30,7 @@ from dnslib import DNSRecord
 from scapy.all import DNS, DNSQR, UDP, Raw, sniff
 
 from .common_utils import print_verbose, udp_sr1
+from .protocol_tester import ProtocolTester
 
 DNS_SD_QUERY = "_services._dns-sd._udp.local"
 DNS_SD_MULTICAST_IPV4 = "224.0.0.251"
@@ -197,20 +198,87 @@ def mdns_query(test_params, query):
     return mdns_sniffer.server_response
 
 
-def mdns_ping(test_params):
-    """Checks mDNS service availability by sending ping packet and waiting for response."""
-    query = DNS_SD_QUERY
-    mdns_sniffer = MulticastDNSSniffer(test_params, query)
-    thread = threading.Thread(target=mdns_send_query, args=(test_params, query))
-    thread.start()
-    print_verbose(test_params, "filter: {}".format(mdns_sniffer.filter_string()))
-    sniff(
-        filter=mdns_sniffer.filter_string(),
-        prn=mdns_sniffer.filter_action,
-        count=10000,
-        timeout=test_params.timeout_sec + 2,
-    )
-    print_verbose(
-        test_params, "received mDNS response: {}".format(mdns_sniffer.server_alive)
-    )
-    return mdns_sniffer.server_alive
+class MDNSTester(ProtocolTester):
+    """Tester of mDNS protocol"""
+
+    def __init__(self):
+        ProtocolTester.__init__(self)
+
+    @staticmethod
+    def protocol_short_name():
+        """Provides short (abbreviated) name of protocol"""
+        return "mDNS"
+
+    @staticmethod
+    def protocol_full_name():
+        """Provides full (not abbreviated) name of protocol"""
+        return "Multicast DNS"
+
+    @staticmethod
+    def default_port():
+        """Provides default port used by implemented protocol"""
+        return 5353
+
+    @staticmethod
+    def transport_protocol():
+        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        return UDP
+
+    @staticmethod
+    def request_parser():
+        """Provides Scapy class implementing parsing of protocol requests"""
+        return DNS
+
+    @staticmethod
+    def response_parser():
+        """Provides Scapy class implementing parsing of protocol responses"""
+        return DNS
+
+    @staticmethod
+    def implements_service_ping():
+        """Returns True if this tester implements service_ping for this protocol"""
+        return True
+
+    @staticmethod
+    def ping(test_params, show_result=False):
+        """Checks mDNS service availability by sending ping packet and waiting for response."""
+        query = DNS_SD_QUERY
+        mdns_sniffer = MulticastDNSSniffer(test_params, query)
+        thread = threading.Thread(target=mdns_send_query, args=(test_params, query))
+        thread.start()
+        print_verbose(test_params, "filter: {}".format(mdns_sniffer.filter_string()))
+        sniff(
+            filter=mdns_sniffer.filter_string(),
+            prn=mdns_sniffer.filter_action,
+            count=10000,
+            timeout=test_params.timeout_sec + 2,
+        )
+        print_verbose(
+            test_params, "received mDNS response: {}".format(mdns_sniffer.server_alive)
+        )
+        return mdns_sniffer.server_alive
+
+    @staticmethod
+    def implements_fingerprinting():
+        """Returns True if this tester implements fingerprinting for this protocol"""
+        return False
+
+    @staticmethod
+    def implements_resource_listing():
+        """Returns True if this tester implements resource for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_server_fuzzing():
+        """Returns True if this tester implements server fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_client_fuzzing():
+        """Returns True if this tester implements clients fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_vulnerability_testing():
+        """Returns True if this tester implements vulnerability testing for this protocol"""
+        return True

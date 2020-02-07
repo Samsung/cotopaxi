@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for service_ping."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -26,7 +26,8 @@ from collections import defaultdict
 
 sys.path.append("..")
 
-from ..common_utils import check_caps, Protocol, get_local_ip, TestParams
+from ..common_utils import Protocol, get_local_ip
+from ..cotopaxi_tester import check_caps, TestParams
 from ..service_ping import main, service_ping
 from .common_test_utils import scrap_output, load_test_servers, load_test_servers_list
 from .common_runner import TimerTestRunner
@@ -102,12 +103,11 @@ class TestServicePing(unittest.TestCase):
                     result = service_ping(test_params)
                     if "version" in server:
                         server_name = "{} {}".format(server["name"], server["version"])
-                    print (
-                        "Server: {} port: {} result: {}".format(
-                            server_name, test_params.dst_endpoint.port, result
-                        )
+                    message = "Server: {} port: {} result: {}".format(
+                        server_name, test_params.dst_endpoint.port, result
                     )
-                    self.assertTrue(result)
+                    print (message)
+                    self.assertTrue(result, message + " (not responding to ping)")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for CoAP protocol handling."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -29,6 +29,7 @@ from scapy.all import IP, UDP
 from scapy.contrib.coap import CoAP  # , coap_codes
 
 from .common_utils import amplification_factor, print_verbose, show_verbose, udp_sr1
+from .protocol_tester import ProtocolTester
 
 try:
     from StringIO import StringIO
@@ -55,24 +56,6 @@ def coap_scrap_response(resp_packet):
         sys.stdout, save_stdout = save_stdout, sys.stdout
         parsed_response = save_stdout.getvalue()
     return parsed_response
-
-
-def coap_ping(test_params):
-    """Checks CoAP service availability by sending ping packet and waiting for response."""
-    coap_ping_packets = [COAP_PING_1_RAW, COAP_PING_2_RAW]
-    for coap_ping_raw in coap_ping_packets:
-        packet_raw = dehex(coap_ping_raw)
-        response = udp_sr1(test_params, packet_raw, test_params.wrap_secure_layer)
-        if response is not None:
-            for response_packet in response:
-                coap_response = coap_scrap_response(response_packet)
-                print_verbose(test_params, coap_response)
-                if (
-                    "ver       = 1" in coap_response
-                    and coap_convert_type(coap_response) != "Empty"
-                ):
-                    return True
-    return False
 
 
 def coap_check_url(test_params, method, url):
@@ -203,3 +186,88 @@ def coap_sr1_file(test_params, test_filename):
     with open(test_filename, "r") as file_handle:
         coap_test = file_handle.read()
     return coap_sr1(test_params, coap_test)
+
+
+class CoAPTester(ProtocolTester):
+    """Tester of CoAP protocol"""
+
+    def __init__(self):
+        ProtocolTester.__init__(self)
+
+    @staticmethod
+    def protocol_short_name():
+        """Provides short (abbreviated) name of protocol"""
+        return "CoAP"
+
+    @staticmethod
+    def protocol_full_name():
+        """Provides full (not abbreviated) name of protocol"""
+        return "Constrained Application Protocol"
+
+    @staticmethod
+    def default_port():
+        """Provides default port used by implemented protocol"""
+        return 5683
+
+    @staticmethod
+    def transport_protocol():
+        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        return UDP
+
+    @staticmethod
+    def request_parser():
+        """Provides Scapy class implementing parsing of protocol requests"""
+        return CoAP
+
+    @staticmethod
+    def response_parser():
+        """Provides Scapy class implementing parsing of protocol responses"""
+        return CoAP
+
+    @staticmethod
+    def implements_service_ping():
+        """Returns True if this tester implements service_ping for this protocol"""
+        return True
+
+    @staticmethod
+    def ping(test_params, show_result=False):
+        """Checks CoAP service availability by sending ping packet and waiting for response."""
+        coap_ping_packets = [COAP_PING_1_RAW, COAP_PING_2_RAW]
+        for coap_ping_raw in coap_ping_packets:
+            packet_raw = dehex(coap_ping_raw)
+            response = udp_sr1(test_params, packet_raw, test_params.wrap_secure_layer)
+            if response is not None:
+                for response_packet in response:
+                    coap_response = coap_scrap_response(response_packet)
+                    print_verbose(test_params, coap_response)
+                    if (
+                        "ver       = 1" in coap_response
+                        and coap_convert_type(coap_response) != "Empty"
+                    ):
+                        return True
+        return False
+
+    @staticmethod
+    def implements_fingerprinting():
+        """Returns True if this tester implements fingerprinting for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_resource_listing():
+        """Returns True if this tester implements resource for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_server_fuzzing():
+        """Returns True if this tester implements server fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_client_fuzzing():
+        """Returns True if this tester implements clients fuzzing for this protocol"""
+        return True
+
+    @staticmethod
+    def implements_vulnerability_testing():
+        """Returns True if this tester implements vulnerability testing for this protocol"""
+        return True

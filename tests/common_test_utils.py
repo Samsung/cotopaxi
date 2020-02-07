@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Common test functions."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -22,11 +22,15 @@
 
 import configparser
 import os
+import socket
 import sys
+import time
 import traceback
-import unittest
+import timeout_decorator
 import yaml
-from ..common_utils import check_caps, get_local_ip
+
+from ..common_utils import get_local_ip
+from ..cotopaxi_tester import check_caps
 
 try:
     from StringIO import StringIO
@@ -74,13 +78,26 @@ def load_test_servers_list():
     return None
 
 
-class CotopaxiRemoteTester(unittest.TestCase):
+def poke_tcp_server(server_port):
+    for i in range(2):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(0.1)
+            sock.connect(("127.0.0.1", server_port))
+            sock.send("123")
+            sock.close()
+        except (socket.timeout, socket.error):
+            time.sleep(0.1)
+
+
+class CotopaxiToolTester(object):
     config = load_test_servers()
     test_servers = load_test_servers_list()
+    print ("Loaded test servers")
     local_ip = get_local_ip()
 
     def __init__(self, *args, **kwargs):
-        unittest.TestCase.__init__(self, *args, **kwargs)
+        self.main = None
 
     @classmethod
     def setUpClass(cls):
@@ -93,3 +110,21 @@ class CotopaxiRemoteTester(unittest.TestCase):
                 "or add CAP_NET_ADMIN, CAP_NET_RAW manually!\n"
                 "On Windows run as Administrator."
             )
+
+    @timeout_decorator.timeout(5)
+    def test_main_help(self):
+        output = scrap_output(self.main, ["-h"])
+        self.assertIn("optional arguments", output)
+        self.assertIn("show this help message and exit", output)
+
+
+class CotopaxiToolServerTester(CotopaxiToolTester):
+    def __init__(self, *args, **kwargs):
+        CotopaxiToolTester.__init__(self, *args, **kwargs)
+        self.main = None
+
+
+class CotopaxiToolClientTester(CotopaxiToolTester):
+    def __init__(self, *args, **kwargs):
+        CotopaxiToolTester.__init__(self, *args, **kwargs)
+        self.main = None

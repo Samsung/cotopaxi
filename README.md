@@ -1,7 +1,7 @@
 
 # Cotopaxi
 
-Set of tools for security testing of Internet of Things devices using protocols like: CoAP, DTLS, HTCPCP, mDNS, MQTT, SSDP.
+Set of tools for security testing of Internet of Things devices using protocols like: CoAP, DTLS, HTCPCP, mDNS, MQTT, QUIC, RTSP, SSDP.
 
 ## License:
 
@@ -70,15 +70,15 @@ Protocols supported by different tools:
 
 Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | QUIC  | RTSP  | SSDP
 ---------------------|-------|-------|-------|-------|--------|-------|-------|-------|-----
-service_ping         |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
+service_ping         |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
 server_fingerprinter |       |&#9745;|&#9745;|        |       |       |       |       |
 credential_cracker   |       |  N/A  |  N/A  |  N/A   |  N/A  |       |  N/A  |  N/A  |  N/A  
 resource_listing     |       |&#9745;|  N/A  |        |&#9745;|       |       |&#9745;|&#9745;
-protocol_fuzzer      |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
-client_proto_fuzzer  |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
-vulnerability_tester |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
-client_vuln_tester   |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|       |&#9745;|&#9745;
-amplifier_detector   |       |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |       |  N/A  |&#9745;
+protocol_fuzzer      |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+client_proto_fuzzer  |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+vulnerability_tester |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+client_vuln_tester   |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+amplifier_detector   |       |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |&#9745;|  N/A  |&#9745;
 active_scanner       |       |       |&#9745;|        |       |       |       |       |
 
 
@@ -88,7 +88,7 @@ Tool for checking availability of network endpoints at given IP and port ranges
 ```
 usage: sudo python -m cotopaxi.service_ping.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
                        [--verbose]
-                       [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}]
+                       [--protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                        [--src-ip SRC_IP] [--src-port SRC_PORT]
                        dest_ip dest_port
 
@@ -108,13 +108,17 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}, -P {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}
-                        protocol to be tested (UDP includes CoAP, mDNS and
-                        DTLS, TCP includes CoAP and MQTT, ALL includes all
-                        supported protocols)
+  --protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+                        protocol to be tested (UDP includes all UDP-based
+                        protocols, while TCP includes all TCP-based protocols,
+                        ALL includes all supported protocols)
+  --src-ip SRC_IP, -SI SRC_IP
+                        source IP address (return result will not be
+                        received!)
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
+
 ```
 -------------------------------------------------------------------------------
 
@@ -140,10 +144,10 @@ Currently supported servers:
     *  OpenSSL,
     *  TinyDTLS
 ```
-usage: sudo python -m cotopaxi.server_fingerprinter [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                               [--verbose]
-                               [--protocol {CoAP,DTLS}]
-                               [--src-port SRC_PORT]
+usage: sudo python -m cotopaxi.server_fingerprinter.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+                               [--verbose] [--protocol {CoAP,DTLS}]
+                               [--src-ip SRC_IP] [--src-port SRC_PORT]
+                               [--ignore-ping-check]
                                dest_ip dest_port
 
 positional arguments:
@@ -164,11 +168,15 @@ optional arguments:
                         Turn on verbose/debug mode (more messages)
   --protocol {CoAP,DTLS}, -P {CoAP,DTLS}
                         protocol to be tested
+  --src-ip SRC_IP, -SI SRC_IP
+                        source IP address (return result will not be
+                        received!)
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
   --ignore-ping-check, -Pn
                         ignore ping check (treat all ports as alive)
+
 ```
 
 -------------------------------------------------------------------------------
@@ -180,7 +188,7 @@ Sample URL lists are available in the _urls_ directory
 
 ```
 usage: sudo python -m cotopaxi.resource_listing.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                           [--verbose] [--protocol {CoAP,mDNS,SSDP,RTSP}]
+                           [--verbose] [--protocol {CoAP,HTTP,mDNS,RTSP,SSDP}]
                            [--src-ip SRC_IP] [--src-port SRC_PORT]
                            [--ignore-ping-check]
                            [--method {GET,POST,PUT,DELETE,ALL} [{GET,POST,PUT,DELETE,ALL} ...]]
@@ -193,8 +201,9 @@ positional arguments:
   dest_port             destination port or multiple ports given by list
                         separated by coma (e.g. '8080,9090') or port range
                         (e.g. '1000-2000') or both
-  url_filepath          path to file with list of URLs to be tested (each URL
-                        in separated line)
+  names_filepath        path to file with list of names (URLs for CoAP or
+                        services for mDNS) to be tested (each name in
+                        separated line)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -204,16 +213,20 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,mDNS,SSDP,RTSP}, -P {CoAP,mDNS,SSDP,RTSP}
+  --protocol {CoAP,HTTP,mDNS,RTSP,SSDP}, -P {CoAP,HTTP,mDNS,RTSP,SSDP}
                         protocol to be tested
-  --method {GET,POST,PUT,DELETE,ALL}, -M {GET,POST,PUT,DELETE,ALL}
-                        methods to be tested (ALL includes all supported
-                        methods)
+  --src-ip SRC_IP, -SI SRC_IP
+                        source IP address (return result will not be
+                        received!)
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
   --ignore-ping-check, -Pn
                         ignore ping check (treat all ports as alive)
+  --method {GET,POST,PUT,DELETE,ALL} [{GET,POST,PUT,DELETE,ALL} ...], -M {GET,POST,PUT,DELETE,ALL} [{GET,POST,PUT,DELETE,ALL} ...]
+                        methods to be tested (ALL includes all supported
+                        methods)
+
 ```
 -------------------------------------------------------------------------------
 
@@ -224,7 +237,7 @@ Black-box fuzzer for testing protocol servers
 ```
 usage: sudo python -m cotopaxi.protocol_fuzzer.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
                           [--verbose]
-                          [--protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}]
+                          [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                           [--hide-disclaimer] [--src-ip SRC_IP]
                           [--src-port SRC_PORT] [--ignore-ping-check]
                           [--corpus-dir CORPUS_DIR]
@@ -247,7 +260,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}, -P {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}
+  --protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
                         protocol to be tested
   --hide-disclaimer, -HD
                         hides legal disclaimer (shown before starting
@@ -266,7 +279,6 @@ optional arguments:
   --delay-after-crash DELAY_AFTER_CRASH, -DAC DELAY_AFTER_CRASH
                         number of seconds that fuzzer will wait after crash
                         for respawning tested server
-
 ```
 
 -------------------------------------------------------------------------------
@@ -276,10 +288,10 @@ optional arguments:
 Black-box fuzzer for testing protocol clients
 
 ```
-usage: sudo client_proto_fuzzer.py [-h] [--server-ip SERVER_IP]
-                              [--server-port SERVER_PORT]
-                              [--protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}]
-                              [--verbose] [--corpus-dir CORPUS_DIR]
+usage: sudo python -m cotopaxi.client_proto_fuzzer.py [-h] [--server-ip SERVER_IP]
+                              [--server-port SERVER_PORT] [--verbose]
+                              [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                              [--corpus-dir CORPUS_DIR]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -287,14 +299,13 @@ optional arguments:
                         IP address, that will be used to set up tester server
   --server-port SERVER_PORT, -SP SERVER_PORT
                         port that will be used to set up server
-  --protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}, -P {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}
-                        protocol to be tested
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
+  --protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+                        protocol to be tested
   --corpus-dir CORPUS_DIR, -C CORPUS_DIR
                         path to directory with fuzzing payloads (corpus) (each
                         payload in separated file)
-
 ```
 
 -------------------------------------------------------------------------------
@@ -303,9 +314,15 @@ optional arguments:
 
 Tool for checking vulnerability of network endpoints at given IP and port ranges
 ```
-usage: sudo python -m cotopaxi.vulnerability_tester [-h] [-v]
-                               [--cve {ALL,CVE-2018-19417,...}]
-                               [--list LIST] [--src-port SRC_PORT]
+usage: sudo python -m cotopaxi.cotopaxi.vulnerability_tester -h
+usage: vulnerability_tester.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+                               [--verbose]
+                               [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                               [--hide-disclaimer] [--src-ip SRC_IP]
+                               [--src-port SRC_PORT] [--ignore-ping-check]
+                               [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
+                               [--cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]]
+                               [--list]
                                dest_ip dest_port
 
 positional arguments:
@@ -322,27 +339,30 @@ optional arguments:
                         number of retries
   --timeout TIMEOUT, -T TIMEOUT
                         timeout in seconds
-  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}, -P {ALL,UDP,TCP,CoAP,HTCPCP,mDNS,RTSP,SSDP,MQTT,DTLS}
-                        protocol to be tested (UDP includes CoAP, mDNS and
-                        DTLS, TCP includes CoAP and MQTT, ALL includes all
-                        supported protocols)
+  --verbose, -V, --debug, -D
+                        Turn on verbose/debug mode (more messages)
+  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+                        protocol to be tested (UDP includes all UDP-based
+                        protocols, while TCP includes all TCP-based protocols,
+                        ALL includes all supported protocols)
   --hide-disclaimer, -HD
                         hides legal disclaimer (shown before starting
                         intrusive tools)
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --cve {ALL,CVE-2018-19417,...}
-                        list of vulnerabilities to be tested (by CVE id)
-  --vuln {ALL,BOTAN_000,COAPTHON3_000,...} 
-                        list of vulnerabilities to be tested (by SOFT_NUM id)
-
-  --list, -L            display lists of all vulnerabilities supported by this
-                        tool with detailed description
+  --src-ip SRC_IP, -SI SRC_IP
+                        source IP address (return result will not be
+                        received!)
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
   --ignore-ping-check, -Pn
                         ignore ping check (treat all ports as alive)
+  --vuln {ALL,BEWARD_000,BOTAN_000,...} ...]
+                        list of vulnerabilities to be tested (by SOFT_NUM id)
+  --cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]
+                        list of vulnerabilities to be tested (by CVE id)
+  --list, -L            display lists of all vulnerabilities supported by this
+                        tool with detailed description
+
 ```
 -------------------------------------------------------------------------------
 
@@ -351,12 +371,11 @@ optional arguments:
 Tool for checking vulnerability of network clients connecting to server provided by this tool
 
 ```
-usage: sudo client_vuln_tester.py [-h] [--server-ip SERVER_IP]
-                             [--server-port SERVER_PORT]
-                             [--protocol {CoAP,mDNS,MQTT,DTLS,SSDP,HTCPCP}]
-                             [--verbose]
-                             [--vuln {ALL,BOTAN_000,COAPTHON3_000,...} [{ALL,BOTAN_000,COAPTHON3_000,...} ...]]
-                             [--cve {ALL,CVE-2017-12087,...} [{ALL,CVE-2017-12087,...} ...]]
+usage: sudo python -m cotopaxi.client_vuln_tester.py [-h] [--server-ip SERVER_IP]
+                             [--server-port SERVER_PORT] [--verbose]
+                             [--protocol {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                             [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
+                             [--cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]]
                              [--list]
 
 optional arguments:
@@ -365,13 +384,13 @@ optional arguments:
                         IP address, that will be used to set up tester server
   --server-port SERVER_PORT, -SP SERVER_PORT
                         port that will be used to set up server
-  --protocol {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}, -P {CoAP,HTCPCP,mDNS,MQTT,DTLS,RTSP,SSDP}
-                        protocol to be tested
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --vuln {ALL,BOTAN_000,COAPTHON3_000,...} [{ALL,BOTAN_000,COAPTHON3_000,...} ...]
+  --protocol {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+                        protocol to be tested
+  --vuln {ALL,BEWARD_000,BOTAN_000,...} ...]
                         list of vulnerabilities to be tested (by SOFT_NUM id)
-  --cve {ALL,CVE-2017-12087,CVE-2017-12130,...} [{ALL,CVE-2017-12087,CVE-2017-12130,...} ...]
+  --cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]
                         list of vulnerabilities to be tested (by CVE id)
   --list, -L            display lists of all vulnerabilities supported by this
                         tool with detailed description

@@ -27,7 +27,7 @@ sys.path.append("..")
 from scapy.all import IP, UDP
 from ..amplifier_detector import main, ReflectorSniffer, amplifier_parse_args
 from .common_test_utils import scrap_output
-from ..common_utils import check_caps
+from ..cotopaxi_tester import check_caps
 from .common_runner import TimerTestRunner
 
 

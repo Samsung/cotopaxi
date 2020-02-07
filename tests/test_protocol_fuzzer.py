@@ -25,7 +25,8 @@ import unittest
 
 sys.path.append("..")
 
-from ..common_utils import check_caps, get_local_ip
+from ..common_utils import get_local_ip
+from ..cotopaxi_tester import check_caps
 from ..protocol_fuzzer import main
 from .common_test_utils import scrap_output, load_test_servers
 from .common_runner import TimerTestRunner

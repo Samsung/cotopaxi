@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool for protocol fuzzing of network service at given IP and port ranges."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -28,12 +28,8 @@ import time
 
 from scapy.all import Raw
 
-from .common_utils import (
-    CotopaxiTester,
-    print_verbose,
-    proto_mapping_response,
-    sr1_file,
-)
+from .common_utils import print_verbose
+from .cotopaxi_tester import CotopaxiTester, PROTOCOL_TESTERS, sr1_file
 from .service_ping import service_ping
 from .vulnerability_tester import Vulnerability
 
@@ -87,7 +83,7 @@ class FuzzingCase(Vulnerability):
             )
             print (60 * "-" + "\nResponse:")
             try:
-                proto_handler = proto_mapping_response(test_params.protocol)
+                proto_handler = PROTOCOL_TESTERS[test_params.protocol].response_parser()
                 packet = proto_handler(test_result[Raw].load)
                 packet.show()
             except (TypeError, IndexError, struct.error):
@@ -105,15 +101,15 @@ class FuzzingCase(Vulnerability):
                 print (
                     "[+] Server {}:{} is dead after sending payload".format(
                         test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
-		    )
-		)
+                    )
+                )
                 test_params.test_stats.active_endpoints[test_params.protocol].append(
-		    "{}:{} - payload: {}".format(
-			test_params.dst_endpoint.ip_addr,
-			test_params.dst_endpoint.port,
-			self.payload_file,
-		    )
-		)
+                    "{}:{} - payload: {}".format(
+                        test_params.dst_endpoint.ip_addr,
+                        test_params.dst_endpoint.port,
+                        self.payload_file,
+                    )
+                )
                 print ("Waiting {} seconds for the server to start again.".format(60))
                 time.sleep(60)
                 if not service_ping(test_params):
@@ -178,11 +174,9 @@ def load_corpus(tester, args):
     if options.corpus_dir:
         corpus_dir_path = options.corpus_dir
     else:
-        corpus_dir_path = (
-            os.path.dirname(__file__)
-            + "/fuzzing_corpus/"
-            + test_params.protocol.name.lower()
-        )
+        corpus_dir_path = os.path.dirname(__file__) + "/fuzzing_corpus/"
+        if test_params.protocol.name != "ALL":
+            corpus_dir_path += test_params.protocol.name.lower()
     print_verbose(test_params, 80 * "=")
     testcases = []
     for root, _, files in os.walk(corpus_dir_path):
@@ -193,13 +187,16 @@ def load_corpus(tester, args):
             "Cannot load testcases from provided path: {}\n"
             "Testing stopped!".format(corpus_dir_path)
         )
+    print_verbose(test_params, "Loaded corpus of {} testcases".format(len(testcases)))
     return testcases
 
 
 def main(args):
     """Starts protocol fuzzer based on command line parameters"""
 
-    tester = CotopaxiTester(check_ignore_ping=True, use_generic_proto=False)
+    tester = CotopaxiTester(
+        test_name="server fuzzing", check_ignore_ping=True, use_generic_proto=False
+    )
     tester.test_params.positive_result_name = "Payloads causing crash"
     tester.test_params.potential_result_name = None
     tester.test_params.negative_result_name = None

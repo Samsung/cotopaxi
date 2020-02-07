@@ -3,7 +3,7 @@
 Tool for checking availability of network service at given IP and port ranges.
 """
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -25,15 +25,8 @@ Tool for checking availability of network service at given IP and port ranges.
 
 import sys
 
-from .coap_utils import coap_ping
-from .common_utils import CotopaxiTester, Protocol, print_verbose, protocol_enabled
-from .dtls_utils import dtls_ping
-from .htcpcp_utils import htcpcp_ping
-from .http_utils import http_ping
-from .mdns_utils import mdns_ping
-from .mqtt_utils import mqtt_ping
-from .rtsp_utils import rtsp_ping
-from .ssdp_utils import ssdp_ping
+from .common_utils import Protocol, print_verbose
+from .cotopaxi_tester import CotopaxiTester, PROTOCOL_TESTERS, protocol_enabled
 
 
 def endpoint_string(test_params):
@@ -49,17 +42,6 @@ def service_ping(test_params, show_result=False):
     response.
     """
 
-    protocol_handlers = {
-        Protocol.CoAP: coap_ping,
-        Protocol.DTLS: dtls_ping,
-        Protocol.HTCPCP: htcpcp_ping,
-        Protocol.HTTP: http_ping,
-        Protocol.mDNS: mdns_ping,
-        Protocol.SSDP: ssdp_ping,
-        Protocol.MQTT: mqtt_ping,
-        Protocol.RTSP: rtsp_ping,
-    }
-
     ping_protocol_handlers = {
         Protocol.CoAP: "CoAP ping (Empty CON)",
         Protocol.DTLS: "DTLS ping (Client Hello)",
@@ -69,12 +51,13 @@ def service_ping(test_params, show_result=False):
         Protocol.SSDP: "SSDP M-SEARCH",
         Protocol.MQTT: "MQTT ping (Connect)",
         Protocol.RTSP: "RTSP DESCRIBE",
+        Protocol.QUIC: "QUIC message",
     }
     try:
         ping_result = ""
         for protocol in ping_protocol_handlers:
             if protocol_enabled(protocol, test_params.protocol):
-                if protocol_handlers[protocol](test_params) is True:
+                if PROTOCOL_TESTERS[protocol].ping(test_params) is True:
                     ping_result = "responds"
                 else:
                     ping_result = "does NOT respond"
@@ -111,7 +94,7 @@ def perform_service_ping(test_params):
 def main(args):
     """Starts service ping based on command line parameters"""
 
-    tester = CotopaxiTester(show_disclaimer=False)
+    tester = CotopaxiTester(test_name="service ping", show_disclaimer=False)
     tester.parse_args(args)
     tester.perform_testing("service ping", perform_service_ping)
 

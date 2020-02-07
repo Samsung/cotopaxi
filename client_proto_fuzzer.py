@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool for protocol fuzzing of network clients."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -23,13 +23,10 @@
 
 import socket
 import sys
+from scapy.all import TCP, UDP
 
-from .common_utils import (
-    INPUT_BUFFER_SIZE,
-    CotopaxiClientTester,
-    Protocol,
-    print_verbose,
-)
+from .common_utils import INPUT_BUFFER_SIZE, print_verbose
+from .cotopaxi_tester import CotopaxiClientTester, protocols_using
 from .protocol_fuzzer import load_corpus
 
 
@@ -115,7 +112,7 @@ def udp_server(test_params, payloads):
 def main(args):
     """Starts client protocol fuzzer based on command line parameters"""
 
-    tester = CotopaxiClientTester("fuzzing")
+    tester = CotopaxiClientTester("client fuzzing")
     tester.argparser.add_argument(
         "--corpus-dir",
         "-C",
@@ -129,9 +126,9 @@ def main(args):
 
     print ("Loaded {} payloads for fuzzing".format(len(testcases)))
 
-    if tester.test_params.protocol in [Protocol.CoAP, Protocol.DTLS, Protocol.mDNS]:
+    if tester.test_params.protocol in protocols_using(UDP):
         udp_server(tester.test_params, testcases)
-    elif tester.test_params.protocol in [Protocol.MQTT, Protocol.RTSP]:
+    elif tester.test_params.protocol in protocols_using(TCP):
         tcp_server(tester.test_params, testcases)
     else:
         print (

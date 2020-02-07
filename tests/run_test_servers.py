@@ -50,7 +50,9 @@ def load_list_servers():
     return test_servers
 
 
+# set main directory below
 os.chdir("/home/ubuntu")
+
 PROCESSESS = prepare_list_cmd()
 # print processes
 SERVERS = load_list_servers()
@@ -67,7 +69,7 @@ for server in SERVERS:
             print ("Expected result: {}".format(check_result))
             print ("Received result: {}".format(result))
             if check_result in result:
-                print ("Server {} is responding correctly.\n".format(name))
+                print ("Server {} is responding correctly.\n".format(server_name))
                 server_alive = True
             else:
                 server_alive = False

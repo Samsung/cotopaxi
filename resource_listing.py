@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool for checking availability of specified url on server at given IP and port ranges."""
 
-#   Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#   Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #      Authors: Jakub Botwicz (Samsung R&D Poland),
 #               Michał Radwański (Samsung R&D Poland)
 #
@@ -25,13 +25,13 @@ import sys
 
 from .coap_utils import coap_check_url
 from .common_utils import (
-    CotopaxiTester,
     Protocol,
     prepare_names,
     print_verbose,
     ssdp_send_query,
     tcp_sr1,
 )
+from .cotopaxi_tester import CotopaxiTester
 from .mdns_utils import mdns_query
 from .ssdp_utils import SSDP_MULTICAST_IPV4, SSDP_QUERY
 from .rtsp_utils import build_rtsp_query
@@ -147,11 +147,11 @@ def perform_resource_listing_rtsp(test_params, list_streams):
 
 def main(args):
     """Lists resources on remote service based on command line parameters"""
-    supported_protocols = ("CoAP", "mDNS", "SSDP", "RTSP")
     tester = CotopaxiTester(
+        test_name="resource listing",
         check_ignore_ping=True,
         show_disclaimer=False,
-        protocol_choice=supported_protocols,
+        use_generic_proto=False,
     )
     tester.argparser.add_argument(
         "names_filepath",

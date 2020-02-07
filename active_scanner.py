@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Scanner for identyfing issues in DTLS servers or traffic."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                tintinweb@oststrom.com <github.com/tintinweb>
 #
@@ -27,7 +27,8 @@ import concurrent.futures
 import socket
 import sys
 from scapy.all import bind_layers, IP, sniff, UDP
-from scapy.layers.x509 import X509_Cert
+
+# from scapy.layers.x509 import X509_Cert
 from scapy_ssl_tls.ssl_tls import (
     DTLSRecord,
     DTLSClientHello,
@@ -68,6 +69,8 @@ from scapy_ssl_tls.ssl_tls import (
 )
 import scapy_ssl_tls.ssl_tls_keystore as tlsk
 
+from .common_utils import print_verbose, Protocol, show_verbose
+from .cotopaxi_tester import CotopaxiTester
 from .dtls_utils import (
     ENUM_DTLS_VERSIONS,
     DTLS,
@@ -78,7 +81,6 @@ from .dtls_utils import (
     DTLSHandshakes,
     DTLS_COMPRESSION_METHODS,
 )
-from .common_utils import CotopaxiTester, print_verbose, Protocol, show_verbose
 from .service_ping import service_ping
 
 TLS_HANDSHAKE_TYPES.update({0x3: "hello_verify_request"})
@@ -693,8 +695,8 @@ class DTLSScanner(object):
                 DTLSHandshake(fragment_offset=0)
                 / TLSCertificateList()
                 / TLS13Certificate(
-                    certificates=[TLSCertificate(data=X509_Cert(test_packet))],
-                    length=600,
+                    # certificates=[TLSCertificate(data=X509_Cert(test_packet))],
+                    length=600
                 )
             ]
         )
@@ -982,11 +984,11 @@ def active_scanning(test_params):
 def main(args):
     """Starts security active scanning based on command line parameters"""
 
-    supported_protocols = ["DTLS"]
     tester = CotopaxiTester(
+        test_name="active scanning",
         check_ignore_ping=True,
         show_disclaimer=False,
-        protocol_choice=supported_protocols,
+        use_generic_proto=False,
     )
     tester.test_params.positive_result_name = "Identified issues"
     tester.test_params.potential_result_name = "Unidentified endpoints"

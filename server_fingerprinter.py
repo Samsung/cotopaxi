@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool for fingerprinting of network service at given IP and port ranges."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
 #                Michał Radwański (Samsung R&D Poland)
 #
@@ -24,11 +24,12 @@
 import codecs
 import sys
 
-from .coap_utils import coap_ping, coap_sr1_file
-from .common_utils import CotopaxiTester, Protocol, print_verbose, protocol_enabled
+from .coap_utils import CoAPTester, coap_sr1_file
+from .common_utils import Protocol, print_verbose
+from .cotopaxi_tester import CotopaxiTester, protocol_enabled
 from .dtls_utils import (
     DTLSResults,
-    dtls_ping,
+    DTLSTester,
     prepare_dtls_test_packets,
     scrap_dtls_response,
     udp_send,
@@ -120,7 +121,7 @@ def coap_fingerprint(test_params):
     )
     prev_verbose = test_params.verbose
     test_params.verbose = False
-    alive_before = coap_ping(test_params)
+    alive_before = CoAPTester.ping(test_params)
     result = get_result_string(alive_before)
     print (
         "[.] Host {}:{} is {} before test!".format(
@@ -153,7 +154,7 @@ def coap_fingerprint(test_params):
     for i in test_packets:
         test_results[i] = coap_sr1_file(test_params, coap_vuln_file_format.format(i))
     test_params.verbose = prev_verbose
-    alive_after = coap_ping(test_params)
+    alive_after = CoAPTester.ping(test_params)
     result = get_result_string(alive_after)
 
     print (
@@ -188,7 +189,7 @@ def dtls_fingerprint(test_params):
     """Fingerprinting of server for DTLS protocol."""
     # coap_vuln_file_format = "cotopaxi/fingerprinting/coap/coap_finger_000_packet_{:03}.raw"
 
-    alive_before = dtls_ping(test_params)
+    alive_before = DTLSTester.ping(test_params)
     result = get_result_string(alive_before)
     print_verbose(
         test_params,
@@ -226,7 +227,7 @@ def dtls_fingerprint(test_params):
         else:
             test_results[idx] = "No response"
 
-    alive_after = dtls_ping(test_params)
+    alive_after = DTLSTester.ping(test_params)
     result = get_result_string(alive_after)
     print_verbose(
         test_params,
@@ -283,11 +284,11 @@ def service_fingerprint(test_params):
 def main(args):
     """Starts server fingerprinting based on command line parameters"""
 
-    supported_protocols = ("CoAP", "DTLS")
     tester = CotopaxiTester(
         check_ignore_ping=True,
         show_disclaimer=False,
-        protocol_choice=supported_protocols,
+        test_name="fingerprinting",
+        use_generic_proto=False,
     )
     tester.test_params.positive_result_name = "Identified"
     tester.test_params.potential_result_name = "Unidentified endpoints"
