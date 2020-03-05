@@ -18,7 +18,7 @@ git clone https://github.com/Samsung/cotopaxi
 ```    
 cd cotopaxi 
 ```
-3. Install requirements:
+3. Install requirements (in case of any problems with scapy and scapy-ssl_tls see section below):
 ```
 sudo pip install -r requirements.txt 
 ```
