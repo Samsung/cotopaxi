@@ -40,24 +40,28 @@ from .common_utils import (
     tcp_sr1,
     udp_sr1,
 )
+from .amqp_utils import AMQPTester
 from .coap_utils import CoAPTester
 from .dtls_utils import DTLSTester
 from .htcpcp_utils import HTCPCPTester
 from .http_utils import HTTPTester
 from .mdns_utils import MDNSTester
 from .mqtt_utils import MQTTTester
-from .quic_tester import QUICTester
+from .mqttsn_utils import MQTTSNTester
+from .quic_utils import QUICTester
 from .rtsp_utils import RTSPTester
 from .ssdp_utils import SSDPTester
 
 
 PROTOCOL_TESTERS = {
+    Protocol.AMQP: AMQPTester,
     Protocol.CoAP: CoAPTester,
     Protocol.DTLS: DTLSTester,
     Protocol.HTCPCP: HTCPCPTester,
     Protocol.HTTP: HTTPTester,
     Protocol.mDNS: MDNSTester,
     Protocol.MQTT: MQTTTester,
+    Protocol.MQTTSN: MQTTSNTester,
     Protocol.RTSP: RTSPTester,
     Protocol.QUIC: QUICTester,
     Protocol.SSDP: SSDPTester,
@@ -571,7 +575,7 @@ class CotopaxiTester(object):
         self.test_params.nr_retries = options.retries
         self.test_params.timeout_sec = options.timeout
 
-        self.test_params.protocol = Protocol[options.protocol]
+        self.test_params.protocol = Protocol[options.protocol.replace("-", "")]
         try:
             if options.src_ip:
                 self.test_params.src_endpoint.ip_addr = options.src_ip

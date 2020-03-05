@@ -25,7 +25,7 @@ Tool for checking availability of network service at given IP and port ranges.
 
 import sys
 
-from .common_utils import Protocol, print_verbose
+from .common_utils import print_verbose
 from .cotopaxi_tester import CotopaxiTester, PROTOCOL_TESTERS, protocol_enabled
 
 
@@ -42,21 +42,13 @@ def service_ping(test_params, show_result=False):
     response.
     """
 
-    ping_protocol_handlers = {
-        Protocol.CoAP: "CoAP ping (Empty CON)",
-        Protocol.DTLS: "DTLS ping (Client Hello)",
-        Protocol.HTCPCP: "HTCPCP BREW",
-        Protocol.HTTP: "HTTP GET",
-        Protocol.mDNS: "mDNS ping",
-        Protocol.SSDP: "SSDP M-SEARCH",
-        Protocol.MQTT: "MQTT ping (Connect)",
-        Protocol.RTSP: "RTSP DESCRIBE",
-        Protocol.QUIC: "QUIC message",
-    }
     try:
         ping_result = ""
-        for protocol in ping_protocol_handlers:
-            if protocol_enabled(protocol, test_params.protocol):
+        for protocol in PROTOCOL_TESTERS:
+            if (
+                protocol_enabled(protocol, test_params.protocol)
+                and PROTOCOL_TESTERS[protocol].implements_service_ping()
+            ):
                 if PROTOCOL_TESTERS[protocol].ping(test_params) is True:
                     ping_result = "responds"
                 else:
@@ -68,11 +60,11 @@ def service_ping(test_params, show_result=False):
                         endpoints = test_params.test_stats.inactive_endpoints
                     endpoints[protocol].append(endpoint_string(test_params))
                     print (
-                        "[+] Host {0}:{1} {2} to {3} message".format(
+                        '[+] Host {}:{} {} to {} "protocol ping" message'.format(
                             test_params.dst_endpoint.ip_addr,
                             test_params.dst_endpoint.port,
                             ping_result,
-                            ping_protocol_handlers[protocol],
+                            PROTOCOL_TESTERS[protocol].protocol_short_name(),
                         )
                     )
         if ping_result == "responds":

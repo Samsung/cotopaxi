@@ -124,6 +124,8 @@ class Protocol(Enum):
     HTTP = 10
     FTP = 11
     QUIC = 12
+    AMQP = 13
+    MQTTSN = 14
 
 
 def proto_mapping_request(protocol):

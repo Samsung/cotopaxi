@@ -20,14 +20,12 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
 import threading
 import unittest
 import timeout_decorator
 
-sys.path.append("..")
-from ..client_proto_fuzzer import main
-from ..common_utils import get_random_high_port
+from cotopaxi.client_proto_fuzzer import main
+from cotopaxi.common_utils import get_random_high_port
 
 from .common_runner import TimerTestRunner
 from .common_test_utils import CotopaxiToolClientTester, poke_tcp_server, scrap_output

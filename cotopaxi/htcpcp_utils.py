@@ -76,7 +76,8 @@ class HTCPCPTester(ProtocolTester):
     @staticmethod
     def ping(test_params, show_result=False):
         """Checks HTCPCP service availability by sending BREW message and waiting for response."""
-
+        if not test_params:
+            return None
         try:
             for _ in range(1 + test_params.nr_retries):
                 in_data = tcp_sr1(test_params, HTCPCP_BREW)

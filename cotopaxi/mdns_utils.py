@@ -150,26 +150,6 @@ def mdns_send_query(test_params, query, send_multicast=True):
             return
 
 
-def mdns_send_query_old(test_params, query, send_multicast=True):
-    """Sends mDNS query to normal and multicast address."""
-    dns_sd_query = DNS(rd=1, qd=DNSQR(qname=query, qtype="PTR"))
-
-    if test_params.ip_version == 4:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        time.sleep(1)
-        if send_multicast:
-            sock.sendto(str(dns_sd_query), (DNS_SD_MULTICAST_IPV4, 5353))
-    elif test_params.ip_version == 6:
-        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        time.sleep(1)
-        if send_multicast:
-            sock.sendto(str(dns_sd_query), (DNS_SD_MULTICAST_IPV6, 5353))
-    sock.sendto(
-        str(dns_sd_query),
-        (test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port),
-    )
-
-
 def mdns_query(test_params, query):
     """Performs mDNS query and returns response."""
     mdns_sniffer = MulticastDNSSniffer(test_params, query)
@@ -242,6 +222,8 @@ class MDNSTester(ProtocolTester):
     @staticmethod
     def ping(test_params, show_result=False):
         """Checks mDNS service availability by sending ping packet and waiting for response."""
+        if not test_params:
+            return None
         query = DNS_SD_QUERY
         mdns_sniffer = MulticastDNSSniffer(test_params, query)
         thread = threading.Thread(target=mdns_send_query, args=(test_params, query))

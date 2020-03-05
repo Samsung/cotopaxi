@@ -29,8 +29,8 @@ import traceback
 import timeout_decorator
 import yaml
 
-from ..common_utils import get_local_ip
-from ..cotopaxi_tester import check_caps
+from cotopaxi.common_utils import get_local_ip
+from cotopaxi.cotopaxi_tester import check_caps
 
 try:
     from StringIO import StringIO

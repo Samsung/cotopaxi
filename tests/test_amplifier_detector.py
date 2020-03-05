@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for amplifier_detector."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -21,13 +21,11 @@
 #
 
 import unittest
-import sys
 
-sys.path.append("..")
 from scapy.all import IP, UDP
-from ..amplifier_detector import main, ReflectorSniffer, amplifier_parse_args
+from cotopaxi.amplifier_detector import main, ReflectorSniffer, amplifier_parse_args
+from cotopaxi.cotopaxi_tester import check_caps
 from .common_test_utils import scrap_output
-from ..cotopaxi_tester import check_caps
 from .common_runner import TimerTestRunner
 
 

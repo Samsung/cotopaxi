@@ -25,9 +25,8 @@ import threading
 import unittest
 import timeout_decorator
 
-sys.path.append("..")
-from ..client_vuln_tester import main
-from ..common_utils import get_random_high_port
+from cotopaxi.client_vuln_tester import main
+from cotopaxi.common_utils import get_random_high_port
 from .common_runner import TimerTestRunner
 from .common_test_utils import CotopaxiToolClientTester, poke_tcp_server, scrap_output
 

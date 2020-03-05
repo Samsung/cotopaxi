@@ -20,15 +20,11 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
 import unittest
 from collections import defaultdict
-
-sys.path.append("..")
-
-from ..common_utils import Protocol, get_local_ip
-from ..cotopaxi_tester import check_caps, TestParams
-from ..service_ping import main, service_ping
+from cotopaxi.common_utils import Protocol, get_local_ip
+from cotopaxi.cotopaxi_tester import check_caps, TestParams
+from cotopaxi.service_ping import main, service_ping
 from .common_test_utils import scrap_output, load_test_servers, load_test_servers_list
 from .common_runner import TimerTestRunner
 
@@ -108,6 +104,14 @@ class TestServicePing(unittest.TestCase):
                     )
                     print (message)
                     self.assertTrue(result, message + " (not responding to ping)")
+
+    def test_service_ping_mdns(self):
+        output = scrap_output(main, ["224.0.0.251", "15353", "-P", "mDNS"])
+        self.assertIn("mDNS", output)
+
+    def test_service_ping_ssdp(self):
+        output = scrap_output(main, ["224.0.0.251", "15353", "-P", "SSDP"])
+        self.assertIn("SSDP", output)
 
 
 if __name__ == "__main__":

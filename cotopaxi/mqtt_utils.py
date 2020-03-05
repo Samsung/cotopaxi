@@ -110,6 +110,8 @@ class MQTTTester(ProtocolTester):
     @staticmethod
     def ping(test_params, show_result=False):
         """Checks MQTT service availability by sending ping packet and waiting for response."""
+        if not test_params:
+            return None
         # MQTT ping is using Connect message
         for packet_hex in [MQTT_CONN_MQTT, MQTT_CONN_MQISDP]:
             packet_data = dehex(packet_hex)

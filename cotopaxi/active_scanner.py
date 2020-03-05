@@ -49,7 +49,6 @@ from scapy_ssl_tls.ssl_tls import (
     TLSExtRenegotiationInfo,
     TLSExtSignatureAlgorithms,
     TLS13Certificate,
-    TLSCertificate,
     TLSCertificateList,
     TLSServerKeyExchange,
     TLSServerHelloDone,
@@ -670,7 +669,7 @@ class DTLSScanner(object):
         #     print("Test packet = ")
         #     print(test_packet)
         #     print("==============")
-        test_packet = "123123123"
+        # test_packet = "123123123"
         # print("_scan_certificates")
         pkt_hello = DTLSRecord(
             sequence=0,
@@ -915,7 +914,8 @@ def active_scanning(test_params):
     alive_before = service_ping(test_params)
     if not alive_before and not test_params.ignore_ping_check:
         print (
-            "[+] Server {}:{} is dead before starting scan - skipping this host!".format(
+            "[+] Server {}:{} is not responding before starting scan - skipping this host!"
+            "\n    (use --ignore-ping-check if you want to continue anyway)".format(
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
             ),
         )

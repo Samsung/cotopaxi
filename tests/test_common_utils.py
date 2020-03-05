@@ -21,10 +21,12 @@
 #
 
 import unittest
-import sys
 
-sys.path.append("..")
-from ..common_utils import get_local_ip, get_local_ipv6_address, get_random_high_port
+from cotopaxi.common_utils import (
+    get_local_ip,
+    get_local_ipv6_address,
+    get_random_high_port,
+)
 from .common_runner import TimerTestRunner
 
 

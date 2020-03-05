@@ -21,14 +21,15 @@
 #
 
 import unittest
-import sys
 from scapy.all import TCP, UDP
-
-sys.path.append("..")
+from cotopaxi.common_utils import Protocol
+from cotopaxi.cotopaxi_tester import (
+    prepare_ips,
+    prepare_ports,
+    parse_port,
+    protocols_using,
+)
 from .common_test_utils import scrap_output
-from ..common_utils import Protocol
-from ..cotopaxi_tester import prepare_ips, prepare_ports, parse_port, protocols_using
-
 from .common_runner import TimerTestRunner
 
 

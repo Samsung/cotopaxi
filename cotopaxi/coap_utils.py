@@ -232,6 +232,8 @@ class CoAPTester(ProtocolTester):
     @staticmethod
     def ping(test_params, show_result=False):
         """Checks CoAP service availability by sending ping packet and waiting for response."""
+        if not test_params:
+            return None
         coap_ping_packets = [COAP_PING_1_RAW, COAP_PING_2_RAW]
         for coap_ping_raw in coap_ping_packets:
             packet_raw = dehex(coap_ping_raw)

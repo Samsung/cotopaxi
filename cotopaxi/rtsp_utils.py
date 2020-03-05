@@ -89,7 +89,8 @@ class RTSPTester(ProtocolTester):
     @staticmethod
     def ping(test_params, show_result=False):
         """Checks RTSP service availability by sending DESCRIBE message and waiting for response."""
-
+        if not test_params:
+            return None
         rtsp_describe_message = build_rtsp_query(test_params, "DESCRIBE")
         rtsp_options_message = build_rtsp_query(test_params, "OPTIONS")
         try:

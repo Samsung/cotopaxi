@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for protocol fuzzer."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -20,14 +20,10 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
 import unittest
-
-sys.path.append("..")
-
-from ..common_utils import get_local_ip
-from ..cotopaxi_tester import check_caps
-from ..protocol_fuzzer import main
+from cotopaxi.common_utils import get_local_ip
+from cotopaxi.cotopaxi_tester import check_caps
+from cotopaxi.protocol_fuzzer import main
 from .common_test_utils import scrap_output, load_test_servers
 from .common_runner import TimerTestRunner
 

@@ -22,6 +22,7 @@
 #
 
 import codecs
+import os
 import sys
 
 from .coap_utils import CoAPTester, coap_sr1_file
@@ -117,7 +118,8 @@ def get_result_string(value):
 def coap_fingerprint(test_params):
     """Fingerprinting of server for CoAP protocol."""
     coap_vuln_file_format = (
-        "cotopaxi/fingerprinting/coap/coap_finger_000_packet_{:03}.raw"
+        os.path.dirname(__file__)
+        + "/fingerprinting/coap/coap_finger_000_packet_{:03}.raw"
     )
     prev_verbose = test_params.verbose
     test_params.verbose = False

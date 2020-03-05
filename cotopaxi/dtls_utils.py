@@ -726,6 +726,8 @@ class DTLSTester(ProtocolTester):
     @staticmethod
     def ping(test_params, show_result=False):
         """Checks DTLS service availability by sending ping packet and waiting for response."""
+        if not test_params:
+            return None
         ping_packets = [
             DTLS_1_0_HELLO_NMAP,
             DTLS_1_0_HELLO_BOTAN_CLIENT,

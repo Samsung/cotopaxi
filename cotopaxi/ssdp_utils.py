@@ -86,6 +86,8 @@ class SSDPTester(ProtocolTester):
         Checks SSDP service availability by sending ping packet and waiting for
         response.
         """
+        if not test_params:
+            return None
         ssdp_query_multicast = SSDP_QUERY.format(SSDP_MULTICAST_IPV4, "upnp:rootdevice")
         response = ssdp_send_query(test_params, ssdp_query_multicast)
         if response is None:

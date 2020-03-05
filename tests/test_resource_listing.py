@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for resource_listing."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -20,19 +20,20 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
 import unittest
-
-sys.path.append("..")
-
-from ..resource_listing import main
-from .common_test_utils import scrap_output, load_test_servers
-from ..common_utils import get_local_ip
-from ..cotopaxi_tester import check_caps
+from cotopaxi.resource_listing import main
+from cotopaxi.common_utils import get_local_ip
+from cotopaxi.cotopaxi_tester import check_caps
+from .common_test_utils import scrap_output, load_test_servers, CotopaxiToolServerTester
 from .common_runner import TimerTestRunner
 
 
-class TestResourceListing(unittest.TestCase):
+class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
+    def __init__(self, *args, **kwargs):
+        CotopaxiToolServerTester.__init__(self, *args, **kwargs)
+        unittest.TestCase.__init__(self, *args, **kwargs)
+        self.main = main
+
     @classmethod
     def setUpClass(cls):
         try:
@@ -103,7 +104,7 @@ class TestResourceListing(unittest.TestCase):
         )
         self.assertIn("available on server ::1:10 for method GET", output)
 
-    def test_resource_listing(self):
+    def test_resource_listing_coap(self):
         local_ip = get_local_ip()
         print ("ip: {}".format(local_ip))
 
@@ -159,6 +160,64 @@ class TestResourceListing(unittest.TestCase):
         self.assertNotIn("for method POST", output)
         self.assertIn("for method PUT", output)
         self.assertIn("for method DELETE", output)
+
+    def resource_listing(self, server_name, server_ver):
+        test_server_ip = str(self.config["COMMON"]["DEFAULT_IP"])
+        test_server_port = next(
+            x
+            for x in self.test_servers
+            if x["name"] == server_name and x["version"] == server_ver
+        )["port"]
+
+        return scrap_output(main, [test_server_ip, str(test_server_port), "-P", "mDNS"])
+
+    def test_resource_listing_mdns(self):
+        output = scrap_output(
+            main,
+            [
+                "225.0.0.225",
+                "5353",
+                "cotopaxi/lists/urls/short_url_list.txt",
+                "-P",
+                "mDNS",
+                "-T",
+                "0.001",
+            ],
+        )
+        self.assertIn("Finished resource listing", output)
+        self.assertIn("is not responding for query", output)
+
+    def test_resource_listing_ssdp(self):
+        output = scrap_output(
+            main,
+            [
+                "225.0.0.225",
+                "5353",
+                "cotopaxi/lists/urls/short_url_list.txt",
+                "-P",
+                "SSDP",
+                "-T",
+                "0.001",
+            ],
+        )
+        self.assertIn("Finished resource listing", output)
+        self.assertIn("Inactive endpoints: 2", output)
+
+    def test_resource_listing_rtsp(self):
+        output = scrap_output(
+            main,
+            [
+                "225.0.0.225",
+                "5353",
+                "cotopaxi/lists/urls/short_url_list.txt",
+                "-P",
+                "RTSP",
+                "-T",
+                "0.001",
+            ],
+        )
+        self.assertIn("Finished resource listing", output)
+        self.assertIn("Inactive endpoints: 2", output)
 
 
 if __name__ == "__main__":
