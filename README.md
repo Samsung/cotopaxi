@@ -1,7 +1,7 @@
 
 # Cotopaxi
 
-Set of tools for security testing of Internet of Things devices using protocols like: CoAP, DTLS, HTCPCP, mDNS, MQTT, QUIC, RTSP, SSDP.
+Set of tools for security testing of Internet of Things devices using protocols: AMQP, CoAP, DTLS, HTCPCP, mDNS, MQTT, MQTT-SN, QUIC, RTSP, SSDP.
 
 ## License:
 
@@ -10,8 +10,22 @@ https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 
 ## Installation:
 
-Simply clone code from git:
-    https://github.com/Samsung/cotopaxi
+1. Clone code from git:
+``` 
+git clone https://github.com/Samsung/cotopaxi 
+```
+2. Enter cotopaxi directory
+```    
+cd cotopaxi 
+```
+3. Install requirements:
+```
+sudo pip install -r requirements.txt 
+```
+4. Run installer:
+```
+sudo python setup.py install
+```
 
 ## Requirements:
 
@@ -68,18 +82,18 @@ Make sure you check with your local laws before running these tools!
 
 Protocols supported by different tools: 
 
-Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  | QUIC  | RTSP  | SSDP
----------------------|-------|-------|-------|-------|--------|-------|-------|-------|-----
-service_ping         |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  |MQTT-SN| QUIC  | RTSP  | SSDP
+---------------------|-------|-------|-------|-------|--------|-------|-------|-------|-------|-----
+service_ping         |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
 server_fingerprinter |       |&#9745;|&#9745;|        |       |       |       |       |
-credential_cracker   |       |  N/A  |  N/A  |  N/A   |  N/A  |       |  N/A  |  N/A  |  N/A  
-resource_listing     |       |&#9745;|  N/A  |        |&#9745;|       |       |&#9745;|&#9745;
-protocol_fuzzer      |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-client_proto_fuzzer  |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-vulnerability_tester |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-client_vuln_tester   |       |&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-amplifier_detector   |       |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |&#9745;|  N/A  |&#9745;
-active_scanner       |       |       |&#9745;|        |       |       |       |       |
+credential_cracker   |       |  N/A  |  N/A  |  N/A   |  N/A  |       |       |  N/A  |  N/A  |  N/A  
+resource_listing     |       |&#9745;|  N/A  |        |&#9745;|       |       |       |&#9745;|&#9745;
+protocol_fuzzer      |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+client_proto_fuzzer  |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+vulnerability_tester |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+client_vuln_tester   |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+amplifier_detector   |  N/A  |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |&#9745;|&#9745;|  N/A  |&#9745;
+active_scanner       |       |       |&#9745;|        |       |       |       |       |       |
 
 
 **cotopaxi.service_ping**
@@ -480,9 +494,16 @@ https://scapy.readthedocs.io/en/latest/troubleshooting.html#
 
 ## Unit tests
 
-To run all unit tests use (from directory upper than cotopaxi dir):
+To run all unit tests use (from upper cotopaxi dir):
 ```
     sudo python -m unittest discover
+```
+
+To run all unit tests with coverage analysis use (from upper cotopaxi dir):
+```
+    sudo coverage run --source cotopaxi -m unittest discover
+    coverage html
+    firefox htmlcov/index.html
 ```
 
 Most of tests are performed against remote tests servers and require preparing test environment, 

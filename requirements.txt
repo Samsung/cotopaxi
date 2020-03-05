@@ -5,4 +5,6 @@ hexdump>=3.3
 IPy>=0.83
 psutil>=3.4.2
 PyYAML>=3.12
+setuptools
 scapy-ssl-tls==2.0.0
+timeout-decorator
