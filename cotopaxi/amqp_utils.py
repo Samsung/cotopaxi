@@ -96,7 +96,11 @@ class AMQPTester(ProtocolTester):
                         if "HTTP/1." in in_data and "400 Bad Request" in in_data:
                             print_verbose(test_params, "Tested server is HTTP server.")
                             return False
-                        if "\x00\x0a\x00\x09" in in_data and "capabilities" in in_data:
+                        if (
+                            "AMQP" in in_data
+                            or "\x00\x0a\x00\x09" in in_data
+                            and "capabilities" in in_data
+                        ):
                             print_verbose(test_params, "AMQP Connection.Start: SUCCESS")
                             return True
         except (socket.timeout, socket.error) as error:
