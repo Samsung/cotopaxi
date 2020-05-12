@@ -31,18 +31,18 @@ class TestProtocolTester(unittest.TestCase):
         unittest.TestCase.__init__(self, *args, **kwargs)
         self.tester = ProtocolTester()
 
-    def test_tester_names(self):
+    def test_tester_names_pos(self):
         short_name = self.tester.protocol_short_name()
         self.assertIsInstance(short_name, str)
 
         full_name = self.tester.protocol_full_name()
         self.assertIsInstance(full_name, str)
 
-    def test_tester_port(self):
+    def test_tester_port_pos(self):
         default_port = self.tester.default_port()
         self.assertIsInstance(default_port, int)
 
-    def test_tester_implements(self):
+    def test_tester_implements_pos(self):
         self.assertIsInstance(self.tester.implements_service_ping(), bool)
         self.assertIsInstance(self.tester.implements_fingerprinting(), bool)
         self.assertIsInstance(self.tester.implements_resource_listing(), bool)
@@ -51,11 +51,11 @@ class TestProtocolTester(unittest.TestCase):
         self.assertIsInstance(self.tester.implements_active_scanning(), bool)
         self.assertIsInstance(self.tester.implements_vulnerability_testing(), bool)
 
-    def test_tester_protocol(self):
+    def test_tester_protocol_pos(self):
         protocol = self.tester.transport_protocol()
         self.assertTrue(protocol in [None, TCP, UDP])
 
-    def test_tester_parsers(self):
+    def test_tester_parsers_pos(self):
         parser = self.tester.request_parser()
         if parser:
             show_method = getattr(parser, "show", None)
@@ -65,7 +65,7 @@ class TestProtocolTester(unittest.TestCase):
             show_method = getattr(parser, "show", None)
             self.assertTrue(callable(show_method))
 
-    def test_tester_operations(self):
+    def test_tester_operations_pos(self):
         self.tester.ping(None)
         self.tester.fingerprint(None)
         self.tester.resource_listing(None, None)

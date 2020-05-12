@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Tool for checking availability of network service at given IP and port ranges.
-"""
+"""Tool for checking availability of network service."""
 #
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz (Samsung R&D Poland),
@@ -30,18 +28,14 @@ from .cotopaxi_tester import CotopaxiTester, PROTOCOL_TESTERS, protocol_enabled
 
 
 def endpoint_string(test_params):
-    """Returns endpoint description in form of string"""
+    """Return endpoint description in form of string."""
     return "{}:{}".format(
         test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
     )
 
 
 def service_ping(test_params, show_result=False):
-    """
-    Checks service availability by sending 'ping' packet and waiting for
-    response.
-    """
-
+    """Check service availability by sending 'ping' packet and waiting for response."""
     try:
         ping_result = ""
         for protocol in PROTOCOL_TESTERS:
@@ -76,16 +70,12 @@ def service_ping(test_params, show_result=False):
 
 
 def perform_service_ping(test_params):
-    """
-    Checks service availability by sending 'ping' packet and waiting for
-    response.
-    """
+    """Check service availability by sending 'ping' packet and waiting for response."""
     return service_ping(test_params, True)
 
 
 def main(args):
-    """Starts service ping based on command line parameters"""
-
+    """Start service ping based on command line parameters."""
     tester = CotopaxiTester(test_name="service ping", show_disclaimer=False)
     tester.parse_args(args)
     tester.perform_testing("service ping", perform_service_ping)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test runner."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
@@ -53,10 +53,17 @@ class TimerTestRunner(TextTestRunner):
         result = super(TimerTestRunner, self).run(test)
 
         self.stream.writeln(
-            "\nSlow Tests (>{:.03}s):".format(float(self.slow_test_threshold))
+            "\nSlow tests (>{:.03}s):".format(float(self.slow_test_threshold))
         )
         for name, elapsed in result.get_test_timings():
             if elapsed > self.slow_test_threshold:
+                self.stream.writeln("({:.03}s) {}".format(elapsed, name))
+
+        self.stream.writeln(
+            "\nQuick tests (<={:.03}s):".format(float(self.slow_test_threshold))
+        )
+        for name, elapsed in result.get_test_timings():
+            if elapsed <= self.slow_test_threshold:
                 self.stream.writeln("({:.03}s) {}".format(elapsed, name))
 
         return result

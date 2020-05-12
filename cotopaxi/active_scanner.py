@@ -137,7 +137,7 @@ bind_layers(
 
 
 class DTLSInfo(object):
-    """DTLSInfo passively evaluates the traffic and generates events/warning"""
+    """DTLSInfo passively evaluates the traffic and generates events/warning."""
 
     # https://en.wikipedia.org/wiki/RSA_numbers
     RSA_MODULI_KNOWN_FACTORED = (
@@ -242,6 +242,7 @@ class DTLSInfo(object):
     )
 
     def __init__(self, test_params):
+        """Construct DTLSSInfo."""
         self.test_params = test_params
         self.history = []
         self.events = []
@@ -287,6 +288,7 @@ class DTLSInfo(object):
         self.info.server.extensions = set([])
 
     def __str__(self):
+        """Return DTLSInfo statistics."""
         return """<DTLSInfo
         packets.processed: %s
 
@@ -324,7 +326,7 @@ class DTLSInfo(object):
         )
 
     def report_issue(self, description, data):
-        """Append description of issue to set of issues"""
+        """Append description of issue to set of issues."""
         self.test_params.test_stats.active_endpoints[Protocol.DTLS].append(
             "{}:{} - vuln: {}".format(
                 self.test_params.dst_endpoint.ip_addr,
@@ -335,7 +337,9 @@ class DTLSInfo(object):
         self.events.append((description, data))
 
     def check_sloth(self, dtlsinfo):
-        """Obvious SLOTH check, does not detect implementation errors that allow MD5 even
+        """Obvious SLOTH check.
+
+        Does not detect implementation errors that allow MD5 even
            though not announced. Makes only sense for ClientHello.
         """
         exts = [
@@ -360,7 +364,7 @@ class DTLSInfo(object):
                     )
 
     def check_public_key(self, dtlsinfo):
-        """Checks public keys in DTLS sessions"""
+        """Check public keys in DTLS sessions."""
         try:
             for certlist in dtlsinfo.certificates:
                 for cert in certlist.certificates:
@@ -393,17 +397,13 @@ class DTLSInfo(object):
             pass  # tlsinfo.client has no attribute certificates
 
     def check_cipher(self, cipher_namelist, cipher):
-        """Checks whether particular cipher is listed"""
-        tmp = [
-            c
-            for c in cipher_namelist
-            if isinstance(c, basestring) and cipher in c.upper()
-        ]
+        """Check whether particular cipher is listed."""
+        tmp = [c for c in cipher_namelist if isinstance(c, str) and cipher in c.upper()]
         if tmp:
             self.report_issue("CIPHERS - {} ciphers enabled".format(cipher), tmp)
 
     def get_events(self):
-        """Returns list of all reported events"""
+        """Return list of all reported events."""
         events = []
         for dtlsinfo in (self.info.client, self.info.server):
             # test CRIME - compressions offered?
@@ -424,16 +424,12 @@ class DTLSInfo(object):
             tmp = [
                 c
                 for c in cipher_namelist
-                if isinstance(c, basestring)
-                and "SSLV2" in c.upper()
-                and "EXP" in c.upper()
+                if isinstance(c, str) and "SSLV2" in c.upper() and "EXP" in c.upper()
             ]
             if tmp:
                 self.report_issue("DROWN - SSLv2 with EXPORT ciphers enabled", tmp)
             tmp = [
-                c
-                for c in cipher_namelist
-                if isinstance(c, basestring) and "EXP" in c.upper()
+                c for c in cipher_namelist if isinstance(c, str) and "EXP" in c.upper()
             ]
             if tmp:
                 self.report_issue("CIPHERS - Export ciphers enabled", tmp)
@@ -444,7 +440,7 @@ class DTLSInfo(object):
             tmp = [
                 c
                 for c in cipher_namelist
-                if isinstance(c, basestring) and "RSA_EXP" in c.upper()
+                if isinstance(c, str) and "RSA_EXP" in c.upper()
             ]
             if tmp:
                 # only check DHE EXPORT for now. we might want to add DH1024 here.
@@ -454,9 +450,7 @@ class DTLSInfo(object):
             tmp = [
                 c
                 for c in cipher_namelist
-                if isinstance(c, basestring)
-                and "DHE_" in c.upper()
-                and "EXPORT_" in c.upper()
+                if isinstance(c, str) and "DHE_" in c.upper() and "EXPORT_" in c.upper()
             ]
             if tmp:
                 # only check DHE EXPORT for now. we might want to add DH1024 here.
@@ -482,11 +476,11 @@ class DTLSInfo(object):
         return events
 
     def insert(self, pkt, client=None):
-        """Inserts packet into processing queue"""
+        """Insert packet into processing queue."""
         self._process(pkt, client=client)
 
     def process_record(self, pkt, record, client=None):
-        """Processes DTLS record"""
+        """Process DTLS record."""
         print_verbose(self.test_params, "------------- RECORD START --------------")
         show_verbose(self.test_params, record)
         print_verbose(self.test_params, "------------- RECORD STOP --------------")
@@ -570,22 +564,23 @@ class DTLSInfo(object):
 
 
 class DTLSScanner(object):
-    """Generates DTLS probe traffic"""
+    """Generate DTLS probe traffic."""
 
     def __init__(self, test_params, workers=10):
+        """Construct empty DTLSScanner object."""
         self.workers = workers
         self.capabilities = DTLSInfo(test_params)
 
     def scan(self, target, starttls=None):
-        """Initiates scanning process (active)"""
+        """Initiate scanning process (active)."""
         for scan_method in (f for f in dir(self) if f.startswith("_scan_")):
             print (" Starting scan: %s" % (scan_method.replace("_scan_", "")))
             getattr(self, scan_method)(
                 target, starttls=starttls, test_params=self.capabilities.test_params
             )
 
-    def sniff(self, target=None, iface=None):
-        """Initiates swniffing process (passive)"""
+    def sniff(self, target=None, iface=None, timeout=3):
+        """Initiate sniffing process (passive)."""
 
         def _process(pkt):
             match_ip = (
@@ -597,7 +592,7 @@ class DTLSScanner(object):
             match_port = (
                 pkt.haslayer(UDP)
                 and (pkt[UDP].sport == target[1] or pkt[UDP].dport == target[1])
-                if len(target) == 2
+                if target and len(target) == 2
                 else True
             )
             if match_ip and match_port:
@@ -626,16 +621,16 @@ class DTLSScanner(object):
             bpf = None
             if target:
                 bpf = "host %s" % target[0]
-            if len(target) == 2:
-                bpf += " and udp port %d" % target[1]
-            sniff(filter=bpf, prn=_process, store=0, timeout=3)
+                if len(target) == 2:
+                    bpf += " and udp port %d" % target[1]
+            sniff(filter=bpf, prn=_process, store=0, timeout=timeout)
 
     def _scan_compressions(
         self, target, starttls=None, compression_list=None, test_params=None
     ):
-        """Plugin for verifying possible compressions in DTLS"""
+        """Identify possible compressions in DTLS."""
         if not compression_list:
-            compression_list = DTLS_COMPRESSION_METHODS.keys()
+            compression_list = list(DTLS_COMPRESSION_METHODS.keys())
         for comp in compression_list:
             # prepare pkt
             pkt = DTLSRecord(
@@ -663,7 +658,7 @@ class DTLSScanner(object):
                 print (repr(sock_err))
 
     def xxx_scan_certificates(self, target, starttls=None, test_params=None):
-        """Plugin for identyfing server certificates in DTLS"""
+        """Identify server certificates in DTLS."""
         # with open("512b-dsa-example-cert.der", "r") as file_handle:
         #     test_packet = file_handle.read().strip()
         #     print("Test packet = ")
@@ -725,6 +720,7 @@ class DTLSScanner(object):
         version=ENUM_DTLS_VERSIONS.DTLS_1_0,
         test_params=None,
     ):
+        """Check whether particular cipher is listed."""
         pkt = DTLSRecord(
             sequence=0, content_type=TLSContentType.HANDSHAKE, version=version
         ) / DTLSHandshakes(
@@ -748,7 +744,7 @@ class DTLSScanner(object):
             return None
         return resp
 
-    def xxx_scan_accepted_ciphersuites(
+    def scan_accepted_ciphersuites(
         self,
         target,
         starttls=None,
@@ -756,9 +752,9 @@ class DTLSScanner(object):
         version=ENUM_DTLS_VERSIONS.DTLS_1_0,
         test_params=None,
     ):
-        """Plugin for verifying possible ciphersuites of DTLS server"""
+        """Identify possible ciphersuites of DTLS server."""
         if not cipherlist:
-            cipherlist = DTLS_CIPHER_SUITES.keys()
+            cipherlist = list(DTLS_CIPHER_SUITES.keys())
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=self.workers
         ) as executor:
@@ -780,12 +776,10 @@ class DTLSScanner(object):
         self,
         target,
         starttls=None,
-        versionlist=(
-            (k, v) for k, v in DTLS_VERSIONS.iteritems() if v.startswith("DTLS_")
-        ),
+        versionlist=((k, v) for k, v in DTLS_VERSIONS.items() if v.startswith("DTLS_")),
         test_params=None,
     ):
-        """Plugin for verifying possible protocol versions of DTLS server"""
+        """Identify possible protocol versions of DTLS server."""
         for magic, ___ in versionlist:
             pkt = DTLSRecord(
                 version=magic, sequence=0, content_type=TLSContentType.HANDSHAKE
@@ -815,7 +809,7 @@ class DTLSScanner(object):
                 print (repr(sock_err))
 
     def _scan_scsv(self, target, starttls=None, test_params=None):
-        """Plugin for verifying SCSV support by DTLS server"""
+        """Verify SCSV support by DTLS server."""
         pkt = DTLSRecord(version=ENUM_DTLS_VERSIONS.DTLS_1_1) / DTLSHandshakes(
             handshakes=[
                 DTLSHandshake()
@@ -851,7 +845,7 @@ class DTLSScanner(object):
         version=ENUM_DTLS_VERSIONS.DTLS_1_0,
         test_params=None,
     ):
-        """Plugin for verifying vulnerability to Heartbleed attack by DTLS server"""
+        """Plugin for verifying vulnerability to Heartbleed attack by DTLS server."""
         try:
             client = DTLSClient(target, starttls=starttls, test_params=test_params)
             pkt = DTLSRecord(version=version) / DTLSHandshakes(
@@ -882,7 +876,7 @@ class DTLSScanner(object):
         version=ENUM_DTLS_VERSIONS.DTLS_1_0,
         test_params=None,
     ):
-        """Plugin for verifying vulnerability to Insecure Renegotiations by DTLS server"""
+        """Plugin for verifying vulnerability to Insecure Renegotiations by DTLS server."""
         # todo: also test EMPTY_RENEGOTIATION_INFO_SCSV
         try:
             client = DTLSClient(target, starttls=starttls, test_params=test_params)
@@ -910,7 +904,7 @@ class DTLSScanner(object):
 
 
 def active_scanning(test_params):
-    """Performs active scanning based on provided test params"""
+    """Perform active scanning based on provided test params."""
     alive_before = service_ping(test_params)
     if not alive_before and not test_params.ignore_ping_check:
         print (
@@ -982,8 +976,7 @@ def active_scanning(test_params):
 
 
 def main(args):
-    """Starts security active scanning based on command line parameters"""
-
+    """Start security active scanning based on command line parameters."""
     tester = CotopaxiTester(
         test_name="active scanning",
         check_ignore_ping=True,

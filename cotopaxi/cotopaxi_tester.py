@@ -24,6 +24,7 @@
 import argparse
 import socket
 import struct
+import sys
 import time
 from IPy import IP as IPY_IP
 from scapy.all import sniff, TCP, UDP
@@ -69,7 +70,7 @@ PROTOCOL_TESTERS = {
 
 
 def protocols_using(transport_protocol):
-    """Provides list of protocols using provided transport protocol."""
+    """Provide list of protocols using provided transport protocol."""
     return [
         e
         for e, p in PROTOCOL_TESTERS.items()
@@ -78,7 +79,7 @@ def protocols_using(transport_protocol):
 
 
 def protocol_enabled(protocol, proto_mask):
-    """Checks whether protocol is enabled for test using given protocol mask."""
+    """Check whether protocol is enabled for test using given protocol mask."""
     if proto_mask == Protocol.ALL:
         return True
     if proto_mask == protocol:
@@ -98,7 +99,7 @@ SLEEP_TIME_ON_DISCLAIMER = 1
 
 
 def argparser_add_verbose(parser):
-    """Adds verbose parameter to arg parser."""
+    """Add verbose parameter to arg parser."""
     parser.add_argument(
         "--verbose",
         "-V",
@@ -111,7 +112,7 @@ def argparser_add_verbose(parser):
 
 
 def argparser_add_protocols(parser, test_name, use_generic_proto):
-    """Adds protocols to arg parser."""
+    """Add protocols to arg parser."""
     supported_protocols = [
         p.protocol_short_name()
         for p in PROTOCOL_TESTERS.values()
@@ -132,18 +133,21 @@ def argparser_add_protocols(parser, test_name, use_generic_proto):
             "ALL includes all supported protocols)",
         )
     else:
+        default_proto = "CoAP"
+        if len(supported_protocols) == 1:
+            default_proto = supported_protocols[0]
         parser.add_argument(
             "--protocol",
             "-P",
             action="store",
             choices=supported_protocols,
-            default="CoAP",
+            default=default_proto,
             help="protocol to be tested",
         )
 
 
 def argparser_add_dest(parser):
-    """Adds verbose parameter to arg parser."""
+    """Add verbose parameter to arg parser."""
     parser.add_argument("dest_ip", action="store", help="destination IP address")
     parser.add_argument(
         "--port", "--dest_port", "-P", action="store", help="destination port"
@@ -152,7 +156,7 @@ def argparser_add_dest(parser):
 
 
 def argparser_add_number(parser):
-    """Adds verbose parameter to arg parser."""
+    """Add verbose parameter to arg parser."""
     parser.add_argument(
         "--nr",
         "-N",
@@ -165,7 +169,7 @@ def argparser_add_number(parser):
 
 
 def argparser_add_ignore_ping_check(parser):
-    """Adds ignore ping check parameter to arg parser."""
+    """Add ignore ping check parameter to arg parser."""
     parser.add_argument(
         "--ignore-ping-check",
         "-Pn",
@@ -176,11 +180,10 @@ def argparser_add_ignore_ping_check(parser):
 
 
 def create_basic_argparser():
-    """Creates ArgumentParser and add basic options (dest_ip, dest_port and verbose).
+    """Create ArgumentParser and add basic options (dest_ip, dest_port and verbose).
 
-        Returns:
-            ArgumentParser: Parser with added options used by all programs.
-
+    Returns:
+        ArgumentParser: Parser with added options used by all programs.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -220,11 +223,10 @@ def create_basic_argparser():
 
 
 def create_client_tester_argparser():
-    """Creates ArgumentParser and add options for client tester.
+    """Create ArgumentParser and add options for client tester.
 
-        Returns:
-            ArgumentParser: Parser with added options used by all programs.
-
+    Returns:
+        ArgumentParser: Parser with added options used by all programs.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -254,7 +256,7 @@ def create_client_tester_argparser():
 
 
 def check_non_negative_float(value):
-    """Checks whether provided string value converts to non-negative float value"""
+    """Check whether provided string value converts to non-negative float value."""
     ivalue = float(value)
     if ivalue < 0:
         raise argparse.ArgumentTypeError(
@@ -264,9 +266,10 @@ def check_non_negative_float(value):
 
 
 class TestStatistics(object):
-    """Object gathering test statistics"""
+    """Object gathering test statistics."""
 
     def __init__(self):
+        """Create test statistics with zeroed values."""
         self.packets_sent = 0
         self.packets_received = 0
         self.packets_rtt = []
@@ -280,14 +283,15 @@ class TestStatistics(object):
             self.inactive_endpoints[proto] = []
 
     def test_time(self):
-        """Calculates test time in seconds"""
+        """Calculate test time in seconds."""
         return time.time() - self.test_start
 
 
 class Endpoint(object):
-    """Object representing test endpoint (source or destination)"""
+    """Object representing test endpoint (source or destination)."""
 
     def __init__(self, ip_addr=None, port=None, ipv6_addr=None):
+        """Create empty Endpoint object."""
         if ip_addr is None:
             self.ip_addr = get_local_ip()
         else:
@@ -303,39 +307,39 @@ class Endpoint(object):
 
     @property
     def ip_address(self):
-        """ Returns IP address of this endpoint"""
+        """Return IP address of this endpoint."""
         return self.ip_addr
 
     @ip_address.setter
     def ip_address(self, ip_value):
-        """ Sets IP address of this endpoint"""
+        """Set IP address of this endpoint."""
         self.ip_addr = ip_value
 
     @property
     def port(self):
-        """ Returns port of this endpoint"""
+        """Return port of this endpoint."""
         return self.port_
 
     @port.setter
     def port(self, port):
-        """ Sets port of this endpoint"""
+        """Set port of this endpoint."""
         self.port_ = port
 
 
 def message_loss(sent, received):
-    """Calculates message loss factor"""
+    """Calculate message loss factor."""
     if sent > 0 and received <= sent:
         return 100.0 * (sent - received) / sent
     return 0
 
 
 def print_separator(used_char="="):
-    """Print line separator using provided char"""
+    """Print line separator using provided char."""
     print (SEPARATOR_LINE_SIZE * used_char)
 
 
 def print_disclaimer():
-    """Shows legal dislaimer """
+    """Show legal disclaimer."""
     print_separator()
     print (
         """This tool can cause some devices or servers to stop acting in the intended way -
@@ -349,11 +353,11 @@ before running this tool!"""
 
 
 def check_caps():
-    """Function check privileges required to run scapy sniffing functions."""
+    """Check privileges required to run scapy sniffing functions."""
     try:
         sniff(count=1, timeout=1)
     except socket.error:
-        exit(
+        sys.exit(
             "\nThis tool requires admin permissions on network interfaces.\n"
             "On Linux and Unix run it with sudo, use root account (UID=0)"
             " or add CAP_NET_ADMIN, CAP_NET_RAW manually!\n"
@@ -362,10 +366,11 @@ def check_caps():
 
 
 class TestParams(object):
-    """Object defining common test parameters"""
+    """Object defining common test parameters."""
 
     # pylint: disable=too-many-instance-attributes
     def __init__(self, name=""):
+        """Create empty TestParams object."""
         self.test_name = name
         self.src_endpoint = Endpoint()
         self.dst_endpoint = Endpoint()
@@ -383,7 +388,7 @@ class TestParams(object):
         self.negative_result_name = "Inactive endpoints"
 
     def print_stats(self):
-        """Prints statistics gathered during tests"""
+        """Print statistics gathered during tests."""
         print (80 * "=" + "\nTest statistics:")
         print (
             "Messages sent: {}, responses received: {}, "
@@ -446,7 +451,7 @@ class TestParams(object):
             print ("{}: {}".format(self.negative_result_name, len(inactive_endpoints)))
 
     def print_client_stats(self):
-        """Prints statistics gathered during tests of clients"""
+        """Print statistics gathered during tests of clients."""
         print (80 * "=" + "\nTest statistics:")
         print (
             "Requests received: {}, payloads sent: {}, "
@@ -458,15 +463,19 @@ class TestParams(object):
         )
 
     def report_sent_packet(self):
-        """Updated tests statistics with sent packet.
-            :return: time when packet was sent (input parameter for report_received_packet())
+        """Update tests statistics with sent packet.
+
+        Returns:
+            time when packet was sent (input parameter for report_received_packet())
         """
         self.test_stats.packets_sent += 1
         return time.time()
 
     def report_received_packet(self, sent_time):
-        """Updated tests statistics with received packet.
-            :param sent_time: time when packet was sent (returned by report_sent_packet).
+        """Update tests statistics with received packet.
+
+        Args:
+            sent_time: time when packet was sent (returned by report_sent_packet).
         """
         response_time = time.time()
         self.test_stats.packets_received += 1
@@ -474,24 +483,24 @@ class TestParams(object):
 
     @property
     def src(self):
-        """Returns source endpoint"""
+        """Return source endpoint."""
         return self.src_endpoint
 
     @property
     def dst(self):
-        """Returns destination endpoint"""
+        """Return destination endpoint."""
         return self.dst_endpoint
 
     def set_ip_version(self):
-        """Function identifies IP version of the protocol"""
+        """Set IP version of the protocol."""
         ip_addr = IPY_IP(self.dst_endpoint.ip_addr)
         if ip_addr.version() == 6:
             self.ip_version = 6
 
 
 def sr1_file(test_params, test_filename, display_packet=False):
-    """Reads test message from given file, sends this message to server and parses response"""
-    with open(test_filename, "r") as file_handle:
+    """Read test message from given file, sends this message to server and parses response."""
+    with open(test_filename, "rb") as file_handle:
         test_packet = file_handle.read()
     if display_packet:
         # print("Protocol: {}".format(proto_mapping(test_params.protocol)))
@@ -515,7 +524,7 @@ def sr1_file(test_params, test_filename, display_packet=False):
 
 
 class CotopaxiTester(object):
-    """Core tester data and methods"""
+    """Core tester data and methods."""
 
     def __init__(
         self,
@@ -525,6 +534,7 @@ class CotopaxiTester(object):
         show_disclaimer=True,
         protocol_choice=None,
     ):
+        """Create empty CotopaxiTester object."""
         check_caps()
         self.test_params = TestParams(test_name)
         self.list_ips = []
@@ -569,7 +579,7 @@ class CotopaxiTester(object):
             argparser_add_ignore_ping_check(self.argparser)
 
     def parse_args(self, args):
-        """Parses all parameters based on provided argparser options"""
+        """Parse all parameters based on provided argparser options."""
         options = self.argparser.parse_args(args)
         self.test_params.verbose = options.verbose
         self.test_params.nr_retries = options.retries
@@ -611,8 +621,7 @@ class CotopaxiTester(object):
         return options
 
     def perform_testing(self, test_name, test_function, test_cases=None):
-        """Wrapper used to perform tests using CotopaxiTester."""
-
+        """Perform tests using CotopaxiTester."""
         if (
             "show_disclaimer" in self.test_params.parsed_options
             and self.test_params.parsed_options["show_disclaimer"]
@@ -642,23 +651,24 @@ class CotopaxiTester(object):
 
 
 class CotopaxiClientTester(object):
-    """Core client tester (server used for testing clients) data and methods"""
+    """Core client tester (server used for testing clients) data and methods."""
 
     def __init__(self, test_name=""):
+        """Create CotopaxiClientTester object with default values."""
         check_caps()
         self.test_params = TestParams(test_name)
         self.argparser = create_client_tester_argparser()
         argparser_add_protocols(self.argparser, test_name, False)
 
     def parse_args(self, args):
-        """Parses all parameters based on provided argparser options"""
+        """Parse all parameters based on provided argparser options."""
         options = self.argparser.parse_args(args)
         self.test_params.verbose = options.verbose
         self.test_params.protocol = Protocol[options.protocol]
         self.test_params.src_endpoint.ip_addr = options.server_ip
         if options.server_port != -1:
             if options.server_port < 0 or options.server_port > NET_MAX_PORT:
-                exit("Server port must be in range (0, {}).".format(NET_MAX_PORT))
+                sys.exit("Server port must be in range (0, {}).".format(NET_MAX_PORT))
             self.test_params.src_endpoint.port = options.server_port
         else:
             self.test_params.src_endpoint.port = PROTOCOL_TESTERS[
@@ -674,14 +684,13 @@ class CotopaxiClientTester(object):
 
 
 def prepare_ips(ips_input):
-    """Parses IPs description taken from command line into sorted list of unique ip addresses.
+    """Parse IPs description taken from command line into sorted list of unique ip addresses.
 
-        Args:
-            ips_input (str): IP addresses description in format: '1.1.1.1,2.2.2.2/31'.
-
-        Returns:
-            list: Sorted list of unique IP addresses
-                e.g.: ['1.1.1.1', '2.2.2.2', '2.2.2.3'] for the above example.
+    Args:
+        ips_input (str): IP addresses description in format: '1.1.1.1,2.2.2.2/31'.
+    Returns:
+        list: Sorted list of unique IP addresses
+            e.g.: ['1.1.1.1', '2.2.2.2', '2.2.2.3'] for the above example.
     """
     try:
         test_ips = [
@@ -689,14 +698,15 @@ def prepare_ips(ips_input):
             for address_desc in ips_input.split(",")
             for ip_addr in IPY_IP(address_desc, make_net=1)
         ]
-    except ValueError as value_error:
-        exit("Cannot parse IP address: {}".format(value_error))
+    except (TypeError, ValueError) as value_error:
+        print ("Cannot parse IP address: {}".format(value_error))
+        sys.exit(2)
     test_ips = sorted(set(map(str, test_ips)))
     return test_ips
 
 
 def parse_port(port_desc):
-    """Parses single port description taken from command line into int value."""
+    """Parse single port description taken from command line into int value."""
     try:
         if port_desc is not None:
             port = int(port_desc)
@@ -707,27 +717,31 @@ def parse_port(port_desc):
 
 
 def prepare_ports(port_input):
-    """Parses multiple ports description taken from command line into sorted list of unique ports.
+    """Parse multiple ports description taken from command line into sorted list of unique ports.
 
-        Args:
-            port_input (str): Ports description in format: '101,103-105,104,242'.
+    Args:
+        port_input (str): Ports description in format: '101,103-105,104,242'.
 
-        Returns:
-            list: Sorted list of unique IP addresses
-                e.g.: [101, 103, 104, 105, 242] for the above example.
-
+    Returns:
+        list: Sorted list of unique IP addresses
+            e.g.: [101, 103, 104, 105, 242] for the above example.
     """
-
     try:
         ports = set()
         parts = port_input.split(",")
 
         for part in parts:
-            ip_range = map(int, part.split("-", 1))
+            ip_range = list(map(int, part.split("-", 1)))
             ip_range = set(range(ip_range[0], ip_range[-1] + 1))
             ports |= set(ip_range)
 
         ports = sorted(ports)
+
+        for port in ports:
+            if port < 0 or port > NET_MAX_PORT:
+                print ("Port not in range: {}".format(port))
+                sys.exit(2)
         return ports
-    except ValueError as error:
-        exit("Cannot parse port: {}".format(error))
+    except (TypeError, ValueError) as error:
+        print ("Cannot parse port: {}".format(error))
+        sys.exit(2)

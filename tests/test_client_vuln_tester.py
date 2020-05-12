@@ -20,7 +20,6 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
 import threading
 import unittest
 import timeout_decorator
@@ -37,8 +36,8 @@ class TestClientVulnTester(CotopaxiToolClientTester, unittest.TestCase):
         unittest.TestCase.__init__(self, *args, **kwargs)
         self.main = main
 
-    @timeout_decorator.timeout(5)
-    def test_main_basic_params(self):
+    @timeout_decorator.timeout(10)
+    def test_main_basic_params_pos(self):
         server_port = get_random_high_port()
         poke_thread = threading.Thread(target=poke_tcp_server, args=[server_port])
         poke_thread.start()

@@ -48,6 +48,9 @@ def scrap_output(func, data):
         func(data)
     except (SystemExit, Exception) as exception:
         output += str(traceback.extract_stack()) + "\n"
+        # output += str(traceback.format_exc()) + "\n"
+        # output += ''.join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+        # output += traceback.format_stack() + "\n"
         output += repr(exception) + "\n"
     finally:
         output += sys.stdout.getvalue().strip() + "\n"
@@ -79,13 +82,20 @@ def load_test_servers_list():
 
 
 def poke_tcp_server(server_port):
-    for i in range(2):
+    for i in range(4):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(0.1)
             sock.connect(("127.0.0.1", server_port))
-            sock.send("123")
-            sock.close()
+            try:
+                sock.send("123".encode(encoding="ascii"))
+                print ("data sent (P3)")
+            except (AttributeError, UnicodeDecodeError):
+                sock.send(bytes("123"))
+                print ("data sent (P2)")
+            finally:
+                sock.close()
+                print ("socket closed")
         except (socket.timeout, socket.error):
             time.sleep(0.1)
 
@@ -112,7 +122,7 @@ class CotopaxiToolTester(object):
             )
 
     @timeout_decorator.timeout(5)
-    def test_main_help(self):
+    def test_main_help_pos(self):
         output = scrap_output(self.main, ["-h"])
         self.assertIn("optional arguments", output)
         self.assertIn("show this help message and exit", output)
@@ -122,6 +132,31 @@ class CotopaxiToolServerTester(CotopaxiToolTester):
     def __init__(self, *args, **kwargs):
         CotopaxiToolTester.__init__(self, *args, **kwargs)
         self.main = None
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_ip_nonint_neg(self):
+        output = scrap_output(self.main, ["a.b.c.d", "40000"])
+        self.assertIn("Cannot parse IP address", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_ip_5_octets_neg(self):
+        output = scrap_output(self.main, ["1.2.3.4.5", "40000"])
+        self.assertIn("Cannot parse IP address", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_port_nonint_neg(self):
+        output = scrap_output(self.main, ["10.10.10.10", "aaaaa"])
+        self.assertIn("Cannot parse port", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_port_negint_neg(self):
+        output = scrap_output(self.main, ["10.10.10.10", "-10"])
+        self.assertIn("Cannot parse port", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_port_bigint_neg(self):
+        output = scrap_output(self.main, ["10.10.10.10", "999999"])
+        self.assertIn("Port not in range", output)
 
 
 class CotopaxiToolClientTester(CotopaxiToolTester):

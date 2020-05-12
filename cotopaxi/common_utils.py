@@ -52,7 +52,7 @@ NET_MAX_PORT = 65535
 
 
 def get_local_ip():
-    """Returns IP address of local node."""
+    """Return IP address of local node."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.connect(("1.255.255.255", 80))
     local_ip = sock.getsockname()[0]
@@ -61,7 +61,7 @@ def get_local_ip():
 
 
 def get_local_ipv6_address():
-    """Returns IPv6 address of local node."""
+    """Return IPv6 address of local node."""
     sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
     sock.connect(("::1", 80))
     local_ip = sock.getsockname()[0]
@@ -70,18 +70,18 @@ def get_local_ipv6_address():
 
 
 def get_random_high_port():
-    """Returns random value for private (ephemeral or high) TCP or UDP port."""
+    """Return random value for private (ephemeral or high) TCP or UDP port."""
     return random.randint(NET_MIN_HIGH_PORT, NET_MAX_PORT)
 
 
 def print_verbose(test_params, message):
-    """Prints messages displayed only in the verbose/debug mode."""
+    """Print messages displayed only in the verbose/debug mode."""
     if test_params.verbose:
         print (message)
 
 
 def show_verbose(test_params, packet, protocol=None):
-    """Parses response packet and scraps response from stdout."""
+    """Parse response packet and scraps response from stdout."""
     if protocol:
         try:
             proto_handler = proto_mapping_request(protocol)
@@ -99,7 +99,7 @@ def show_verbose(test_params, packet, protocol=None):
 
 
 def scrap_packet(packet):
-    """Parses response packet and scraps response from stdout."""
+    """Parse response packet and scraps response from stdout."""
     capture = StringIO()
     save_stdout, sys.stdout = sys.stdout, capture
     packet.show()
@@ -109,7 +109,7 @@ def scrap_packet(packet):
 
 
 class Protocol(Enum):
-    """Enumeration of protocols supported by Cotopaxi"""
+    """Enumeration of protocols supported by Cotopaxi."""
 
     ALL = 0
     UDP = 1
@@ -129,7 +129,7 @@ class Protocol(Enum):
 
 
 def proto_mapping_request(protocol):
-    """Provides mapping of enum values to implementation classes."""
+    """Provide mapping of enum values to implementation classes."""
     return {
         Protocol.ALL: IP,
         Protocol.UDP: UDP,
@@ -147,7 +147,7 @@ def proto_mapping_request(protocol):
 
 
 def tcp_sr1(test_params, test_packet):
-    """Sends test message to server using TCP protocol and parses response."""
+    """Send test message to server using TCP protocol and parses response."""
     in_data = None
     connect_handler = None
     sent_time = test_params.report_sent_packet()
@@ -163,7 +163,10 @@ def tcp_sr1(test_params, test_packet):
         )
         connect_handler.settimeout(test_params.timeout_sec)
         connect_handler.connect(connect_args[test_params.ip_version])
-        connect_handler.send(str(test_packet))
+        try:
+            connect_handler.send(test_packet.encode(encoding="ascii"))
+        except (AttributeError, UnicodeDecodeError):
+            connect_handler.send(bytes(test_packet))
 
         in_data = connect_handler.recv(INPUT_BUFFER_SIZE)
         if in_data:
@@ -171,7 +174,6 @@ def tcp_sr1(test_params, test_packet):
     except (socket.timeout, socket.error) as exc:
         if test_params.verbose:
             print ("TCP exception: {}".format(exc))
-            # traceback.print_exc()
     finally:
         if connect_handler is not None:
             connect_handler.close()
@@ -179,7 +181,7 @@ def tcp_sr1(test_params, test_packet):
 
 
 def udp_sr1(test_params, udp_test, dtls_wrap=False):
-    """Sends UDP test message to server using UDP protocol and parses response."""
+    """Send UDP test message to server using UDP protocol and parses response."""
     response = None
     sent_time = test_params.report_sent_packet()
     if not dtls_wrap:
@@ -226,17 +228,19 @@ def udp_sr1(test_params, udp_test, dtls_wrap=False):
 
 
 def udp_sr1_file(test_params, test_filename):
-    """Reads UDP test message from given file, sends this message to server and parses response"""
-    with open(test_filename, "r") as file_handle:
+    """Read UDP test message from given file, sends this message to server and parses response."""
+    with open(test_filename, "rb") as file_handle:
         test_data = file_handle.read()
     return udp_sr1(test_params, test_data)
 
 
 def ssdp_send_query(test_params, query):
-    """Sends SSDP query to normal and multicast address."""
+    """Send SSDP query to normal and multicast address."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     if test_params.ip_version == 4:
-        sock.sendto(str(query), (SSDP_MULTICAST_IPV4, test_params.dst_endpoint.port))
+        sock.sendto(
+            query.encode(), (SSDP_MULTICAST_IPV4, test_params.dst_endpoint.port)
+        )
         sent_time = test_params.report_sent_packet()
         sock.settimeout(test_params.timeout_sec)
         try:
@@ -270,27 +274,26 @@ def ssdp_send_query(test_params, query):
 
 
 def prepare_names(name_filepath):
-    """Loads names (URLs or services) from filepath taken from command line
-    into sorted list of unique names.
+    """Load names (URLs or services) from filepath into sorted list of unique names.
 
-        Args:
-            name_filepath (str): Path to file with names.
+    Args:
+        name_filepath (str): Path to file with names.
 
-        Returns:
-            list: Sorted list of unique names.
+    Returns:
+        list: Sorted list of unique names.
     """
-
     try:
-        with open(name_filepath, "r") as file_handle:
+        with open(name_filepath, "rb") as file_handle:
             names_list = {name.strip() for name in file_handle}
     except (IOError, OSError) as file_error:
-        exit("Cannot load names: {}".format(file_error))
+        sys.exit("Cannot load names: {}".format(file_error))
     test_names = sorted(names_list)
     return test_names
 
 
 def amplification_factor(input_size, output_size):
-    """Calculates network traffic amplification factor for specific node
+    """Calculate network traffic amplification factor for specific node.
+
     Args:
         input_size(int): Size of traffic incoming to examined node.
         output_size(int): Size of traffic outgoing from examined node.

@@ -33,49 +33,50 @@ HTCPCP_BREW = (
 
 
 class HTCPCPTester(ProtocolTester):
-    """Tester of HTCPCP protocol"""
+    """Tester of HTCPCP protocol."""
 
     def __init__(self):
+        """Create empty HTCPCPTester object."""
         ProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
-        """Provides short (abbreviated) name of protocol"""
+        """Provide short (abbreviated) name of protocol."""
         return "HTCPCP"
 
     @staticmethod
     def protocol_full_name():
-        """Provides full (not abbreviated) name of protocol"""
+        """Provide full (not abbreviated) name of protocol."""
         return "Hyper Text Coffee Pot Control Protocol"
 
     @staticmethod
     def default_port():
-        """Provides default port used by implemented protocol"""
+        """Provide default port used by implemented protocol."""
         return 80
 
     @staticmethod
     def transport_protocol():
-        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
         return TCP
 
     @staticmethod
     def request_parser():
-        """Provides Scapy class implementing parsing of protocol requests"""
+        """Provide Scapy class implementing parsing of protocol requests."""
         return HTTPRequest
 
     @staticmethod
     def response_parser():
-        """Provides Scapy class implementing parsing of protocol responses"""
+        """Provide Scapy class implementing parsing of protocol responses."""
         return HTTPResponse
 
     @staticmethod
     def implements_service_ping():
-        """Returns True if this tester implements service_ping for this protocol"""
+        """Return True if this tester implements service_ping for this protocol."""
         return True
 
     @staticmethod
     def ping(test_params, show_result=False):
-        """Checks HTCPCP service availability by sending BREW message and waiting for response."""
+        """Check HTCPCP service availability by sending BREW message and waiting for response."""
         if not test_params:
             return None
         try:
@@ -95,25 +96,25 @@ class HTCPCPTester(ProtocolTester):
 
     @staticmethod
     def implements_fingerprinting():
-        """Returns True if this tester implements fingerprinting for this protocol"""
+        """Return True if this tester implements fingerprinting for this protocol."""
         return False
 
     @staticmethod
     def implements_resource_listing():
-        """Returns True if this tester implements resource for this protocol"""
+        """Return True if this tester implements resource for this protocol."""
         return False
 
     @staticmethod
     def implements_server_fuzzing():
-        """Returns True if this tester implements server fuzzing for this protocol"""
+        """Return True if this tester implements server fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_client_fuzzing():
-        """Returns True if this tester implements clients fuzzing for this protocol"""
+        """Return True if this tester implements clients fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_vulnerability_testing():
-        """Returns True if this tester implements vulnerability testing for this protocol"""
+        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

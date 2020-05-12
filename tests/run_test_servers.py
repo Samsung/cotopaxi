@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Script for running all test servers in Cotopaxi testbed."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.

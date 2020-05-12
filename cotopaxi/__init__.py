@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Main module for Cotopaxi"""
+"""Main module for Cotopaxi."""
 #
-#    Copyright (C) 2019 Samsung Electronics. All Rights Reserved.
+#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.

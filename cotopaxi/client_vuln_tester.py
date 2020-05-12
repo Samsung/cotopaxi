@@ -31,7 +31,7 @@ from .vulnerability_tester import VULNS, bypass_list, select_vulnerabilities
 
 
 def main(args):
-    """Starts client vulnerability testing based on command line parameters"""
+    """Start client vulnerability testing based on command line parameters."""
     bypass_list(args)
 
     tester = CotopaxiClientTester("vulnerability testing")

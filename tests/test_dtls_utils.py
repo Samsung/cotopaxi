@@ -21,10 +21,13 @@
 #
 
 import codecs
+import unittest
+
 from cotopaxi.dtls_utils import (
     DTLSTester,
     DTLS,
     DTLS_1_0_HELLO_NMAP,
+    prepare_dtls_test_packets,
     scrap_dtls_response,
 )
 from .common_runner import TimerTestRunner
@@ -36,14 +39,18 @@ class TestDTLSTester(TestProtocolTester):
         TestProtocolTester.__init__(self, *args, **kwargs)
         self.tester = DTLSTester()
 
-    def test_dtls_parse_success(self):
+    def test_dtls_parse_pos(self):
         data = codecs.decode(DTLS_1_0_HELLO_NMAP, "hex")
         dtls_packet = DTLS(data)
         dtls_packet_text = scrap_dtls_response(dtls_packet)
         self.assertIn("client_hello", dtls_packet_text)
         self.assertIn("DTLS_1_", dtls_packet_text)
 
-    def test_dtls_parse_fail(self):
+    def test_prepare_dtls_test_packets_pos(self):
+        data_samples = prepare_dtls_test_packets()
+        self.assertTrue(len(data_samples) > 0)
+
+    def test_dtls_parse_neg(self):
         dtls_packet = DTLS("")
         dtls_packet_text = scrap_dtls_response(dtls_packet)
         print (dtls_packet_text)

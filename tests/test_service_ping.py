@@ -25,11 +25,21 @@ from collections import defaultdict
 from cotopaxi.common_utils import Protocol, get_local_ip
 from cotopaxi.cotopaxi_tester import check_caps, TestParams
 from cotopaxi.service_ping import main, service_ping
-from .common_test_utils import scrap_output, load_test_servers, load_test_servers_list
+from .common_test_utils import (
+    scrap_output,
+    load_test_servers,
+    load_test_servers_list,
+    CotopaxiToolServerTester,
+)
 from .common_runner import TimerTestRunner
 
 
-class TestServicePing(unittest.TestCase):
+class TestServicePing(CotopaxiToolServerTester, unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        CotopaxiToolServerTester.__init__(self, *args, **kwargs)
+        unittest.TestCase.__init__(self, *args, **kwargs)
+        self.main = main
+
     @classmethod
     def setUpClass(cls):
         try:
@@ -42,38 +52,38 @@ class TestServicePing(unittest.TestCase):
                 "On Windows run as Administrator."
             )
 
-    def test_main_empty(self):
+    def test_main_empty_neg(self):
         output = scrap_output(main, [])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_too_few_args(self):
+    def test_main_too_few_args_neg(self):
         output = scrap_output(main, ["10"])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_help(self):
+    def test_main_help_pos(self):
         output = scrap_output(main, ["-h"])
         self.assertIn("positional arguments", output)
         self.assertIn("show this help message and exit", output)
 
-    def test_main_basic_params(self):
+    def test_main_basic_params_pos(self):
         output = scrap_output(main, ["::1", "10", "-P", "DTLS", "-T", "0.001"])
         self.assertIn("[+] Host ::1", output)
         self.assertIn("respond to ", output)
         self.assertIn(" message", output)
 
-    def test_main_basic_params_ipv6(self):
+    def test_main_basic_params_ipv6_pos(self):
         output = scrap_output(main, ["127.0.0.1", "10", "-P", "DTLS", "-T", "0.001"])
         self.assertIn("[+] Host 127.0.0.1:10", output)
         self.assertIn("respond to ", output)
         self.assertIn(" message", output)
 
-    def test_service_ping(self):
+    def test_service_ping_pos(self):
         local_ip = get_local_ip()
         print ("ip: {}".format(local_ip))
 
@@ -105,11 +115,11 @@ class TestServicePing(unittest.TestCase):
                     print (message)
                     self.assertTrue(result, message + " (not responding to ping)")
 
-    def test_service_ping_mdns(self):
+    def test_service_ping_mdns_pos(self):
         output = scrap_output(main, ["224.0.0.251", "15353", "-P", "mDNS"])
         self.assertIn("mDNS", output)
 
-    def test_service_ping_ssdp(self):
+    def test_service_ping_ssdp_pos(self):
         output = scrap_output(main, ["224.0.0.251", "15353", "-P", "SSDP"])
         self.assertIn("SSDP", output)
 

@@ -18,28 +18,45 @@ git clone https://github.com/Samsung/cotopaxi
 ```    
 cd cotopaxi 
 ```
-3. Install requirements (in case of any problems with scapy and scapy-ssl_tls see section below):
+3. Install scapy-ssl_tls (in case of any problems with scapy and scapy-ssl_tls see section below)
+
+For Python 2.7:
+ 
+(this will install also scapy in 2.4.2)
+```
+    pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
+```
+For Python > 3.6:
+```
+    git clone https://github.com/kalidasya/scapy-ssl_tls.git
+    cd scapy-ssl_tls
+    git checkout py3_update
+    sudo python3.6 setup.py install
+```
+
+4. Install other requirements:
 ```
 sudo pip install -r requirements.txt 
 ```
-4. Run installer:
+5. Run installer:
 ```
 sudo python setup.py install
 ```
 
 ## Requirements:
 
-Currently Cotopaxi works only with Python 2.7.x, but future versions will work also with Python 3. 
+Currently Cotopaxi works with Python 2.7.* and with Python 3.6.*. 
 
-If you have previous installation of scapy without scapy-ssl_tls, please remove it or use venv. 
+Installation of required libraries:
 
-Installation of main libraries:
+1. scapy-ssl_tls 
 
-1. scapy-ssl_tls (this will install also scapy in 2.4.2)
+For Python 2.7:
+ 
+(this will install also scapy in 2.4.2)
 ```
     pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
 ```
-
 Common problems:
 * If you encounter error: `error: [Errno 2] No such file or directory: 'LICENSE'`, try repeating command - surprisingly it works.
 * If you encounter error: `NameError: name 'os' is not defined` - add missing `import os` to `scapy/layers/ssl_tls.py`.
@@ -49,11 +66,11 @@ All other required packages can be installed using requirements.txt file:
     pip install -r cotopaxi/requirements.txt
 ```
 
-Manual installation of other required packages:
+All required packages for developement of Cotopaxi (including libraries for unit tests) can be installed using requirements_devel.txt file:
 ```
-    pip install dnslib IPy hexdump pyyaml psutil enum34 configparser
+    pip install -r cotopaxi/requirements_devel.txt
+    pre-commit install
 ```
-
 
 ## Disclaimer
 
@@ -494,16 +511,40 @@ https://scapy.readthedocs.io/en/latest/troubleshooting.html#
 
 ## Unit tests
 
-To run all unit tests use (from upper cotopaxi dir):
+To run all unit tests using unittest use (from upper cotopaxi dir):
 ```
-    sudo python -m unittest discover
+    sudo python -m unittest discover -v
 ```
 
-To run all unit tests with coverage analysis use (from upper cotopaxi dir):
+To run all unit tests using unittest with coverage analysis run (from upper cotopaxi dir):
 ```
     sudo coverage run --source cotopaxi -m unittest discover
     coverage html
     firefox htmlcov/index.html
+```
+
+To run all unit tests using pytest with coverage analysis and branch analysis run (from upper cotopaxi dir):
+
+```
+    sudo python2.7 -m coverage run --source cotopaxi --branch -m pytest -v
+    sudo python2.7 -m coverage html
+    firefox htmlcov/index.html
+
+    sudo python3.6 -m coverage run --source cotopaxi --branch -m pytest -v
+    sudo python3.6 -m coverage html
+    firefox htmlcov/index.html
+```
+
+To run unit tests for one of tools run (from upper cotopaxi dir):
+```
+    sudo python -m tests.test_active_scanner
+    sudo python -m tests.test_amplifier_detector
+    sudo python -m tests.test_client_proto_fuzzer    
+    sudo python -m tests.test_protocol_fuzzer
+    sudo python -m tests.test_resource_listing
+    sudo python -m tests.test_server_fingerprinter
+    sudo python -m tests.test_service_ping
+    sudo python -m tests.test_vulnerability_tester
 ```
 
 Most of tests are performed against remote tests servers and require preparing test environment, 

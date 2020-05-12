@@ -34,7 +34,7 @@ from .common_runner import TimerTestRunner
 
 
 class TestCotopaxiTester(unittest.TestCase):
-    def test_prepare_ips(self):
+    def test_prepare_ips_pos(self):
         result = prepare_ips("3.3.3.3,1.1.1.1,2.2.2.2")
         expected = ["1.1.1.1", "2.2.2.2", "3.3.3.3"]
         self.assertListEqual(result, expected)
@@ -59,7 +59,7 @@ class TestCotopaxiTester(unittest.TestCase):
         expected = ["1.1.1.1", "1.1.1.2", "1.1.1.3", "2.2.2.2", "2.2.2.3"]
         self.assertListEqual(result, expected)
 
-    def test_prepare_ports(self):
+    def test_prepare_ports_pos(self):
         result = prepare_ports("101,103-105,104,242")
         expected = [101, 103, 104, 105, 242]
         self.assertListEqual(result, expected)
@@ -68,17 +68,19 @@ class TestCotopaxiTester(unittest.TestCase):
         expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         self.assertListEqual(result, expected)
 
-    def test_parse_port(self):
+    def test_parse_port_neg(self):
         output = scrap_output(parse_port, "101,103-105,104,242")
         # expected = None
         # self.assertEqual(result, expected)
         self.assertIn("Could not parse port: invalid literal for int", output)
 
+    def test_parse_port_pos(self):
+
         result = parse_port("1")
         expected = 1
         self.assertEqual(result, expected)
 
-    def test_protocols_using(self):
+    def test_protocols_using_pos(self):
         udp_protos = protocols_using(UDP)
         self.assertGreaterEqual(len(udp_protos), 4)
         self.assertTrue(Protocol.CoAP in udp_protos)

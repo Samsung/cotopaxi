@@ -34,14 +34,13 @@ from scapy.all import (
     ByteEnumField,
     IntField,
     ICMP,
-    Packet,
-    PacketListField,
     Raw,
     StrFixedLenField,
     StrLenField,
     UDP,
     XShortEnumField,
 )
+from scapy.compat import plain_str
 from scapy_ssl_tls.ssl_tls import (
     DTLSClientHello,
     DTLSRecord,
@@ -53,8 +52,7 @@ from scapy_ssl_tls.ssl_tls import (
     TLSDecryptablePacket,
     PacketListFieldContext,
     PacketNoPayload,
-    TLSAlert,
-    TLSPlaintext,
+    SSL,
     TLS_HANDSHAKE_TYPES,
     TLSCompressionMethod,
     TLSContentType,
@@ -100,67 +98,27 @@ DTLS_CIPHER_SUITES = TLS_CIPHER_SUITES
 
 
 class DTLSHandshakes(TLSDecryptablePacket):
-    """ Representation of DTLS Handshake """
+    """Representation of DTLS Handshake."""
 
     name = "DTLS Handshakes"
     fields_desc = [PacketListFieldContext("handshakes", None, DTLSHandshake)]
 
 
-class DTLS(Packet):
-    """Representation of DTLS message"""
+class DTLS(SSL):
+    """Representation of DTLS messages (stream)."""
 
-    name = "DTLS"
-    fields_desc = [PacketListField("records", None, DTLSRecord)]
-    CONTENT_TYPE_MAP = {0x15: TLSAlert, 0x16: DTLSHandshakes, 0x17: TLSPlaintext}
-
-    def __init__(self, *args, **fields):
-        self.tls_ctx = fields.pop("ctx", None)
-        self._origin = fields.pop("_origin", None)
-        self.guessed_next_layer = DTLSRecord
-        Packet.__init__(self, *args, **fields)
-
-    @classmethod
-    def from_records(cls, records, ctx=None):
-        """Merges record into object"""
-        pkt_str = "".join(list(map(str, records)))
-        return cls(pkt_str, ctx)
+    def __init__(self, *args, **kwargs):
+        """Create empty DTLS object."""
+        SSL.__init__(self, *args, **kwargs)
 
     def pre_dissect(self, raw_bytes):  # pylint: disable=arguments-differ
-        self.fields_desc = [PacketListField("records", None, self.guessed_next_layer)]
+        """Prepare layer for dissection."""
+        SSL.guessed_next_layer = DTLSRecord
         return raw_bytes
-
-    def do_dissect(self, raw_bytes):  # pylint: disable=arguments-differ
-        pos = 0
-        record = self.guessed_next_layer
-        record_header_len = len(record())
-
-        records = []
-        # Consume all bytes passed to us by the underlayer. We're expecting no
-        # further payload on top of us. If there is additional data on top of our layer
-        # We will incorrectly parse it
-        while pos < len(raw_bytes) - record_header_len:
-            payload_len = record(raw_bytes[pos : pos + record_header_len]).length
-            if self.tls_ctx is not None:
-                payload = record(
-                    raw_bytes[pos : pos + record_header_len + payload_len],
-                    ctx=self.tls_ctx,
-                )
-                # Perform inline decryption if required
-                # payload = self.do_decrypt_payload(payload)
-                self.tls_ctx.insert(payload, origin=self._origin)
-            else:
-                payload = record(raw_bytes[pos : pos + record_header_len + payload_len])
-            # Populate our list of found records
-            records.append(payload)
-            # Move to the next record
-            pos += record_header_len + payload.length
-        self.fields["records"] = records
-        # This will always be empty (equivalent to returning "")
-        return raw_bytes[pos:]
 
 
 class DTLSServerHello(PacketNoPayload):
-    """Representation of DTLSServerHello message"""
+    """Representation of DTLSServerHello message."""
 
     name = "DTLS Server Hello"
     fields_desc = [
@@ -196,7 +154,7 @@ class DTLSServerHello(PacketNoPayload):
 
 
 def scrap_dtls_response(resp_packet):
-    """Parses response packet and scraps DTLS response from stdout."""
+    """Parse response packet and scraps DTLS response from stdout."""
     save_stdout, sys.stdout = sys.stdout, StringIO()
     resp_packet.show()
     parsed_response = sys.stdout.getvalue()
@@ -208,7 +166,7 @@ def scrap_dtls_response(resp_packet):
 
 
 class DTLSAlert(TLSDecryptablePacket):
-    """Additional class for scapy support for DTLS"""
+    """Additional class for scapy support for DTLS."""
 
     name = "DTLS Alert"
     fields_desc = [
@@ -220,7 +178,7 @@ class DTLSAlert(TLSDecryptablePacket):
 
 
 class DTLSClient(object):
-    """Interface for using DTLS as client"""
+    """Interface for using DTLS as client."""
 
     def __init__(
         self,
@@ -230,6 +188,7 @@ class DTLSClient(object):
         starttls=None,
         test_params=None,
     ):
+        """Create empty DTLSClient object."""
         last_exception = Exception()
         self.target = target
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -286,14 +245,14 @@ class DTLSClient(object):
             self.recvall(timeout=2)
 
     def sendall(self, pkt, timeout=None):
-        """ Sends packet via DTLS connection """
+        """Send packet via DTLS connection."""
         if timeout:
             self._sock.settimeout(timeout)
         # print("sendto: %s to %s" % (str(pkt), str(self.target)))
-        self._sock.sendto(str(pkt), self.target)
+        self._sock.sendto(bytes(pkt), self.target)
 
     def recv(self, size=8192 * 4, timeout=None):
-        """ Receives currently available data from DTLS connection """
+        """Receive currently available data from DTLS connection."""
         if timeout:
             self._sock.settimeout(timeout)
         while True:
@@ -307,7 +266,7 @@ class DTLSClient(object):
         return None
 
     def recvall(self, size=8192 * 4, timeout=None):
-        """ Receives all data available during timeout from DTLS connection """
+        """Receive all data available during timeout from DTLS connection."""
         resp = []
         if timeout:
             self._sock.settimeout(timeout)
@@ -316,17 +275,22 @@ class DTLSClient(object):
                 data = self._sock.recvfrom(size)
                 if not data:
                     break
-                resp.append(data[0])
+                plain_data = plain_str(data[0])
+                resp.append(plain_data)
+                # print("recvall - chunk size = {}".format(len(data[0])))
             except socket.timeout:
                 break
-        return DTLS("".join(resp))
+        # print(resp)
+        resp_packet = DTLS("".join(resp))
+        # resp_packet.show()
+        return resp_packet
 
 
 bind_layers(DTLSRecord, DTLSAlert, {"content_type": TLSContentType.ALERT})
 
 
 def show_dtls_packet(packet):
-    """"Displays DTLS packet."""
+    """Display DTLS packet."""
     if packet.getlayer(Raw):
         dtls = DTLSRecord(packet[Raw].load)
         print (dtls)
@@ -423,7 +387,7 @@ DTLS_1_0_CERT_FRAGMENT = (
 
 
 def check_dtls_response(test_params, response):
-    """Checks whether response is DTLS packet"""
+    """Check whether response is DTLS packet."""
     if response is not None and DTLSRecord in response:
         try:
             print_verbose(
@@ -464,7 +428,7 @@ def check_dtls_response(test_params, response):
 
 
 def udp_send(test_params, data):
-    """Function to send data using UDP protocol"""
+    """Send data using UDP protocol."""
     dst_ip = IPY_IP(test_params.dst_endpoint.ip_addr)
     if dst_ip.version() == 4:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -513,7 +477,7 @@ def udp_send(test_params, data):
 
 
 def scrap_response(test_params, packet):
-    """Scraps text description of DTLS packet"""
+    """Scrap text description of DTLS packet."""
     try:
         in_data = packet[Raw].load
         response = DTLSRecord(in_data)
@@ -527,8 +491,11 @@ def scrap_response(test_params, packet):
     return None
 
 
+FINGERPRINTING_DIR = "cotopaxi/fingerprinting/dtls/"
+
+
 def prepare_dtls_test_packets():
-    """Prepares list of packets to perform server fingerprinting."""
+    """Prepare list of packets to perform server fingerprinting."""
     test_packets = [
         DTLS_1_0_CLIENT_KEY_EXCHANGE_MBED_CLIENT,
         DTLS_1_0_CLIENT_APP_DATA_MBED_CLIENT,
@@ -547,21 +514,25 @@ def prepare_dtls_test_packets():
         DTLSClientHello
     ].version = 0x0000  # malformed DTLS version
     # dtls_hello_malformed_version.show()
+    # 1
     test_packets.append(dtls_hello_malformed_version)
 
     dtls_1_0_hello_malformed_ctype = DTLSRecord(data)
     dtls_1_0_hello_malformed_ctype.content_type = 0xFF  # malformed content type
     # dtls_1_0_hello_malformed_ctype.show()
+    # 2
     test_packets.append(dtls_1_0_hello_malformed_ctype)
 
     dtls_1_0_hello_malformed_epoch = DTLSRecord(data)
     dtls_1_0_hello_malformed_epoch.epoch = 0xFF  # malformed epoch
     # dtls_1_0_hello_malformed_epoch.show()
+    # 3
     test_packets.append(dtls_1_0_hello_malformed_epoch)
 
     dtls_1_0_hello_malformed = DTLSRecord(data)
     dtls_1_0_hello_malformed.sequence = 0xFF  # malformed sequence
     # dtls_1_0_hello_malformed.show()
+    # 4
     test_packets.append(dtls_1_0_hello_malformed)
 
     dtls_1_0_hello_malformed = DTLSRecord(data)
@@ -570,7 +541,9 @@ def prepare_dtls_test_packets():
         DTLSClientHello
     ].cookie_length = 0x0002  # malformed cookie len
     # dtls_1_0_hello_malformed.show()
+    # 5
     test_packets.append(dtls_1_0_hello_malformed)
+    # test_packets.append(dtls_1_0_hello_malformed_ctype) # UWAGA - podmiana!!!!
 
     # malformed packets based on DTLS_1_0
 
@@ -581,12 +554,10 @@ def prepare_dtls_test_packets():
     # dtls_1_2_hello.show()
     # test_packets.append(dtls_1_2_hello)
 
-    dtls_hello_malformed_version = DTLSRecord(data)
-    dtls_hello_malformed_version.version = 0xFEFD  # DTLS 1.2
-    dtls_hello_malformed_version[
-        DTLSClientHello
-    ].version = 0x0000  # malformed DTLS version
-    # dtls_hello_malformed_version.show()
+    with open(
+        FINGERPRINTING_DIR + "dtls_hello_malformed_version.raw", "rb"
+    ) as file_handle:
+        dtls_hello_malformed_version = file_handle.read()
     test_packets.append(dtls_hello_malformed_version)
 
     dtls_1_0_hello_malformed_ctype = DTLSRecord(data)
@@ -604,19 +575,57 @@ def prepare_dtls_test_packets():
     # dtls_1_0_hello_malformed.show()
     test_packets.append(dtls_1_0_hello_malformed)
 
-    dtls_1_0_hello_malformed = DTLSRecord(data)
-    # dtls_1_0_hello_malformed[DTLSClientHello].cookie = '010000000000'
-    dtls_1_0_hello_malformed[
-        DTLSClientHello
-    ].cookie_length = 0x0002  # malformed cookie len
-    # dtls_1_0_hello_malformed.show()
+    with open(FINGERPRINTING_DIR + "dtls_1_0_hello_malformed.raw", "rb") as file_handle:
+        dtls_1_0_hello_malformed = file_handle.read()
     test_packets.append(dtls_1_0_hello_malformed)
-    encoded = [codecs.encode(str(packet), "hex") for packet in test_packets]
+
+    dtls_finger_file_format = (
+        os.path.dirname(__file__)
+        + "/fingerprinting/dtls/fingerprint_000_packet_{:03}.raw"
+    )
+
+    packet_nr = 0
+    for packet in test_packets:
+        # print(packet_nr)
+        # print("Packet size = {}".format(len(str(packet))))
+        # print(packet)
+        # print("-")
+        # print(bytes(str(packet), encoding='ascii'))
+        # print("-")
+
+        # P2.7
+        # print("encoded.append('" + codecs.encode(bytes(packet), "hex") + "')")
+        # encoded.append(codecs.encode(bytes(packet), "hex"))
+        # with open(dtls_finger_file_format.format(packet_nr), "w") as file_handle:
+        #    file_handle.write(bytes(packet))
+
+        # P3.6
+        # print(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
+        # encoded.append(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
+        packet_nr += 1
+
+    encoded = [codecs.encode(bytes(packet), "hex") for packet in test_packets]
     return encoded
 
 
+def load_dtls_test_packets():
+    """Load list of packets to perform server fingerprinting."""
+    dtls_finger_file_format = (
+        os.path.dirname(__file__)
+        + "/fingerprinting/dtls/fingerprint_000_packet_{:03}.raw"
+    )
+
+    test_packets = []
+    for nr_packet in range(0, 12):
+        with open(dtls_finger_file_format.format(nr_packet), "rb") as file_handle:
+            test_packet = file_handle.read()
+        test_packets.append(test_packet)
+
+    return test_packets
+
+
 def dtls_convert_version(response):
-    """Converts DTLS server response to attribute version used by classifier"""
+    """Convert DTLS server response to attribute version used by classifier."""
     versions = {"DTLS_1_0", "DTLS_1_1"}
     for ver_in in versions:
         if ver_in in response:
@@ -625,7 +634,7 @@ def dtls_convert_version(response):
 
 
 def dtls_convert_type(response):
-    """Converts DTLS server response to attribute type used by classifier"""
+    """Convert DTLS server response to attribute type used by classifier."""
     types = {"alert", "handshake"}
     for type_in in types:
         if "type      = " + type_in in response:
@@ -634,7 +643,7 @@ def dtls_convert_type(response):
 
 
 def dtls_convert_description(response):
-    """Converts DTLS server response to attribute description used by classifier"""
+    """Convert DTLS server response to attribute description used by classifier."""
     descriptions = {
         "unexpected_message",
         "protocol_version",
@@ -649,33 +658,35 @@ def dtls_convert_description(response):
 
 
 def dtls_convert_length(response):
-    """Converts DTLS server response to attribute length used by classifier"""
+    """Convert DTLS server response to attribute length used by classifier."""
     return len(response)
 
 
 class DTLSResults(object):
-    """Wrapper for all DTLS results"""
+    """Wrapper for all DTLS results."""
 
     def __init__(self):
+        """Create DTLSResult object with default values."""
         self.version = "no_response"
         self.type = "no_response"
         self.description = "no_response"
         self.length = "no_response"
 
     def __str__(self):
+        """Convert DTLS to str."""
         return "version = {} type = {} description = {} length = {}".format(
             self.version, self.type, self.description, self.length
         )
 
     def fill(self, version, type_name, description, length):
-        """Setter for all parameters"""
+        """Setter for all parameters."""
         self.version = version
         self.type = type_name
         self.description = description
         self.length = length
 
     def convert(self, response):
-        """Converts all parameters of DTLS response"""
+        """Convert all parameters of DTLS response."""
         self.version = dtls_convert_version(response)
         self.type = dtls_convert_type(response)
         self.description = dtls_convert_description(response)
@@ -683,49 +694,50 @@ class DTLSResults(object):
 
 
 class DTLSTester(ProtocolTester):
-    """Tester of DTLS protocol"""
+    """Tester of DTLS protocol."""
 
     def __init__(self):
+        """Create empty DTLSTester object."""
         ProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
-        """Provides short (abbreviated) name of protocol"""
+        """Provide short (abbreviated) name of protocol."""
         return "DTLS"
 
     @staticmethod
     def protocol_full_name():
-        """Provides full (not abbreviated) name of protocol"""
+        """Provide full (not abbreviated) name of protocol."""
         return "Datagram Transport Layer Security"
 
     @staticmethod
     def default_port():
-        """Provides default port used by implemented protocol"""
+        """Provide default port used by implemented protocol."""
         return 443
 
     @staticmethod
     def transport_protocol():
-        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
         return UDP
 
     @staticmethod
     def request_parser():
-        """Provides Scapy class implementing parsing of protocol requests"""
+        """Provide Scapy class implementing parsing of protocol requests."""
         return DTLSRecord
 
     @staticmethod
     def response_parser():
-        """Provides Scapy class implementing parsing of protocol responses"""
+        """Provide Scapy class implementing parsing of protocol responses."""
         return DTLSRecord
 
     @staticmethod
     def implements_service_ping():
-        """Returns True if this tester implements service_ping for this protocol"""
+        """Return True if this tester implements service_ping for this protocol."""
         return True
 
     @staticmethod
     def ping(test_params, show_result=False):
-        """Checks DTLS service availability by sending ping packet and waiting for response."""
+        """Check DTLS service availability by sending ping packet and waiting for response."""
         if not test_params:
             return None
         ping_packets = [
@@ -750,25 +762,30 @@ class DTLSTester(ProtocolTester):
 
     @staticmethod
     def implements_fingerprinting():
-        """Returns True if this tester implements fingerprinting for this protocol"""
+        """Return True if this tester implements fingerprinting for this protocol."""
         return True
 
     @staticmethod
     def implements_resource_listing():
-        """Returns True if this tester implements resource for this protocol"""
+        """Return True if this tester implements resource for this protocol."""
         return False
 
     @staticmethod
     def implements_server_fuzzing():
-        """Returns True if this tester implements server fuzzing for this protocol"""
+        """Return True if this tester implements server fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_client_fuzzing():
-        """Returns True if this tester implements clients fuzzing for this protocol"""
+        """Return True if this tester implements clients fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_active_scanning():
-        """Returns True if this tester implements active scanning for this protocol"""
+        """Return True if this tester implements active scanning for this protocol."""
+        return True
+
+    @staticmethod
+    def implements_vulnerability_testing():
+        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

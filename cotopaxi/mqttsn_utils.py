@@ -45,7 +45,7 @@ MQTTSN_GATEWAY_INFO = "030201"
 
 
 def mqttsn_request(test_params, out_packet):
-    """Sends MQTT-SN request to broker and waiting for response."""
+    """Send MQTT-SN request to broker and waiting for response."""
     try:
         for i in range(1 + test_params.nr_retries):
             in_data = udp_sr1(test_params, str(out_packet))
@@ -83,51 +83,52 @@ def mqttsn_request(test_params, out_packet):
 
 
 class MQTTSNTester(ProtocolTester):
-    """Tester of MQTT-SN protocol"""
+    """Tester of MQTT-SN protocol."""
 
     def __init__(self):
+        """Construct MQTTSNTester."""
         ProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
-        """Provides short (abbreviated) name of protocol"""
+        """Provide short (abbreviated) name of protocol."""
         return "MQTT-SN"
 
     @staticmethod
     def protocol_full_name():
-        """Provides full (not abbreviated) name of protocol"""
+        """Provide full (not abbreviated) name of protocol."""
         return "MQ Telemetry Transport for Sensor Networks"
 
     @staticmethod
     def default_port():
-        """Provides default port used by implemented protocol"""
+        """Provide default port used by implemented protocol."""
         return 1883
 
     @staticmethod
     def transport_protocol():
-        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
         return UDP
 
     @staticmethod
     def request_parser():
-        """Provides Scapy class implementing parsing of protocol requests"""
+        """Provide Scapy class implementing parsing of protocol requests."""
         # return MQTTSN
         return MQTT
 
     @staticmethod
     def response_parser():
-        """Provides Scapy class implementing parsing of protocol responses"""
+        """Provide Scapy class implementing parsing of protocol responses."""
         # return MQTTSN
         return MQTT
 
     @staticmethod
     def implements_service_ping():
-        """Returns True if this tester implements service_ping for this protocol"""
+        """Return True if this tester implements service_ping for this protocol."""
         return True
 
     @staticmethod
     def ping(test_params, show_result=False):
-        """Checks MQTT-SN service availability by sending ping packet and waiting for response."""
+        """Check MQTT-SN service availability by sending ping packet and waiting for response."""
         if not test_params:
             return None
         # MQTT-SN ping is using Search Gateway message
@@ -140,25 +141,25 @@ class MQTTSNTester(ProtocolTester):
 
     @staticmethod
     def implements_fingerprinting():
-        """Returns True if this tester implements fingerprinting for this protocol"""
+        """Return True if this tester implements fingerprinting for this protocol."""
         return False
 
     @staticmethod
     def implements_resource_listing():
-        """Returns True if this tester implements resource for this protocol"""
+        """Return True if this tester implements resource for this protocol."""
         return False
 
     @staticmethod
     def implements_server_fuzzing():
-        """Returns True if this tester implements server fuzzing for this protocol"""
+        """Return True if this tester implements server fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_client_fuzzing():
-        """Returns True if this tester implements clients fuzzing for this protocol"""
+        """Return True if this tester implements clients fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_vulnerability_testing():
-        """Returns True if this tester implements vulnerability testing for this protocol"""
+        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

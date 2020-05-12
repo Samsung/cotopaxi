@@ -42,7 +42,7 @@ class TestAmplifierDetector(unittest.TestCase):
                 "On Windows run as Administrator."
             )
 
-    def test_reflector_sniffer(self):
+    def test_reflector_sniffer_pos(self):
 
         args = ["8.8.8.8", "-I", "0"]
         options = amplifier_parse_args(args)
@@ -66,19 +66,19 @@ class TestAmplifierDetector(unittest.TestCase):
         self.assertIn(" 28 ", result)
         self.assertIn(" 0.00%", result)
 
-    def test_main_empty(self):
+    def test_main_empty_neg(self):
         output = scrap_output(main, [])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_help(self):
+    def test_main_help_pos(self):
         output = scrap_output(main, ["-h"])
         self.assertIn("positional arguments", output)
         self.assertIn("show this help message and exit", output)
 
-    def test_main_basic(self):
+    def test_main_basic_pos(self):
         output = scrap_output(main, ["192.168.0.100", "-N", "0"])
         self.assertIn("Starting sniffing with filter", output)
 

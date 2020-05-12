@@ -38,10 +38,10 @@ from .rtsp_utils import build_rtsp_query
 
 
 def perform_resource_listing_coap(test_params, tuple_url_methods):
-    """Checks whether listed urls/methods are available on CoAP server."""
+    """Check whether listed urls/methods are available on CoAP server."""
 
     def check_method_and_url(method, url):
-        """Checks method and URL in CoAP response."""
+        """Check method and URL in CoAP response."""
         coap_check_result = coap_check_url(test_params, method, url)
 
         ip_port_and_url = "{}:{}/{}".format(
@@ -55,7 +55,7 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
             print (
                 "[-] Url |{}| is not available on server {}:{} "
                 "for method {}".format(
-                    url,
+                    url.decode("ascii"),
                     test_params.dst_endpoint.ip_addr,
                     test_params.dst_endpoint.port,
                     method,
@@ -69,7 +69,7 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
             print (
                 "[+] Url |{}| received code |{}| on server {}:{} "
                 "for method {}".format(
-                    url,
+                    url.decode("ascii"),
                     coap_return_code,
                     test_params.dst_endpoint.ip_addr,
                     test_params.dst_endpoint.port,
@@ -91,13 +91,13 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
 
 
 def perform_resource_listing_mdns(test_params, list_services):
-    """Checks whether listed mDNS services are available on server."""
+    """Check whether listed mDNS services are available on server."""
     for query in list_services:
         mdns_query(test_params, query)
 
 
 def perform_resource_listing_ssdp(test_params, list_services):
-    """Checks whether listed SSDP services are available on server."""
+    """Check whether listed SSDP services are available on server."""
     for service_name in list_services:
         query = SSDP_QUERY.format(SSDP_MULTICAST_IPV4, service_name)
         response = ssdp_send_query(test_params, query)
@@ -119,7 +119,7 @@ def perform_resource_listing_ssdp(test_params, list_services):
 
 
 def perform_resource_listing_rtsp(test_params, list_streams):
-    """Checks whether listed RTSP streams are available on server."""
+    """Check whether listed RTSP streams are available on server."""
     for stream_name in list_streams:
         print_verbose(test_params, "Testing stream: {}".format(stream_name))
         query = build_rtsp_query(test_params, "DESCRIBE", stream_name)
@@ -146,7 +146,7 @@ def perform_resource_listing_rtsp(test_params, list_streams):
 
 
 def main(args):
-    """Lists resources on remote service based on command line parameters"""
+    """List resources on remote service based on command line parameters."""
     tester = CotopaxiTester(
         test_name="resource listing",
         check_ignore_ping=True,

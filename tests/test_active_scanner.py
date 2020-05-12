@@ -20,16 +20,22 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import timeout_decorator
 import unittest
 
-from cotopaxi.active_scanner import main
+from cotopaxi.active_scanner import main, DTLSScanner
 from cotopaxi.common_utils import get_local_ip
-from cotopaxi.cotopaxi_tester import check_caps
-from .common_test_utils import scrap_output, load_test_servers
+from cotopaxi.cotopaxi_tester import check_caps, TestParams
+from .common_test_utils import scrap_output, load_test_servers, CotopaxiToolServerTester
 from .common_runner import TimerTestRunner
 
 
-class TestActiveScanner(unittest.TestCase):
+class TestActiveScanner(CotopaxiToolServerTester, unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        CotopaxiToolServerTester.__init__(self, *args, **kwargs)
+        unittest.TestCase.__init__(self, *args, **kwargs)
+        self.main = main
+
     @classmethod
     def setUpClass(cls):
         try:
@@ -42,36 +48,36 @@ class TestActiveScanner(unittest.TestCase):
                 "On Windows run as Administrator."
             )
 
-    def test_main_empty(self):
+    def test_main_empty_neg(self):
         output = scrap_output(main, [])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_too_few_args(self):
+    def test_main_too_few_args_neg(self):
         output = scrap_output(main, ["10"])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_help(self):
+    def test_main_help_pos(self):
         output = scrap_output(main, ["-h"])
         self.assertIn("positional arguments", output)
         self.assertIn("show this help message and exit", output)
 
-    def test_main_no_ping(self):
+    def test_main_no_ping_neg(self):
         output = scrap_output(main, ["127.0.0.1", "10", "-V", "-T", "0.001"])
         self.assertIn("--ignore-ping-check", output)
         self.assertIn("skipping", output)
 
-    def test_main_no_ping_ipv6(self):
+    def test_main_no_ping_ipv6_neg(self):
         output = scrap_output(main, ["::1", "10", "-V", "-T", "0.001"])
         self.assertIn("--ignore-ping-check", output)
         self.assertIn("skipping", output)
 
-    def test_active_scanner(self):
+    def test_active_scanner_pos(self):
         local_ip = get_local_ip()
         print ("ip: {}".format(local_ip))
 
@@ -85,6 +91,11 @@ class TestActiveScanner(unittest.TestCase):
             self.assertIn("Finished active security scanning", output)
             self.assertIn("Starting scan: supported_protocol_versions", output)
             self.assertIn("Supported protocol versions", output)
+
+    @timeout_decorator.timeout(2)
+    def not_test_dtls_scanner_sniff_pos(self):
+        scanner = DTLSScanner(TestParams())
+        scanner.sniff(timeout=0.0001)
 
 
 if __name__ == "__main__":

@@ -42,21 +42,22 @@ UNICAST_ADDRESSES = [DNS_SD_MULTICAST_IPV4, DNS_SD_MULTICAST_IPV6]
 
 
 class ReflectorSniffer(object):
-    """Wrapper for all sniffer variables"""
+    """Wrapper for all sniffer variables."""
 
     class Statistics(object):
         """Class handling internal statistics of sniffer."""
 
         def __init__(self):
+            """Create empty ReflectorSniffer object."""
             self.packets_in_nr = 0
             self.packets_out_nr = 0
             self.packets_in_size = 0
             self.packets_out_size = 0
             self.packet_record_amplify = 0
-            self.packet_record_desc = None
+            self.packet_record_desc = "[.] No interesting amplification cases!"
 
         def count_packet(self, packet, direction_in):
-            """Counts size of sniffed packet"""
+            """Count size of sniffed packet."""
             if direction_in:
                 self.packets_in_nr += 1
                 self.packets_in_size += len(packet)
@@ -65,10 +66,10 @@ class ReflectorSniffer(object):
                 self.packets_out_size += len(packet)
 
         def update_record_amplify(self, from_target, to_target, ampl_factor):
-            """Updates packet with highest amplify factor."""
+            """Update packet with highest amplify factor."""
             self.packet_record_amplify = ampl_factor
             desc = [
-                "Highest amplify packet factor: {}".format(ampl_factor),
+                "[+] Highest amplify packet factor: {}".format(ampl_factor),
                 "TO TARGET",
                 scrap_packet(to_target),
                 "FROM TARGET",
@@ -79,14 +80,14 @@ class ReflectorSniffer(object):
             return self.packet_record_desc
 
     def __init__(self, options):
+        """Create ReflectorSniffer object based on provided options."""
         self.input_options = options
         self.stats = self.Statistics()
         self.time_displayed = time.time()
         self.last_packet_in = None
 
     def filter_action(self, packet):
-        """Counts size of sniffed packet"""
-
+        """Count size of sniffed packet."""
         if self.input_options:
             observed_ip_addr = self.input_options.dest_ip
             observed_port = parse_port(self.input_options.port)
@@ -145,14 +146,14 @@ class ReflectorSniffer(object):
         return None
 
     def __str__(self):
-        """Displays results of sniffing."""
+        """Prepare results of sniffing in str form."""
         if self.stats.packet_record_desc:
             return self.stats.packet_record_desc
         return ""
 
 
 def amplifier_parse_args(args):
-    """Parses arguments for amplifier."""
+    """Parse arguments for amplifier."""
     parser = argparse.ArgumentParser()
     parser = argparser_add_verbose(parser)
     parser = argparser_add_dest(parser)
@@ -170,8 +171,7 @@ def amplifier_parse_args(args):
 
 
 def main(args):
-    """Sets up reflector detection sniffer based on command line parameters"""
-
+    """Set up reflector detection sniffer based on command line parameters."""
     check_caps()
     options = amplifier_parse_args(args)
 

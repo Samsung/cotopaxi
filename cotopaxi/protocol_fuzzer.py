@@ -38,15 +38,16 @@ class FuzzingCase(Vulnerability):
     """Object representing crash vulnerability."""
 
     def __init__(self, payload_file):
+        """Create empty FuzzingCase object."""
         Vulnerability.__init__(self, payload_file=payload_file)
 
     def verify(self, test_params):
-        """Verifies whether remote host is vulnerable to this vulnerability."""
+        """Verify whether remote host is vulnerable to this vulnerability."""
         pass
 
     def test_payload(self, test_params, test_timeouts, alive_before=True):
-        """
-        Send payload for fuzzing.
+        """Send payload for fuzzing.
+        
         test_timeouts list is extended if applicable.
         """
         if not alive_before:
@@ -140,7 +141,7 @@ class FuzzingCase(Vulnerability):
 
 
 def perform_protocol_fuzzing(test_params, test_cases):
-    """Checks service availability by sending 'ping' packet and waiting for response."""
+    """Check service availability by sending 'ping' packet and waiting for response."""
     test_timeouts = []
     alive = False
     test_cases.sort(key=lambda x: x.payload_file)
@@ -166,7 +167,7 @@ def perform_protocol_fuzzing(test_params, test_cases):
 
 
 def load_corpus(tester, args):
-    """Provides corpus of payloads based on options provided by args."""
+    """Provide corpus of payloads based on options provided by args."""
     options = tester.parse_args(args)
     test_params = tester.test_params
 
@@ -183,7 +184,7 @@ def load_corpus(tester, args):
         for file_name in files:
             testcases.append(FuzzingCase(os.path.join(root, file_name)))
     if not testcases:
-        exit(
+        sys.exit(
             "Cannot load testcases from provided path: {}\n"
             "Testing stopped!".format(corpus_dir_path)
         )
@@ -192,8 +193,7 @@ def load_corpus(tester, args):
 
 
 def main(args):
-    """Starts protocol fuzzer based on command line parameters"""
-
+    """Start protocol fuzzer based on command line parameters."""
     tester = CotopaxiTester(
         test_name="server fuzzing", check_ignore_ping=True, use_generic_proto=False
     )

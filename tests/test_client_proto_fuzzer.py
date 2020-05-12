@@ -20,6 +20,7 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import time
 import threading
 import unittest
 import timeout_decorator
@@ -37,8 +38,8 @@ class TestClientProtoFuzzer(CotopaxiToolClientTester, unittest.TestCase):
         unittest.TestCase.__init__(self, *args, **kwargs)
         self.main = main
 
-    @timeout_decorator.timeout(5)
-    def test_main_basic_params(self):
+    @timeout_decorator.timeout(10)
+    def test_main_basic_params_pos(self):
         server_port = get_random_high_port()
         poke_thread = threading.Thread(target=poke_tcp_server, args=[server_port])
         poke_thread.start()
@@ -54,7 +55,9 @@ class TestClientProtoFuzzer(CotopaxiToolClientTester, unittest.TestCase):
                 "cotopaxi/fuzzing_corpus/coap_minimal",
             ],
         )
+        time.sleep(1)
         poke_thread.join()
+        time.sleep(1)
         self.assertIn("Finished client fuzzing", output)
 
 

@@ -31,7 +31,7 @@ from .common_runner import TimerTestRunner
 
 
 class TestCommonUtils(unittest.TestCase):
-    def test_get_local_ip(self):
+    def test_get_local_ip_pos(self):
         local_ip = get_local_ip()
         print ("ip: {}".format(local_ip))
         print ("len(ip): {}".format(len(local_ip)))
@@ -40,7 +40,7 @@ class TestCommonUtils(unittest.TestCase):
         self.assertGreater(len(local_ip), 7)
         self.assertEqual(local_ip.count("."), 3)
 
-    def test_get_local_ipv6(self):
+    def test_get_local_ipv6_pos(self):
         local_ip = get_local_ipv6_address()
         print ("ipv6: {}".format(local_ip))
         print ("len(ipv6): {}".format(len(local_ip)))
@@ -49,7 +49,7 @@ class TestCommonUtils(unittest.TestCase):
         # self.assertGreater(len(local_ip), 7)
         self.assertGreater(local_ip.count(":"), 0)
 
-    def test_get_random_high_port(self):
+    def test_get_random_high_port_pos(self):
         port = get_random_high_port()
         print ("port: {}".format(port))
         self.assertIsNotNone(port)

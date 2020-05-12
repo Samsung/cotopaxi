@@ -43,7 +43,7 @@ COAP_REV_CODES = {"GET": 1, "POST": 2, "PUT": 3, "DELETE": 4}
 
 
 def coap_scrap_response(resp_packet):
-    """Parses response packet and scraps CoAP response from stdout."""
+    """Parse response packet and scraps CoAP response from stdout."""
     parsed_response = ""
     if resp_packet.haslayer(IP):
         del resp_packet[IP].chksum
@@ -59,7 +59,7 @@ def coap_scrap_response(resp_packet):
 
 
 def coap_check_url(test_params, method, url):
-    """Checks on CoAP server whether resource named url is available."""
+    """Check on CoAP server whether resource named url is available."""
     packet = CoAP()
     # 1 - GET
     # 2 - POST
@@ -76,7 +76,7 @@ def coap_check_url(test_params, method, url):
     show_verbose(test_params, packet)
     print_verbose(test_params, "\n" + 30 * "-" + "\n")
 
-    answer = udp_sr1(test_params, str(packet))
+    answer = udp_sr1(test_params, bytes(packet))
 
     if answer is not None:
         parsed_response = coap_scrap_response(answer)
@@ -102,7 +102,7 @@ def coap_check_url(test_params, method, url):
 
 
 def coap_convert_type(response):
-    """Converts CoAP server response to attribute type used by classifier"""
+    """Convert CoAP server response to attribute type used by classifier."""
     types = {"ACK", "RST", "CON", "NON"}
     for type_in in types:
         if "type      = " + type_in in response:
@@ -111,7 +111,7 @@ def coap_convert_type(response):
 
 
 def coap_convert_code(response):
-    """Converts CoAP server response to attribute code used by classifier"""
+    """Convert CoAP server response to attribute code used by classifier."""
     if "2.05 Content" in response:
         return "2_05"
     if "4.00 Bad Request" in response:
@@ -126,7 +126,7 @@ def coap_convert_code(response):
 
 
 def coap_convert_options(response):
-    """Converts CoAP server response to attribute options used by classifier"""
+    """Convert CoAP server response to attribute options used by classifier."""
     return_response = "Empty"
     if "[('ETag'" in response:
         return_response = "ETag"
@@ -146,28 +146,29 @@ def coap_convert_options(response):
 
 
 class CoAPResults(object):
-    """Wrapper for all CoAP results"""
+    """Wrapper for all CoAP results."""
 
     def __init__(self):
+        """Create empty COAPResult object."""
         self.type = "No"
         self.code = "No"
         self.options = "No"
 
     def __str__(self):
+        """Convert COAPResult object into str."""
         return "type = {} code = {} options = {}".format(
             self.type, self.code, self.options
         )
 
     def fill(self, type_name, code, options):
-        """Test method"""
+        """Fill object."""
         self.type = type_name
         self.code = code
         self.options = options
 
 
 def coap_sr1(test_params, coap_test):
-    """Sends CoAP test message to server and parses response."""
-
+    """Send CoAP test message to server and parses response."""
     response = udp_sr1(test_params, coap_test)
     test_result = CoAPResults()
     if response is not None:
@@ -181,57 +182,57 @@ def coap_sr1(test_params, coap_test):
 
 
 def coap_sr1_file(test_params, test_filename):
-    """Reads CoAP test message from given file, sends this message to server and parses response"""
-    # with io.open(test_filename, "r", encoding='latin-1') as file_handle:
-    with open(test_filename, "r") as file_handle:
+    """Read CoAP test message from given file, sends this message to server and parses response."""
+    with open(test_filename, "rb") as file_handle:
         coap_test = file_handle.read()
     return coap_sr1(test_params, coap_test)
 
 
 class CoAPTester(ProtocolTester):
-    """Tester of CoAP protocol"""
+    """Tester of CoAP protocol."""
 
     def __init__(self):
+        """Create empty CoAPTester object."""
         ProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
-        """Provides short (abbreviated) name of protocol"""
+        """Provide short (abbreviated) name of protocol."""
         return "CoAP"
 
     @staticmethod
     def protocol_full_name():
-        """Provides full (not abbreviated) name of protocol"""
+        """Provide full (not abbreviated) name of protocol."""
         return "Constrained Application Protocol"
 
     @staticmethod
     def default_port():
-        """Provides default port used by implemented protocol"""
+        """Provide default port used by implemented protocol."""
         return 5683
 
     @staticmethod
     def transport_protocol():
-        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
         return UDP
 
     @staticmethod
     def request_parser():
-        """Provides Scapy class implementing parsing of protocol requests"""
+        """Provide Scapy class implementing parsing of protocol requests."""
         return CoAP
 
     @staticmethod
     def response_parser():
-        """Provides Scapy class implementing parsing of protocol responses"""
+        """Provide Scapy class implementing parsing of protocol responses."""
         return CoAP
 
     @staticmethod
     def implements_service_ping():
-        """Returns True if this tester implements service_ping for this protocol"""
+        """Return True if this tester implements service_ping for this protocol."""
         return True
 
     @staticmethod
     def ping(test_params, show_result=False):
-        """Checks CoAP service availability by sending ping packet and waiting for response."""
+        """Check CoAP service availability by sending ping packet and waiting for response."""
         if not test_params:
             return None
         coap_ping_packets = [COAP_PING_1_RAW, COAP_PING_2_RAW]
@@ -251,25 +252,25 @@ class CoAPTester(ProtocolTester):
 
     @staticmethod
     def implements_fingerprinting():
-        """Returns True if this tester implements fingerprinting for this protocol"""
+        """Return True if this tester implements fingerprinting for this protocol."""
         return True
 
     @staticmethod
     def implements_resource_listing():
-        """Returns True if this tester implements resource for this protocol"""
+        """Return True if this tester implements resource for this protocol."""
         return True
 
     @staticmethod
     def implements_server_fuzzing():
-        """Returns True if this tester implements server fuzzing for this protocol"""
+        """Return True if this tester implements server fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_client_fuzzing():
-        """Returns True if this tester implements clients fuzzing for this protocol"""
+        """Return True if this tester implements clients fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_vulnerability_testing():
-        """Returns True if this tester implements vulnerability testing for this protocol"""
+        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

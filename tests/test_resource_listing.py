@@ -20,7 +20,9 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import timeout_decorator
 import unittest
+
 from cotopaxi.resource_listing import main
 from cotopaxi.common_utils import get_local_ip
 from cotopaxi.cotopaxi_tester import check_caps
@@ -46,14 +48,14 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
                 "On Windows run as Administrator."
             )
 
-    def test_main_empty(self):
+    def test_main_empty_neg(self):
         output = scrap_output(main, [])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_too_few_args(self):
+    def test_main_too_few_args_neg(self):
         output = scrap_output(main, ["127.0.0.1"])
         self.assertTrue(
             "error: too few arguments" in output
@@ -65,16 +67,41 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
             or "error: the following arguments are required" in output
         )
 
-    def test_main_help(self):
+    def test_main_help_pos(self):
         output = scrap_output(main, ["-h"])
         self.assertIn("positional arguments", output)
         self.assertIn("show this help message and exit", output)
 
-    def test_main_no_file(self):
+    def test_main_no_file_neg(self):
         output = scrap_output(main, ["127.0.0.1", "10", "test", "-P", "CoAP"])
         self.assertIn("Cannot load names: [Errno 2] No such file or directory", output)
 
-    def test_main_basic_params(self):
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_ip_nonint_neg(self):
+        output = scrap_output(self.main, ["a.b.c.d", "40000", "abc"])
+        self.assertIn("Cannot parse IP address", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_ip_5_octets_neg(self):
+        output = scrap_output(self.main, ["1.2.3.4.5", "40000", "abc"])
+        self.assertIn("Cannot parse IP address", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_port_nonint_neg(self):
+        output = scrap_output(self.main, ["10.10.10.10", "aaaaa", "abc"])
+        self.assertIn("Cannot parse port", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_port_negint_neg(self):
+        output = scrap_output(self.main, ["10.10.10.10", "-10", "abc"])
+        self.assertIn("Cannot parse port", output)
+
+    @timeout_decorator.timeout(5)
+    def test_main_wrong_port_bigint_neg(self):
+        output = scrap_output(self.main, ["10.10.10.10", "999999", "abc"])
+        self.assertIn("Port not in range", output)
+
+    def test_main_basic_params_pos(self):
         output = scrap_output(
             main,
             [
@@ -89,7 +116,7 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
         )
         self.assertIn("available on server 127.0.0.1:10 for method GET", output)
 
-    def test_main_basic_params_ipv6(self):
+    def test_main_basic_params_ipv6_pos(self):
         output = scrap_output(
             main,
             [
@@ -104,7 +131,7 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
         )
         self.assertIn("available on server ::1:10 for method GET", output)
 
-    def test_resource_listing_coap(self):
+    def test_resource_listing_coap_pos(self):
         local_ip = get_local_ip()
         print ("ip: {}".format(local_ip))
 
@@ -171,7 +198,7 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
 
         return scrap_output(main, [test_server_ip, str(test_server_port), "-P", "mDNS"])
 
-    def test_resource_listing_mdns(self):
+    def test_resource_listing_mdns_pos(self):
         output = scrap_output(
             main,
             [
@@ -187,7 +214,7 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
         self.assertIn("Finished resource listing", output)
         self.assertIn("is not responding for query", output)
 
-    def test_resource_listing_ssdp(self):
+    def test_resource_listing_ssdp_pos(self):
         output = scrap_output(
             main,
             [
@@ -203,7 +230,7 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
         self.assertIn("Finished resource listing", output)
         self.assertIn("Inactive endpoints: 2", output)
 
-    def test_resource_listing_rtsp(self):
+    def test_resource_listing_rtsp_pos(self):
         output = scrap_output(
             main,
             [

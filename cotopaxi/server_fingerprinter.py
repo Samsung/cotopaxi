@@ -21,7 +21,6 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import codecs
 import os
 import sys
 
@@ -31,7 +30,7 @@ from .cotopaxi_tester import CotopaxiTester, protocol_enabled
 from .dtls_utils import (
     DTLSResults,
     DTLSTester,
-    prepare_dtls_test_packets,
+    load_dtls_test_packets,
     scrap_dtls_response,
     udp_send,
 )
@@ -111,7 +110,7 @@ def dtls_classifier(test_results):
 
 
 def get_result_string(value):
-    """Converts result value into string."""
+    """Convert result value into string."""
     return "alive" if value else "dead"
 
 
@@ -218,12 +217,14 @@ def dtls_fingerprint(test_params):
             test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
         ),
     )
-    test_packets = prepare_dtls_test_packets()
+
+    test_packets = load_dtls_test_packets()
+
     test_results = len(test_packets) * [None]
     test_results_parsed = [DTLSResults() for _ in test_packets]
 
     for idx, packet_data in enumerate(test_packets):
-        response_data = udp_send(test_params, codecs.decode(packet_data, "hex"))
+        response_data = udp_send(test_params, packet_data)
         if response_data is not None:
             test_results[idx] = scrap_dtls_response(response_data)
         else:
@@ -275,7 +276,7 @@ def dtls_fingerprint(test_params):
 
 
 def service_fingerprint(test_params):
-    """Checks service availability by sending 'ping' packet and waiting for response."""
+    """Check service availability by sending 'ping' packet and waiting for response."""
     if protocol_enabled(Protocol.CoAP, test_params.protocol):
         coap_fingerprint(test_params)
     if protocol_enabled(Protocol.DTLS, test_params.protocol):
@@ -284,8 +285,7 @@ def service_fingerprint(test_params):
 
 
 def main(args):
-    """Starts server fingerprinting based on command line parameters"""
-
+    """Start server fingerprinting based on command line parameters."""
     tester = CotopaxiTester(
         check_ignore_ping=True,
         show_disclaimer=False,

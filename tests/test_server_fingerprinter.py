@@ -24,11 +24,16 @@ import unittest
 from cotopaxi.common_utils import get_local_ip
 from cotopaxi.cotopaxi_tester import check_caps
 from cotopaxi.server_fingerprinter import main
-from .common_test_utils import scrap_output, load_test_servers
+from .common_test_utils import scrap_output, load_test_servers, CotopaxiToolServerTester
 from .common_runner import TimerTestRunner
 
 
-class TestServerFingerprinter(unittest.TestCase):
+class TestServerFingerprinter(CotopaxiToolServerTester, unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        CotopaxiToolServerTester.__init__(self, *args, **kwargs)
+        unittest.TestCase.__init__(self, *args, **kwargs)
+        self.main = main
+
     @classmethod
     def setUpClass(cls):
         try:
@@ -41,31 +46,31 @@ class TestServerFingerprinter(unittest.TestCase):
                 "On Windows run as Administrator."
             )
 
-    def test_main_empty(self):
+    def test_main_empty_neg(self):
         output = scrap_output(main, [])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_too_few_args(self):
+    def test_main_too_few_args_neg(self):
         output = scrap_output(main, ["10"])
         self.assertTrue(
             "error: too few arguments" in output
             or "error: the following arguments are required" in output
         )
 
-    def test_main_help(self):
+    def test_main_help_pos(self):
         output = scrap_output(main, ["-h"])
         self.assertIn("positional arguments", output)
         self.assertIn("show this help message and exit", output)
 
-    def test_main_no_ping(self):
+    def test_main_no_ping_neg(self):
         output = scrap_output(main, ["127.0.0.1", "10", "-V", "-T", "0.001"])
         self.assertIn("--ignore-ping-check", output)
         self.assertIn("stopped", output)
 
-    def test_main_no_ping_ipv6(self):
+    def test_main_no_ping_ipv6_neg(self):
         output = scrap_output(main, ["::1", "10", "-V", "-T", "0.001"])
         self.assertIn("--ignore-ping-check", output)
         self.assertIn("stopped", output)
@@ -75,7 +80,7 @@ class TestServerFingerprinter(unittest.TestCase):
     #     self.assertIn("Started fingerprinting of CoAP server", output)
     #     self.assertIn("[+] CoAP server 127.0.0.1:10 is using software:", output)
 
-    def test_server_fingerprinter(self):
+    def test_server_fingerprinter_pos(self):
         local_ip = get_local_ip()
         print ("ip: {}".format(local_ip))
 

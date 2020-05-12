@@ -31,8 +31,7 @@ from .protocol_fuzzer import load_corpus
 
 
 def tcp_server(test_params, payloads):
-    """Starts TCP server used for testing clients."""
-
+    """Start TCP server used for testing clients."""
     print (
         "Starting TCP server on IP {} port {}".format(
             test_params.src_endpoint.ip_addr, test_params.src_endpoint.port
@@ -45,7 +44,8 @@ def tcp_server(test_params, payloads):
     try:
         for payload in payloads:
             # print_verbose(test_params, "Next payload is: {}".format(payload.payload_file))
-            message = open(payload.payload_file).read()
+            with open(payload.payload_file, "rb") as file_handle:
+                message = file_handle.read()
             (client_sock, addr) = sock.accept()
             test_params.test_stats.packets_received += 1
             print_verbose(test_params, "Received packet from: {}".format(addr))
@@ -71,8 +71,7 @@ def tcp_server(test_params, payloads):
 
 
 def udp_server(test_params, payloads):
-    """Starts UDP server used for testing clients."""
-
+    """Start UDP server used for testing clients."""
     print (
         "Starting UDP server on IP {} port {}".format(
             test_params.src_endpoint.ip_addr, test_params.src_endpoint.port
@@ -85,7 +84,8 @@ def udp_server(test_params, payloads):
     try:
         for payload in payloads:
             # print_verbose(test_params, "Next payload is: {}".format(payload.payload_file))
-            message = open(payload.payload_file).read()
+            with open(payload.payload_file, "rb") as payload_file:
+                message = payload_file.read()
             (_, addr) = sock.recvfrom(INPUT_BUFFER_SIZE)
             test_params.test_stats.packets_received += 1
             print_verbose(test_params, "Received packet from: {}".format(addr))
@@ -110,8 +110,7 @@ def udp_server(test_params, payloads):
 
 
 def main(args):
-    """Starts client protocol fuzzer based on command line parameters"""
-
+    """Start client protocol fuzzer based on command line parameters."""
     tester = CotopaxiClientTester("client fuzzing")
     tester.argparser.add_argument(
         "--corpus-dir",

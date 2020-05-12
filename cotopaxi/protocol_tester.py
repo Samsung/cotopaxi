@@ -26,49 +26,50 @@ ABC = abc.ABCMeta("ABC", (object,), {"__slots__": ()})
 
 
 class ProtocolTester(ABC):
-    """Representation of abstract protocol tester"""
+    """Representation of abstract protocol tester."""
 
     def __init__(self):
+        """Create empty ProtocolTester object."""
         pass
 
     @staticmethod
     def protocol_short_name():
-        """Provides short (abbreviated) name of protocol"""
+        """Provide short (abbreviated) name of protocol."""
         return "AGP"
 
     @staticmethod
     def protocol_full_name():
-        """Provides full (not abbreviated) name of protocol"""
+        """Provide full (not abbreviated) name of protocol."""
         return "Abstract Generic Protocol"
 
     @staticmethod
     def default_port():
-        """Provides default port used by implemented protocol"""
+        """Provide default port used by implemented protocol."""
         return -1
 
     @staticmethod
     def transport_protocol():
-        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
         return None
 
     @staticmethod
     def request_parser():
-        """Provides Scapy class implementing parsing of protocol requests"""
+        """Provide Scapy class implementing parsing of protocol requests."""
         return None
 
     @staticmethod
     def response_parser():
-        """Provides Scapy class implementing parsing of protocol responses"""
+        """Provide Scapy class implementing parsing of protocol responses."""
         return None
 
     @staticmethod
     def implements_service_ping():
-        """Returns True if this tester implements service_ping for this protocol"""
+        """Return True if this tester implements service_ping for this protocol."""
         return False
 
     @staticmethod
     def ping(test_params, show_result=False):
-        """Implementation of service ping for this protocol"""
+        """Perform service ping for this protocol."""
         if show_result:
             print ("Started ping for AGP protocol")
         if not test_params:
@@ -77,44 +78,44 @@ class ProtocolTester(ABC):
 
     @staticmethod
     def implements_fingerprinting():
-        """Returns True if this tester implements fingerprinting for this protocol"""
+        """Return True if this tester implements fingerprinting for this protocol."""
         return False
 
     @staticmethod
     def fingerprint(test_params):
-        """Implementation of server fingerprinter for this protocol"""
+        """Perform server fingerprinting for this protocol."""
         if test_params:
             return ""
         return None
 
     @staticmethod
     def implements_resource_listing():
-        """Returns True if this tester implements resource for this protocol"""
+        """Return True if this tester implements resource for this protocol."""
         return False
 
     @staticmethod
     def resource_listing(test_params, resource_list):
-        """Implementation of resource listing for this protocol"""
+        """Perform resource listing for this protocol."""
         if test_params and resource_list:
             return ""
         return None
 
     @staticmethod
     def implements_server_fuzzing():
-        """Returns True if this tester implements server fuzzing for this protocol"""
+        """Return True if this tester implements server fuzzing for this protocol."""
         return False
 
     @staticmethod
     def implements_client_fuzzing():
-        """Returns True if this tester implements clients fuzzing for this protocol"""
+        """Return True if this tester implements clients fuzzing for this protocol."""
         return False
 
     @staticmethod
     def implements_active_scanning():
-        """Returns True if this tester implements active scanning for this protocol"""
+        """Return True if this tester implements active scanning for this protocol."""
         return False
 
     @staticmethod
     def implements_vulnerability_testing():
-        """Returns True if this tester implements vulnerability testing for this protocol"""
+        """Return True if this tester implements vulnerability testing for this protocol."""
         return False
