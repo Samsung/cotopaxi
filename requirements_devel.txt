@@ -1,0 +1,7 @@
+configparser
+coverage
+pre-commit
+pydocstyle
+pylint
+pytest
+timeout-decorator
