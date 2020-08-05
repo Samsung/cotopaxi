@@ -37,7 +37,6 @@ from scapy.all import (
     Raw,
     StrFixedLenField,
     StrLenField,
-    UDP,
     XShortEnumField,
 )
 from scapy.compat import plain_str
@@ -79,7 +78,7 @@ from .common_utils import (
     get_local_ip,
     get_random_high_port,
 )
-from .protocol_tester import ProtocolTester
+from .protocol_tester import UDPBasedProtocolTester
 
 try:
     from StringIO import StringIO
@@ -693,12 +692,12 @@ class DTLSResults(object):
         self.length = dtls_convert_length(response)
 
 
-class DTLSTester(ProtocolTester):
+class DTLSTester(UDPBasedProtocolTester):
     """Tester of DTLS protocol."""
 
     def __init__(self):
         """Create empty DTLSTester object."""
-        ProtocolTester.__init__(self)
+        UDPBasedProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -716,11 +715,6 @@ class DTLSTester(ProtocolTester):
         return 443
 
     @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return UDP
-
-    @staticmethod
     def request_parser():
         """Provide Scapy class implementing parsing of protocol requests."""
         return DTLSRecord
@@ -729,11 +723,6 @@ class DTLSTester(ProtocolTester):
     def response_parser():
         """Provide Scapy class implementing parsing of protocol responses."""
         return DTLSRecord
-
-    @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
 
     @staticmethod
     def ping(test_params, show_result=False):
@@ -766,26 +755,6 @@ class DTLSTester(ProtocolTester):
         return True
 
     @staticmethod
-    def implements_resource_listing():
-        """Return True if this tester implements resource for this protocol."""
-        return False
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
     def implements_active_scanning():
         """Return True if this tester implements active scanning for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

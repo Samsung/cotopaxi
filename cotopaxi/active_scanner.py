@@ -911,7 +911,7 @@ def active_scanning(test_params):
             "[+] Server {}:{} is not responding before starting scan - skipping this host!"
             "\n    (use --ignore-ping-check if you want to continue anyway)".format(
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
-            ),
+            )
         )
         return
     scanner = DTLSScanner(test_params)

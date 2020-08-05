@@ -25,7 +25,7 @@
 import sys
 from scapy.all import TCP, UDP
 
-from .client_proto_fuzzer import tcp_server, udp_server
+from .client_proto_fuzzer import TCPFuzzer, UDPFuzzer
 from .cotopaxi_tester import CotopaxiClientTester, protocols_using
 from .vulnerability_tester import VULNS, bypass_list, select_vulnerabilities
 
@@ -54,9 +54,11 @@ def main(args):
     print ("Loaded {} vulnerabilities for test".format(len(test_vulns)))
 
     if tester.test_params.protocol in protocols_using(UDP):
-        udp_server(tester.test_params, test_vulns)
+        server = UDPFuzzer(tester.test_params)
+        server.perform_fuzzing(test_vulns)
     elif tester.test_params.protocol in protocols_using(TCP):
-        tcp_server(tester.test_params, test_vulns)
+        server = TCPFuzzer(tester.test_params)
+        server.perform_fuzzing(test_vulns)
     else:
         print (
             "Protocol {} is not supported by this tool!".format(

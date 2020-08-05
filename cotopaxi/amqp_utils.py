@@ -22,21 +22,19 @@
 
 import codecs
 import socket
-from scapy.all import TCP
-from scapy.layers.http import HTTPRequest, HTTPResponse
 
-from .common_utils import print_verbose, tcp_sr1
-from .protocol_tester import ProtocolTester
+from .common_utils import print_verbose, tcp_sr1, prepare_separator
+from .http_utils import HTTPTester
 
 AMQP_PING_000 = "414d515001010009"
 
 
-class AMQPTester(ProtocolTester):
+class AMQPTester(HTTPTester):
     """Tester of AMQP protocol."""
 
     def __init__(self):
         """Construct AMQPTester."""
-        ProtocolTester.__init__(self)
+        HTTPTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -54,26 +52,6 @@ class AMQPTester(ProtocolTester):
         return 5672
 
     @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return TCP
-
-    @staticmethod
-    def request_parser():
-        """Provide Scapy class implementing parsing of protocol requests."""
-        return HTTPRequest
-
-    @staticmethod
-    def response_parser():
-        """Provide Scapy class implementing parsing of protocol responses."""
-        return HTTPResponse
-
-    @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
-
-    @staticmethod
     def ping(test_params, show_result=False):
         """Check AMQP service availability by sending DESCRIBE message and waiting for response."""
         if not test_params:
@@ -89,9 +67,9 @@ class AMQPTester(ProtocolTester):
                             "\n".join(
                                 [
                                     "Received response:",
-                                    50 * "=",
+                                    prepare_separator(),
                                     in_data.strip(),
-                                    50 * "=",
+                                    prepare_separator(),
                                 ]
                             ),
                         )
@@ -108,28 +86,3 @@ class AMQPTester(ProtocolTester):
         except (socket.timeout, socket.error) as error:
             print_verbose(test_params, error)
         return False
-
-    @staticmethod
-    def implements_fingerprinting():
-        """Return True if this tester implements fingerprinting for this protocol."""
-        return False
-
-    @staticmethod
-    def implements_resource_listing():
-        """Return True if this tester implements resource for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
-        return True

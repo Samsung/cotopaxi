@@ -30,83 +30,121 @@ from .cotopaxi_tester import CotopaxiClientTester, protocols_using
 from .protocol_fuzzer import load_corpus
 
 
-def tcp_server(test_params, payloads):
-    """Start TCP server used for testing clients."""
-    print (
-        "Starting TCP server on IP {} port {}".format(
-            test_params.src_endpoint.ip_addr, test_params.src_endpoint.port
+class ClientFuzzer(object):
+    """Generic fuzzer server used to perform fuzzing."""
+
+    def __init__(self, test_params):
+        """Initialize client fuzzer using given test_params."""
+        self.test_params = test_params
+        self.sock = None
+        self.client_addr = None
+
+    def start_server(self):
+        """Start server used for testing clients."""
+        print (
+            "Starting server on IP {} port {}".format(
+                self.test_params.src_endpoint.ip_addr,
+                self.test_params.src_endpoint.port,
+            )
         )
-    )
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind((test_params.src_endpoint.ip_addr, test_params.src_endpoint.port))
-    sock.listen(10)
 
-    try:
-        for payload in payloads:
-            # print_verbose(test_params, "Next payload is: {}".format(payload.payload_file))
-            with open(payload.payload_file, "rb") as file_handle:
-                message = file_handle.read()
-            (client_sock, addr) = sock.accept()
-            test_params.test_stats.packets_received += 1
-            print_verbose(test_params, "Received packet from: {}".format(addr))
-            client_sock.send(message)
-            client_sock.close()
-            test_params.test_stats.packets_sent += 1
-            if payload.name:
-                if payload.cve_id:
-                    print (
-                        "Payload for vulnerability {} / {} sent.".format(
-                            payload.name, payload.cve_id
+    def wait_client(self):
+        """Wait for client."""
+        pass
+
+    def send_message(self, message):
+        """Send message to client."""
+        pass
+
+    def perform_fuzzing(self, payloads):
+        """Perform fuzzing using provided payloads."""
+        self.start_server()
+        try:
+            for payload in payloads:
+                self.wait_client()
+                with open(payload.payload_file, "rb") as payload_file:
+                    payload_content = payload_file.read()
+                self.test_params.test_stats.packets_received += 1
+                print_verbose(
+                    self.test_params,
+                    "Received packet from: {}".format(self.client_addr),
+                )
+                self.send_message(payload_content)
+                self.test_params.test_stats.packets_sent += 1
+                if payload.name:
+                    if payload.cve_id:
+                        print (
+                            "Payload for vulnerability {} / {} sent.".format(
+                                payload.name, payload.cve_id
+                            )
                         )
-                    )
+                    else:
+                        print (
+                            "Payload for vulnerability {} sent.".format(payload.name)
+                        )
                 else:
-                    print ("Payload for vulnerability {} sent.".format(payload.name))
-            else:
-                print ("Payload {} sent!".format(payload.payload_file))
-        print ("[.] Finished {} (all payloads sent).".format(test_params.test_name))
-    except KeyboardInterrupt:
-        print ("\nExiting...")
-    finally:
-        test_params.print_client_stats()
+                    print ("Payload {} sent!".format(payload.payload_file))
+            print (
+                "[.] Finished {} (all payloads sent).".format(
+                    self.test_params.test_name
+                )
+            )
+        except KeyboardInterrupt:
+            print ("\nExiting...")
+        finally:
+            self.test_params.print_client_stats()
 
 
-def udp_server(test_params, payloads):
-    """Start UDP server used for testing clients."""
-    print (
-        "Starting UDP server on IP {} port {}".format(
-            test_params.src_endpoint.ip_addr, test_params.src_endpoint.port
+class UDPFuzzer(ClientFuzzer):
+    """UDP fuzzer server used to perform fuzzing."""
+
+    def __init__(self, test_params):
+        """Initialize client fuzzer using given test_params."""
+        ClientFuzzer.__init__(self, test_params)
+
+    def start_server(self):
+        """Start server used for testing clients."""
+        super(UDPFuzzer, self).start_server()
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.bind(
+            (self.test_params.src_endpoint.ip_addr, self.test_params.src_endpoint.port)
         )
-    )
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind((test_params.src_endpoint.ip_addr, test_params.src_endpoint.port))
 
-    try:
-        for payload in payloads:
-            # print_verbose(test_params, "Next payload is: {}".format(payload.payload_file))
-            with open(payload.payload_file, "rb") as payload_file:
-                message = payload_file.read()
-            (_, addr) = sock.recvfrom(INPUT_BUFFER_SIZE)
-            test_params.test_stats.packets_received += 1
-            print_verbose(test_params, "Received packet from: {}".format(addr))
-            sock.sendto(message, addr)
-            test_params.test_stats.packets_sent += 1
-            if payload.name:
-                if payload.cve_id:
-                    print (
-                        "Payload for vulnerability {} / {} sent.".format(
-                            payload.name, payload.cve_id
-                        )
-                    )
-                else:
-                    print ("Payload for vulnerability {} sent.".format(payload.name))
-            else:
-                print ("Payload {} sent!".format(payload.payload_file))
-        print ("[.] Finished {} (all payloads sent).".format(test_params.test_name))
-    except KeyboardInterrupt:
-        print ("\nExiting...")
-    finally:
-        test_params.print_client_stats()
+    def wait_client(self):
+        """Wait for client."""
+        (_, self.client_addr) = self.sock.recvfrom(INPUT_BUFFER_SIZE)
+
+    def send_message(self, message):
+        """Send message to client."""
+        self.sock.sendto(message, self.client_addr)
+
+
+class TCPFuzzer(ClientFuzzer):
+    """TCP fuzzer server used to perform fuzzing."""
+
+    def __init__(self, test_params):
+        """Initialize client fuzzer using given test_params."""
+        ClientFuzzer.__init__(self, test_params)
+        self.client_sock = None
+
+    def start_server(self):
+        """Start server used for testing clients."""
+        super(TCPFuzzer, self).start_server()
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.bind(
+            (self.test_params.src_endpoint.ip_addr, self.test_params.src_endpoint.port)
+        )
+        self.sock.listen(10)
+
+    def wait_client(self):
+        """Wait for client."""
+        (self.client_sock, self.client_addr) = self.sock.accept()
+
+    def send_message(self, message):
+        """Send message to client."""
+        self.client_sock.send(message)
+        self.client_sock.close()
 
 
 def main(args):
@@ -122,13 +160,14 @@ def main(args):
     )
 
     testcases = load_corpus(tester, args)
-
     print ("Loaded {} payloads for fuzzing".format(len(testcases)))
 
     if tester.test_params.protocol in protocols_using(UDP):
-        udp_server(tester.test_params, testcases)
+        server = UDPFuzzer(tester.test_params)
+        server.perform_fuzzing(testcases)
     elif tester.test_params.protocol in protocols_using(TCP):
-        tcp_server(tester.test_params, testcases)
+        server = TCPFuzzer(tester.test_params)
+        server.perform_fuzzing(testcases)
     else:
         print (
             "Protocol {} is not supported by this tool!".format(

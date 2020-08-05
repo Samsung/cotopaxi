@@ -23,11 +23,10 @@
 
 import socket
 from hexdump import dehex
-from scapy.all import TCP
 from scapy.contrib.mqtt import CONTROL_PACKET_TYPE, MQTT, MQTTConnack, RETURN_CODE
 
 from .common_utils import print_verbose, show_verbose, tcp_sr1
-from .protocol_tester import ProtocolTester
+from .protocol_tester import TCPBasedProtocolTester
 
 # MQTT message
 # message type = CONNECT
@@ -66,12 +65,12 @@ def mqtt_request(test_params, out_packet):
     return False
 
 
-class MQTTTester(ProtocolTester):
+class MQTTTester(TCPBasedProtocolTester):
     """Tester of MQTT protocol."""
 
     def __init__(self):
         """Construct MQTTTester."""
-        ProtocolTester.__init__(self)
+        TCPBasedProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -89,11 +88,6 @@ class MQTTTester(ProtocolTester):
         return 1883
 
     @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return TCP
-
-    @staticmethod
     def request_parser():
         """Provide Scapy class implementing parsing of protocol requests."""
         return MQTT
@@ -102,11 +96,6 @@ class MQTTTester(ProtocolTester):
     def response_parser():
         """Provide Scapy class implementing parsing of protocol responses."""
         return MQTT
-
-    @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
 
     @staticmethod
     def ping(test_params, show_result=False):
@@ -120,28 +109,3 @@ class MQTTTester(ProtocolTester):
             if mqtt_request(test_params, out_packet):
                 return True
         return False
-
-    @staticmethod
-    def implements_fingerprinting():
-        """Return True if this tester implements fingerprinting for this protocol."""
-        return False
-
-    @staticmethod
-    def implements_resource_listing():
-        """Return True if this tester implements resource for this protocol."""
-        return False
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
-        return True

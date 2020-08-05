@@ -83,6 +83,9 @@ class TestActiveScanner(CotopaxiToolServerTester, unittest.TestCase):
 
         config = load_test_servers()
         test_server_ip = config["COMMON"]["DEFAULT_IP"]
+        if "DTLS_TEST_SERVERS" not in config or "goldy" not in ["DTLS_TEST_SERVERS"]:
+            print ("No remote DTLS servers - remote tests not performed!")
+            return
         dtls_servers = ["goldy"]
         for dtls_server in dtls_servers:
             port = config["DTLS_TEST_SERVERS"][dtls_server + "_port"]

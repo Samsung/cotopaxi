@@ -21,11 +21,10 @@
 #
 
 import socket
-from scapy.all import TCP
 from scapy.layers.http import HTTPRequest, HTTPResponse
 
 from .common_utils import print_verbose, tcp_sr1
-from .protocol_tester import ProtocolTester
+from .protocol_tester import TCPBasedProtocolTester
 
 HTTP_REQUEST = "{} http://{} HTTP/1.1\r\n" "Host: {}:{}\r\n"
 
@@ -41,12 +40,12 @@ def build_http_query(test_params, method="GET", path="", data=None):
     return http_query + "\r\n"
 
 
-class HTTPTester(ProtocolTester):
+class HTTPTester(TCPBasedProtocolTester):
     """Tester of HTTP protocol."""
 
     def __init__(self):
         """Create empty HTTPTester."""
-        ProtocolTester.__init__(self)
+        TCPBasedProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -64,11 +63,6 @@ class HTTPTester(ProtocolTester):
         return 80
 
     @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return TCP
-
-    @staticmethod
     def request_parser():
         """Provide Scapy class implementing parsing of protocol requests."""
         return HTTPRequest
@@ -77,11 +71,6 @@ class HTTPTester(ProtocolTester):
     def response_parser():
         """Provide Scapy class implementing parsing of protocol responses."""
         return HTTPResponse
-
-    @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
 
     @staticmethod
     def ping(test_params, show_result=False):
@@ -102,28 +91,3 @@ class HTTPTester(ProtocolTester):
         except (socket.timeout, socket.error) as error:
             print_verbose(test_params, error)
         return False
-
-    @staticmethod
-    def implements_fingerprinting():
-        """Return True if this tester implements fingerprinting for this protocol."""
-        return False
-
-    @staticmethod
-    def implements_resource_listing():
-        """Return True if this tester implements resource for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
-        return True

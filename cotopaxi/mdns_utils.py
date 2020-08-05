@@ -30,7 +30,7 @@ from dnslib import DNSRecord
 from scapy.all import DNS, DNSQR, UDP, Raw, sniff
 
 from .common_utils import print_verbose, udp_sr1
-from .protocol_tester import ProtocolTester
+from .protocol_tester import UDPBasedProtocolTester
 
 DNS_SD_QUERY = "_services._dns-sd._udp.local"
 DNS_SD_MULTICAST_IPV4 = "224.0.0.251"
@@ -179,12 +179,12 @@ def mdns_query(test_params, query):
     return mdns_sniffer.server_response
 
 
-class MDNSTester(ProtocolTester):
+class MDNSTester(UDPBasedProtocolTester):
     """Tester of mDNS protocol."""
 
     def __init__(self):
         """Create empty MDNSTester object."""
-        ProtocolTester.__init__(self)
+        UDPBasedProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -202,11 +202,6 @@ class MDNSTester(ProtocolTester):
         return 5353
 
     @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return UDP
-
-    @staticmethod
     def request_parser():
         """Provide Scapy class implementing parsing of protocol requests."""
         return DNS
@@ -215,11 +210,6 @@ class MDNSTester(ProtocolTester):
     def response_parser():
         """Provide Scapy class implementing parsing of protocol responses."""
         return DNS
-
-    @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
 
     @staticmethod
     def ping(test_params, show_result=False):
@@ -243,26 +233,6 @@ class MDNSTester(ProtocolTester):
         return mdns_sniffer.server_alive
 
     @staticmethod
-    def implements_fingerprinting():
-        """Return True if this tester implements fingerprinting for this protocol."""
-        return False
-
-    @staticmethod
     def implements_resource_listing():
         """Return True if this tester implements resource for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

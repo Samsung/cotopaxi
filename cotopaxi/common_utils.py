@@ -50,6 +50,9 @@ NET_MIN_HIGH_PORT = 49152
 # Maximal number of port for TCP and UDP protocols
 NET_MAX_PORT = 65535
 
+# Length of line for separator
+NR_CHARS_SEPARATOR = 80
+
 
 def get_local_ip():
     """Return IP address of local node."""
@@ -71,7 +74,20 @@ def get_local_ipv6_address():
 
 def get_random_high_port():
     """Return random value for private (ephemeral or high) TCP or UDP port."""
-    return random.randint(NET_MIN_HIGH_PORT, NET_MAX_PORT)
+    return random.randint(NET_MIN_HIGH_PORT, NET_MAX_PORT)  # nosec
+
+
+def prepare_separator(
+    separator_char="=", pre_separator_text=None, post_separator_text=None
+):
+    """Prepare line separator."""
+    result = ""
+    if pre_separator_text:
+        result += pre_separator_text + "\n"
+    result += NR_CHARS_SEPARATOR * separator_char
+    if post_separator_text:
+        result += "\n" + post_separator_text
+    return result
 
 
 def print_verbose(test_params, message):
@@ -214,7 +230,10 @@ def udp_sr1(test_params, udp_test, dtls_wrap=False):
     else:
         # do_patch()
         if test_params.ip_version == 4:
-            sock = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+            sock = ssl.wrap_socket(
+                socket.socket(socket.AF_INET, socket.SOCK_DGRAM),
+                ssl_version=ssl.PROTOCOL_TLSv1_2,
+            )
             sock.connect(
                 (test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port)
             )

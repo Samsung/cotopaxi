@@ -26,10 +26,16 @@ import sys
 
 from hexdump import dehex
 from scapy.all import IP, UDP
-from scapy.contrib.coap import CoAP  # , coap_codes
+from scapy.contrib.coap import CoAP
 
-from .common_utils import amplification_factor, print_verbose, show_verbose, udp_sr1
-from .protocol_tester import ProtocolTester
+from .common_utils import (
+    amplification_factor,
+    prepare_separator,
+    print_verbose,
+    show_verbose,
+    udp_sr1,
+)
+from .protocol_tester import UDPBasedProtocolTester
 
 try:
     from StringIO import StringIO
@@ -69,19 +75,27 @@ def coap_check_url(test_params, method, url):
         packet[CoAP].code = COAP_REV_CODES[method]
     else:
         packet[CoAP].code = 1  # GET
-    packet[CoAP].msg_id = random.randint(0, 32768)
+    packet[CoAP].msg_id = random.randint(0, 32768)  # nosec
     packet[CoAP].options = [("Uri-Path", url)]
 
-    print_verbose(test_params, "\n" + 30 * "-" + "Request:\n")
+    print_verbose(
+        test_params,
+        prepare_separator("-", pre_separator_text="\n", post_separator_text="Request:"),
+    )
     show_verbose(test_params, packet)
-    print_verbose(test_params, "\n" + 30 * "-" + "\n")
+    print_verbose(test_params, prepare_separator("-", pre_separator_text="\n"))
 
     answer = udp_sr1(test_params, bytes(packet))
 
     if answer is not None:
         parsed_response = coap_scrap_response(answer)
         code = coap_convert_code(parsed_response)
-        print_verbose(test_params, "\n" + 30 * "-" + "Response:\n")
+        print_verbose(
+            test_params,
+            prepare_separator(
+                "-", pre_separator_text="\n", post_separator_text="Response:"
+            ),
+        )
         show_verbose(test_params, answer)
         print_verbose(test_params, parsed_response)
 
@@ -95,9 +109,14 @@ def coap_check_url(test_params, method, url):
             )
             return code
     else:
-        print_verbose(test_params, "\n" + 30 * "-" + "\n No response\n")
+        print_verbose(
+            test_params,
+            prepare_separator(
+                "-", pre_separator_text="\n", post_separator_text="No response"
+            ),
+        )
 
-    print_verbose(test_params, "\n" + 30 * "-" + "\n")
+    print_verbose(test_params, prepare_separator("-", pre_separator_text="\n"))
     return None
 
 
@@ -188,12 +207,12 @@ def coap_sr1_file(test_params, test_filename):
     return coap_sr1(test_params, coap_test)
 
 
-class CoAPTester(ProtocolTester):
+class CoAPTester(UDPBasedProtocolTester):
     """Tester of CoAP protocol."""
 
     def __init__(self):
         """Create empty CoAPTester object."""
-        ProtocolTester.__init__(self)
+        UDPBasedProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -211,11 +230,6 @@ class CoAPTester(ProtocolTester):
         return 5683
 
     @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return UDP
-
-    @staticmethod
     def request_parser():
         """Provide Scapy class implementing parsing of protocol requests."""
         return CoAP
@@ -226,11 +240,6 @@ class CoAPTester(ProtocolTester):
         return CoAP
 
     @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
-
-    @staticmethod
     def ping(test_params, show_result=False):
         """Check CoAP service availability by sending ping packet and waiting for response."""
         if not test_params:
@@ -239,7 +248,7 @@ class CoAPTester(ProtocolTester):
         for coap_ping_raw in coap_ping_packets:
             packet_raw = dehex(coap_ping_raw)
             response = udp_sr1(test_params, packet_raw, test_params.wrap_secure_layer)
-            if response is not None:
+            if response:
                 for response_packet in response:
                     coap_response = coap_scrap_response(response_packet)
                     print_verbose(test_params, coap_response)
@@ -258,19 +267,4 @@ class CoAPTester(ProtocolTester):
     @staticmethod
     def implements_resource_listing():
         """Return True if this tester implements resource for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

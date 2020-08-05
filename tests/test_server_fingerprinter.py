@@ -86,6 +86,9 @@ class TestServerFingerprinter(CotopaxiToolServerTester, unittest.TestCase):
 
         config = load_test_servers()
         test_server_ip = config["COMMON"]["DEFAULT_IP"]
+        if "CoAP_TEST_SERVERS" not in config or not config["CoAP_TEST_SERVERS"]:
+            print ("No remote CoAP servers - remote tests not performed!")
+            return
         coap_servers = ["aiocoap", "coapthon", "freecoap", "wakaama"]
         for coap_server in coap_servers:
             port = config["CoAP_TEST_SERVERS"][coap_server + "_port"]

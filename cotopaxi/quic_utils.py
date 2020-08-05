@@ -20,9 +20,10 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import codecs
 from scapy.all import ICMP, UDP
 
-from .protocol_tester import ProtocolTester
+from .protocol_tester import UDPBasedProtocolTester
 from .common_utils import udp_sr1, print_verbose
 
 QUIC_PING_000 = (
@@ -103,12 +104,12 @@ QUIC_PING_001 = (
 )
 
 
-class QUICTester(ProtocolTester):
+class QUICTester(UDPBasedProtocolTester):
     """Tester of QUIC protocol."""
 
     def __init__(self):
         """Create empty QUICTester object."""
-        ProtocolTester.__init__(self)
+        UDPBasedProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -126,11 +127,6 @@ class QUICTester(ProtocolTester):
         return 443
 
     @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return UDP
-
-    @staticmethod
     def request_parser():
         """Provide Scapy class implementing parsing of protocol requests."""
         return UDP
@@ -141,11 +137,6 @@ class QUICTester(ProtocolTester):
         return UDP
 
     @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
-
-    @staticmethod
     def ping(test_params, show_result=False):
         """Check whether QUIC server is responding."""
         if not test_params:
@@ -153,7 +144,7 @@ class QUICTester(ProtocolTester):
 
         ping_packets = [QUIC_PING_000, QUIC_PING_001]
         for ping_packet in ping_packets:
-            ping_data = ping_packet.decode("hex")
+            ping_data = codecs.decode(ping_packet, "hex")
 
             response = udp_sr1(test_params, ping_data)
             if not response:
@@ -169,28 +160,3 @@ class QUICTester(ProtocolTester):
             # if check_dtls_response(test_params, parsed_response):
             #     return True
         return False
-
-    @staticmethod
-    def implements_fingerprinting():
-        """Return True if this tester implements fingerprinting for this protocol."""
-        return False
-
-    @staticmethod
-    def implements_resource_listing():
-        """Return True if this tester implements resource for this protocol."""
-        return False
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
-        return True

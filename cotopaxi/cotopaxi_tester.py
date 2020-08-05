@@ -29,12 +29,14 @@ import time
 from IPy import IP as IPY_IP
 from scapy.all import sniff, TCP, UDP
 from scapy.error import Scapy_Exception
+import validators
 
 from .common_utils import (
     get_local_ip,
     get_local_ipv6_address,
     get_random_high_port,
     NET_MAX_PORT,
+    prepare_separator,
     print_verbose,
     Protocol,
     ssdp_send_query,
@@ -91,9 +93,6 @@ def protocol_enabled(protocol, proto_mask):
     return False
 
 
-# Number of characters in line of separator
-SEPARATOR_LINE_SIZE = 80
-
 # Time in sec to be delayed to show disclaimer
 SLEEP_TIME_ON_DISCLAIMER = 1
 
@@ -148,7 +147,9 @@ def argparser_add_protocols(parser, test_name, use_generic_proto):
 
 def argparser_add_dest(parser):
     """Add verbose parameter to arg parser."""
-    parser.add_argument("dest_ip", action="store", help="destination IP address")
+    parser.add_argument(
+        "dest_ip", action="store", help="destination IP address"
+    )
     parser.add_argument(
         "--port", "--dest_port", "-P", action="store", help="destination port"
     )
@@ -180,16 +181,16 @@ def argparser_add_ignore_ping_check(parser):
 
 
 def create_basic_argparser():
-    """Create ArgumentParser and add basic options (dest_ip, dest_port and verbose).
+    """Create ArgumentParser and add basic options (dest_addr, dest_port and verbose).
 
     Returns:
         ArgumentParser: Parser with added options used by all programs.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "dest_ip",
+        "dest_addr",
         action="store",
-        help="destination IP address or multiple IPs "
+        help="destination hostname, IP address or multiple IPs "
         "separated by coma (e.g. '1.1.1.1,2.2.2.2') or given by CIDR netmask "
         "(e.g. '10.0.0.0/22') or both",
     )
@@ -234,7 +235,7 @@ def create_client_tester_argparser():
         "-SI",
         action="store",
         help="IP address, that will be used to set up tester server",
-        default="0.0.0.0",
+        default="0.0.0.0",  # nosec
     )
     parser.add_argument(
         "--server-port",
@@ -333,14 +334,9 @@ def message_loss(sent, received):
     return 0
 
 
-def print_separator(used_char="="):
-    """Print line separator using provided char."""
-    print (SEPARATOR_LINE_SIZE * used_char)
-
-
 def print_disclaimer():
     """Show legal disclaimer."""
-    print_separator()
+    print (prepare_separator())
     print (
         """This tool can cause some devices or servers to stop acting in the intended way -
 for example leading to crash or hang of tested entities or flooding
@@ -348,7 +344,7 @@ with network traffic other entities!
 Make sure you have permission from the owners of tested devices or servers
 before running this tool!"""
     )
-    print_separator()
+    print (prepare_separator())
     time.sleep(SLEEP_TIME_ON_DISCLAIMER)
 
 
@@ -389,7 +385,7 @@ class TestParams(object):
 
     def print_stats(self):
         """Print statistics gathered during tests."""
-        print (80 * "=" + "\nTest statistics:")
+        print (prepare_separator(post_separator_text="Test statistics:"))
         print (
             "Messages sent: {}, responses received: {}, "
             "{:.0f}% message loss, test time: {:.0f} ms".format(
@@ -411,7 +407,7 @@ class TestParams(object):
             )
         if not self.positive_result_name:
             return
-        print (80 * "=" + "\nTest results:")
+        print (prepare_separator(post_separator_text="Test results:"))
         active_endpoints = set()
         potential_endpoints = set()
         inactive_endpoints = set()
@@ -427,7 +423,10 @@ class TestParams(object):
             )
         )
         if self.potential_result_name:
-            for proto, inactive_endpoint in self.test_stats.inactive_endpoints.items():
+            for (
+                proto,
+                inactive_endpoint,
+            ) in self.test_stats.inactive_endpoints.items():
                 inactive_endpoints.update(set(inactive_endpoint))
             if potential_endpoints:
                 print (
@@ -436,7 +435,7 @@ class TestParams(object):
                     )
                 )
             potential_results = []
-            for proto, proto_results in self.test_stats.potential_endpoints.items():
+            for (proto, proto_results) in self.test_stats.potential_endpoints.items():
                 if proto_results:
                     potential_results.append(
                         "    For {}: {}".format(proto, proto_results)
@@ -452,7 +451,7 @@ class TestParams(object):
 
     def print_client_stats(self):
         """Print statistics gathered during tests of clients."""
-        print (80 * "=" + "\nTest statistics:")
+        print (prepare_separator(post_separator_text="Test statistics:"))
         print (
             "Requests received: {}, payloads sent: {}, "
             "test time: {:.0f} ms".format(
@@ -510,7 +509,7 @@ def sr1_file(test_params, test_filename, display_packet=False):
                     test_packet
                 )
             out_packet.show()
-            print_verbose(test_params, 60 * "-")
+            print_verbose(test_params, prepare_separator("-"))
         except (TypeError, struct.error, RuntimeError, ValueError, Scapy_Exception):
             pass
     test_result = None
@@ -604,11 +603,19 @@ class CotopaxiTester(object):
 
         if options.verbose:
             print ("options: {}".format(options))
-            print ("dest_ip: {}".format(options.dest_ip))
+            print ("dest_addr: {}".format(options.dest_addr))
             print ("dest_port: {}".format(options.dest_port))
             print ("protocol: {}".format(options.protocol))
 
-        self.list_ips = prepare_ips(options.dest_ip)
+        if validators.domain(options.dest_addr) is True:
+            try:
+                self.list_ips = prepare_ips(socket.gethostbyname(options.dest_addr))
+            except socket.gaierror:
+                print ("[!] Cannot resolve hostname: {}".format(options.dest_addr))
+                sys.exit(2)
+        else:
+            self.list_ips = prepare_ips(options.dest_addr)
+
         self.list_ports = prepare_ports(options.dest_port)
 
         if options.verbose:

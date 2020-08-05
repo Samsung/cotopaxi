@@ -97,6 +97,11 @@ class TestServicePing(CotopaxiToolServerTester, unittest.TestCase):
         test_servers_proto = defaultdict(list)
 
         list_test_servers = load_test_servers_list()
+        if not list_test_servers:
+            print (
+                "No remote servers in test_servers.yaml - remote tests not performed!"
+            )
+            return
         for server in list_test_servers:
             test_servers_proto[server["protocol"]].append(server)
 

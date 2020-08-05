@@ -79,7 +79,7 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
 
     url_list, methods = tuple_url_methods
     for method in methods:
-        url_not_existing = "not existing" + 3 * str(random.randrange(2 ** 15))
+        url_not_existing = "not existing" + 3 * str(random.randrange(2 ** 15))  # nosec
         coap_code_not_existing = coap_check_url(test_params, method, url_not_existing)
         print_verbose(
             test_params,

@@ -66,8 +66,8 @@ def load_test_servers():
     config.read(os.path.dirname(__file__) + "/test_config.ini")
     test_server_ip = config["COMMON"]["DEFAULT_IP"]
     if test_server_ip is None or test_server_ip == "1.1.1.1" or test_server_ip == "":
-        exit(
-            "\n\nPlease provide address of test server(s) in "
+        print (
+            "\nRemote tests are not performed!\nPlease provide address of test server(s) in "
             "cotopaxi/tests/test_config.ini to perform remote tests!\n\n"
         )
     return config

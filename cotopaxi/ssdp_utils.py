@@ -21,10 +21,9 @@
 #
 
 from scapy.all import UDP
-from scapy.layers.http import HTTPRequest, HTTPResponse
 
 from .common_utils import ssdp_send_query
-from .protocol_tester import ProtocolTester
+from .http_utils import HTTPTester
 
 SSDP_QUERY = (
     "M-SEARCH * HTTP/1.1\r\n"
@@ -39,12 +38,12 @@ SSDP_MULTICAST_IPV6 = "FF05::C"
 SSDP_MULTICAST_PORT = 1900
 
 
-class SSDPTester(ProtocolTester):
+class SSDPTester(HTTPTester):
     """Tester of SSDP protocol."""
 
     def __init__(self):
         """Create empty SSDPTester object."""
-        ProtocolTester.__init__(self)
+        HTTPTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -67,21 +66,6 @@ class SSDPTester(ProtocolTester):
         return UDP
 
     @staticmethod
-    def request_parser():
-        """Provide Scapy class implementing parsing of protocol requests."""
-        return HTTPRequest
-
-    @staticmethod
-    def response_parser():
-        """Provide Scapy class implementing parsing of protocol responses."""
-        return HTTPResponse
-
-    @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
-
-    @staticmethod
     def ping(test_params, show_result=False):
         """Check SSDP server availability by sending ping packet."""
         if not test_params:
@@ -94,26 +78,6 @@ class SSDPTester(ProtocolTester):
         return "200 OK" in response
 
     @staticmethod
-    def implements_fingerprinting():
-        """Return True if this tester implements fingerprinting for this protocol."""
-        return False
-
-    @staticmethod
     def implements_resource_listing():
         """Return True if this tester implements resource for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
         return True

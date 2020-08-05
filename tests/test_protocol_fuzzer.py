@@ -97,6 +97,9 @@ class TestProtocolFuzzer(CotopaxiToolServerTester, unittest.TestCase):
         print ("ip: {}".format(local_ip))
 
         config = load_test_servers()
+        if "CoAP_TEST_SERVERS" not in config or not config["CoAP_TEST_SERVERS"]:
+            print ("No remote CoAP servers - remote tests not performed!")
+            return
         test_server_ip = config["COMMON"]["DEFAULT_IP"]
         coap_servers = ["aiocoap"]
         for coap_server in coap_servers:

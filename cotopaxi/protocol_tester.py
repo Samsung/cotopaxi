@@ -21,6 +21,7 @@
 #
 
 import abc
+from scapy.all import TCP, UDP
 
 ABC = abc.ABCMeta("ABC", (object,), {"__slots__": ()})
 
@@ -116,6 +117,73 @@ class ProtocolTester(ABC):
         return False
 
     @staticmethod
+    # pylint: disable=invalid-name
     def implements_vulnerability_testing():
         """Return True if this tester implements vulnerability testing for this protocol."""
         return False
+
+
+class TCPBasedProtocolTester(ProtocolTester):
+    """Tester of any TCP based protocol."""
+
+    def __init__(self):
+        """Construct TCPBasedProtocolTester."""
+        ProtocolTester.__init__(self)
+
+    @staticmethod
+    def transport_protocol():
+        """Provide Scapy class of transport protocol used by this tester."""
+        return TCP
+
+    @staticmethod
+    def implements_service_ping():
+        """Return True if this tester implements service_ping for this protocol."""
+        return True
+
+    @staticmethod
+    def implements_server_fuzzing():
+        """Return True if this tester implements server fuzzing for this protocol."""
+        return True
+
+    @staticmethod
+    def implements_client_fuzzing():
+        """Return True if this tester implements clients fuzzing for this protocol."""
+        return True
+
+    @staticmethod
+    def implements_vulnerability_testing():
+        """Return True if this tester implements vulnerability testing for this protocol."""
+        return True
+
+
+class UDPBasedProtocolTester(ProtocolTester):
+    """Tester of any UDP based protocol."""
+
+    def __init__(self):
+        """Construct TCPBasedProtocolTester."""
+        ProtocolTester.__init__(self)
+
+    @staticmethod
+    def transport_protocol():
+        """Provide Scapy class of transport protocol used by this tester."""
+        return UDP
+
+    @staticmethod
+    def implements_service_ping():
+        """Return True if this tester implements service_ping for this protocol."""
+        return True
+
+    @staticmethod
+    def implements_server_fuzzing():
+        """Return True if this tester implements server fuzzing for this protocol."""
+        return True
+
+    @staticmethod
+    def implements_client_fuzzing():
+        """Return True if this tester implements clients fuzzing for this protocol."""
+        return True
+
+    @staticmethod
+    def implements_vulnerability_testing():
+        """Return True if this tester implements vulnerability testing for this protocol."""
+        return True

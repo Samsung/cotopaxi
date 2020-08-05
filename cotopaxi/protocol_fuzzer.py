@@ -28,7 +28,7 @@ import time
 
 from scapy.all import Raw
 
-from .common_utils import print_verbose
+from .common_utils import print_verbose, prepare_separator
 from .cotopaxi_tester import CotopaxiTester, PROTOCOL_TESTERS, sr1_file
 from .service_ping import service_ping
 from .vulnerability_tester import Vulnerability
@@ -45,9 +45,32 @@ class FuzzingCase(Vulnerability):
         """Verify whether remote host is vulnerable to this vulnerability."""
         pass
 
+    @staticmethod
+    def wait_server_respawn(test_params, wait_time_sec=60, nr_iterations=2):
+        """Wait for server to respawn after crash."""
+        print (
+            "Waiting {} seconds for the server to start again.".format(wait_time_sec)
+        )
+        iteration = 0
+        server_respawned = False
+        while not server_respawned:
+            time.sleep(wait_time_sec)
+            if not service_ping(test_params):
+                print ("Server did not respawn (wait {})!".format(iteration + 1))
+            else:
+                print ("Server is alive again (after {} waits)!".format(iteration + 1))
+                return True
+            iteration += 1
+        print (
+            "Server did not respawn after {} x {} sec!\nExiting!".format(
+                nr_iterations, wait_time_sec
+            )
+        )
+        return False
+
     def test_payload(self, test_params, test_timeouts, alive_before=True):
         """Send payload for fuzzing.
-        
+
         test_timeouts list is extended if applicable.
         """
         if not alive_before:
@@ -73,26 +96,28 @@ class FuzzingCase(Vulnerability):
                 )
             )
             return False
-        print_verbose(test_params, 60 * "-" + "\nRequest:")
+        print_verbose(
+            test_params, prepare_separator("-", post_separator_text="Request:")
+        )
         payload_sent_time = time.time()
         test_result = sr1_file(test_params, self.payload_file, test_params.verbose)
-        print_verbose(test_params, 60 * "-")
+        print_verbose(test_params, prepare_separator("-"))
         print ("[.] Payload {} sent".format(self.payload_file))
         if test_result is not None:
             test_timeouts.append(
                 (time.time() - payload_sent_time, self.payload_file, test_result)
             )
-            print (60 * "-" + "\nResponse:")
+            print (prepare_separator("-", post_separator_text="Response:"))
             try:
                 proto_handler = PROTOCOL_TESTERS[test_params.protocol].response_parser()
                 packet = proto_handler(test_result[Raw].load)
                 packet.show()
             except (TypeError, IndexError, struct.error):
                 pass
-            print (60 * "-")
+            print (prepare_separator("-"))
         else:
             print ("Received no response from server")
-            print (60 * "-")
+            print (prepare_separator("-"))
         alive_after = service_ping(test_params)
         flag = True
         if not alive_after:
@@ -111,16 +136,8 @@ class FuzzingCase(Vulnerability):
                         self.payload_file,
                     )
                 )
-                print ("Waiting {} seconds for the server to start again.".format(60))
-                time.sleep(60)
-                if not service_ping(test_params):
-                    print ("Server did not respawn (wait 1)!")
-                    time.sleep(60)
-                    if not service_ping(test_params):
-                        print ("Server did not respawn (wait 2)!\nExiting!")
-                        return False
-                    else:
-                        print ("Server is alive again (after 2 waits)!")
+                if not self.wait_server_respawn(test_params):
+                    return False
             else:
                 flag = True
         if flag and alive_after and not test_params.ignore_ping_check:
@@ -136,7 +153,7 @@ class FuzzingCase(Vulnerability):
             test_params,
             "[+] Finished fuzzing with payload: {}".format(self.payload_file),
         )
-        print_verbose(test_params, 60 * "=")
+        print_verbose(test_params, prepare_separator())
         return True
 
 
@@ -158,12 +175,12 @@ def perform_protocol_fuzzing(test_params, test_cases):
 
     if test_timeouts:
         test_timeouts.sort(reverse=True)
-        print (80 * "-")
+        print (prepare_separator())
         print ("\nPayloads with longest Round-Trip Time (RTT):")
-        print (" RTT (sec) | Payload\n" + 80 * "-")
+        print (prepare_separator("-", pre_separator_text="RTT (sec) | Payload"))
         for _, timeout in zip(range(len(test_cases) // 10), test_timeouts):
             print ("  {:0.5f}  | {}".format(timeout[0], timeout[1]))
-        print (80 * "-")
+        print (prepare_separator("-"))
 
 
 def load_corpus(tester, args):
@@ -178,7 +195,7 @@ def load_corpus(tester, args):
         corpus_dir_path = os.path.dirname(__file__) + "/fuzzing_corpus/"
         if test_params.protocol.name != "ALL":
             corpus_dir_path += test_params.protocol.name.lower()
-    print_verbose(test_params, 80 * "=")
+    print_verbose(test_params, prepare_separator())
     testcases = []
     for root, _, files in os.walk(corpus_dir_path):
         for file_name in files:

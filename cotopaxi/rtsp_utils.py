@@ -23,11 +23,9 @@
 
 import socket
 from random import randint
-from scapy.all import TCP
-from scapy.layers.http import HTTPRequest, HTTPResponse
 
 from .common_utils import print_verbose, tcp_sr1
-from .protocol_tester import ProtocolTester
+from .http_utils import HTTPTester
 
 RTSP_QUERY = "{} rtsp://{}:{}/{} RTSP/1.0\r\n" "CSeq:{}\r\n" "\r\n"
 
@@ -35,7 +33,7 @@ RTSP_QUERY = "{} rtsp://{}:{}/{} RTSP/1.0\r\n" "CSeq:{}\r\n" "\r\n"
 def build_rtsp_query(test_params, method="DESCRIBE", path="", cseq=None):
     """Create RTSP query string based on provided data."""
     if not cseq:
-        cseq = randint(0, 10000)
+        cseq = randint(0, 10000)  # nosec
     return RTSP_QUERY.format(
         method,
         test_params.dst_endpoint.ip_addr,
@@ -45,12 +43,12 @@ def build_rtsp_query(test_params, method="DESCRIBE", path="", cseq=None):
     )
 
 
-class RTSPTester(ProtocolTester):
+class RTSPTester(HTTPTester):
     """Tester of RTSP protocol."""
 
     def __init__(self):
         """Create empty RTSPTester object."""
-        ProtocolTester.__init__(self)
+        HTTPTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
@@ -66,26 +64,6 @@ class RTSPTester(ProtocolTester):
     def default_port():
         """Provide default port used by implemented protocol."""
         return 554
-
-    @staticmethod
-    def transport_protocol():
-        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
-        return TCP
-
-    @staticmethod
-    def request_parser():
-        """Provide Scapy class implementing parsing of protocol requests."""
-        return HTTPRequest
-
-    @staticmethod
-    def response_parser():
-        """Provide Scapy class implementing parsing of protocol responses."""
-        return HTTPResponse
-
-    @staticmethod
-    def implements_service_ping():
-        """Return True if this tester implements service_ping for this protocol."""
-        return True
 
     @staticmethod
     def ping(test_params, show_result=False):
@@ -122,26 +100,6 @@ class RTSPTester(ProtocolTester):
         return False
 
     @staticmethod
-    def implements_fingerprinting():
-        """Return True if this tester implements fingerprinting for this protocol."""
-        return False
-
-    @staticmethod
     def implements_resource_listing():
         """Return True if this tester implements resource for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_server_fuzzing():
-        """Return True if this tester implements server fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_client_fuzzing():
-        """Return True if this tester implements clients fuzzing for this protocol."""
-        return True
-
-    @staticmethod
-    def implements_vulnerability_testing():
-        """Return True if this tester implements vulnerability testing for this protocol."""
         return True
