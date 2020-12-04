@@ -51,14 +51,18 @@ COAP_REV_CODES = {"GET": 1, "POST": 2, "PUT": 3, "DELETE": 4}
 def coap_scrap_response(resp_packet):
     """Parse response packet and scraps CoAP response from stdout."""
     parsed_response = ""
-    if resp_packet.haslayer(IP):
-        del resp_packet[IP].chksum
-        del resp_packet[IP].id
-    if resp_packet.haslayer(UDP):
-        del resp_packet[UDP].chksum
-        save_stdout, sys.stdout = sys.stdout, StringIO()
-        coap = CoAP(resp_packet[UDP].load)
-        coap.show()
+    save_stdout, sys.stdout = sys.stdout, StringIO()
+    try:
+        if resp_packet.haslayer(IP):
+            del resp_packet[IP].chksum
+            del resp_packet[IP].id
+        if resp_packet.haslayer(UDP):
+            del resp_packet[UDP].chksum
+            coap = CoAP(resp_packet[UDP].load)
+            coap.show()
+    except (NameError) as exc:
+        print("Exception: {}".format(exc))
+    finally:
         sys.stdout, save_stdout = save_stdout, sys.stdout
         parsed_response = save_stdout.getvalue()
     return parsed_response
@@ -100,7 +104,7 @@ def coap_check_url(test_params, method, url):
         print_verbose(test_params, parsed_response)
 
         if code != "Empty":
-            print (
+            print(
                 "SENT size:{} RECV size:{} AMPLIFICATION FACTOR:{:0.2f}%".format(
                     len(packet),
                     len(answer),
@@ -250,13 +254,22 @@ class CoAPTester(UDPBasedProtocolTester):
             response = udp_sr1(test_params, packet_raw, test_params.wrap_secure_layer)
             if response:
                 for response_packet in response:
+                    response_packet.show()
+                    if (
+                        response_packet.haslayer(CoAP)
+                        and response_packet[CoAP].ver == 1
+                    ):
+                        return True
                     coap_response = coap_scrap_response(response_packet)
+                    # print(coap_response)
                     print_verbose(test_params, coap_response)
                     if (
                         "ver       = 1" in coap_response
                         and coap_convert_type(coap_response) != "Empty"
                     ):
+                        print_verbose(test_params, "Found CoAP response")
                         return True
+        print_verbose(test_params, "NOT found CoAP response")
         return False
 
     @staticmethod

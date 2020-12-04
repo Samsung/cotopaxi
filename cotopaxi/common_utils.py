@@ -27,7 +27,7 @@ import ssl
 import sys
 from enum import Enum
 
-from scapy.all import DNS, IP, TCP, UDP, IPv6, Raw, sr1
+from scapy.all import Ether, DNS, IP, TCP, UDP, IPv6, Raw, sr1, sniff
 from scapy.layers.http import HTTPRequest
 from scapy.contrib.coap import CoAP
 from scapy.contrib.mqtt import MQTT
@@ -93,7 +93,7 @@ def prepare_separator(
 def print_verbose(test_params, message):
     """Print messages displayed only in the verbose/debug mode."""
     if test_params.verbose:
-        print (message)
+        print(message)
 
 
 def show_verbose(test_params, packet, protocol=None):
@@ -189,14 +189,14 @@ def tcp_sr1(test_params, test_packet):
             test_params.report_received_packet(sent_time)
     except (socket.timeout, socket.error) as exc:
         if test_params.verbose:
-            print ("TCP exception: {}".format(exc))
+            print("TCP exception: {}".format(exc))
     finally:
         if connect_handler is not None:
             connect_handler.close()
     return in_data
 
 
-def udp_sr1(test_params, udp_test, dtls_wrap=False):
+def udp_sr1(test_params, udp_test, dtls_wrap=False, spoof_src_endpoint=False):
     """Send UDP test message to server using UDP protocol and parses response."""
     response = None
     sent_time = test_params.report_sent_packet()
@@ -216,12 +216,36 @@ def udp_sr1(test_params, udp_test, dtls_wrap=False):
         #     udp_test_packet.show()
         if test_params.timeout_sec == 0:
             test_params.timeout_sec = 0.0001
-        response = sr1(
-            udp_test_packet,
-            verbose=test_params.verbose,
-            timeout=test_params.timeout_sec,
-            retry=test_params.nr_retries,
-        )
+
+        if spoof_src_endpoint:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.bind((test_params.src_endpoint.ip_addr, test_params.src_endpoint.port))
+            response = sr1(
+                udp_test_packet,
+                timeout=0,
+                retry=0,
+                # nofilter=1,
+                verbose=test_params.verbose,
+                # timeout=test_params.timeout_sec,
+                # retry=test_params.nr_retries,
+            )
+            filter_string = (
+                "udp and host "
+                + test_params.dst_endpoint.ip_addr
+                + " and host "
+                + test_params.src_endpoint.ip_addr
+            )
+            sniff_response = sniff(
+                filter=filter_string, count=1, timeout=test_params.timeout_sec
+            )
+            # print(type(sniff_response))
+            if sniff_response:
+                response = sniff_response[0]
+                response = list(response)
+            sock.close()
+        else:
+            response = udp_send_payload(test_params, udp_test)
+
         if response:
             print_verbose(
                 test_params, "Received response - size: {}".format(len(response))
@@ -241,8 +265,7 @@ def udp_sr1(test_params, udp_test, dtls_wrap=False):
             response = IP() / UDP() / Raw(sock.recv())
             if response:
                 test_params.report_sent_packet(sent_time)
-
-    #            sock.close()
+            sock.close()
     return response
 
 
@@ -251,6 +274,40 @@ def udp_sr1_file(test_params, test_filename):
     with open(test_filename, "rb") as file_handle:
         test_data = file_handle.read()
     return udp_sr1(test_params, test_data)
+
+
+def udp_send_payload(test_params, payload):
+    """Send UDP payload using standard Python function."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.sendto(
+        bytes(payload),
+        (test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port),
+    )
+    sent_time = test_params.report_sent_packet()
+    sock.settimeout(test_params.timeout_sec)
+    try:
+        while True:
+            data, addr = sock.recvfrom(INPUT_BUFFER_SIZE)
+            print_verbose(
+                test_params,
+                "Received response from {} - content:\n{}\n-----".format(addr, data),
+            )
+            if (
+                test_params.dst_endpoint.ip_addr,
+                test_params.dst_endpoint.port,
+            ) == addr:
+                print_verbose(
+                    test_params, "This is the response that we was waiting for!"
+                )
+                test_params.report_received_packet(sent_time)
+                return IP() / UDP() / Raw(data)
+            else:
+                print_verbose(
+                    test_params, "Received response from another host (not target)!"
+                )
+    except socket.timeout:
+        print_verbose(test_params, "Received no response!")
+    return None
 
 
 def ssdp_send_query(test_params, query):
@@ -288,7 +345,7 @@ def ssdp_send_query(test_params, query):
             print_verbose(test_params, "Received no response!")
 
     elif test_params.ip_version == 6:
-        print ("IPv6 is not supported for SSDP")
+        print("IPv6 is not supported for SSDP")
     return None
 
 
