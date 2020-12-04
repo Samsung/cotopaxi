@@ -1,3 +1,4 @@
+black
 configparser
 coverage
 pre-commit

@@ -100,6 +100,7 @@ We would like to thank above listed authors for sharing this corpus!
 * service_ping
 * server_fingerprinter
 * device_identification
+* traffic_analyzer
 * resource_listing
 * protocol_fuzzer (for fuzzing servers)
 * client_proto_fuzzer (for fuzzing clients)
@@ -108,21 +109,22 @@ We would like to thank above listed authors for sharing this corpus!
 * amplifier_detector
 * active_scanner
 
-Protocols supported by different tools: 
+Protocols supported by different tools (left box describes working implementation in Python 2 and right one for Python 3): 
 
 Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  |MQTT-SN| QUIC  | RTSP  | SSDP
 ---------------------|-------|-------|-------|-------|--------|-------|-------|-------|-------|-----
-service_ping         |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-server_fingerprinter |       |&#9745;|&#9745;|        |       |       |       |       |       |
-device_identification|&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
+service_ping         |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+server_fingerprinter |       |&#9745;&#9745;|&#9745;&#9745;|        |       |       |       |       |       |
+device_identification|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
+traffic_analyzer     |&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
 credential_cracker   |       |  N/A  |  N/A  |  N/A   |  N/A  |       |       |  N/A  |  N/A  |  N/A
-resource_listing     |       |&#9745;|  N/A  |        |&#9745;|       |       |       |&#9745;|&#9745;
-protocol_fuzzer      |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-client_proto_fuzzer  |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-vulnerability_tester |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-client_vuln_tester   |&#9745;|&#9745;|&#9745;|&#9745; |&#9745;|&#9745;|&#9745;|&#9745;|&#9745;|&#9745;
-amplifier_detector   |  N/A  |&#9745;|&#9745;|  N/A   |&#9745;|  N/A  |&#9745;|&#9745;|  N/A  |&#9745;
-active_scanner       |       |       |&#9745;|        |       |       |       |       |       |
+resource_listing     |       |&#9745;&#9745;|  N/A  |        |&#9745;&#9745;|       |       |       |&#9745;&#9745;|&#9745;&#9745;
+protocol_fuzzer      |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+client_proto_fuzzer  |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+vulnerability_tester |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+client_vuln_tester   |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+amplifier_detector   |  N/A  |&#9745;&#9745;|&#9745;&#9745;|  N/A   |&#9745;&#9745;|  N/A  |&#9745;&#9745;|&#9745;&#9745;|  N/A  |&#9745;&#9745;
+active_scanner       |       |       |&#9745;&#9745;|        |       |       |       |       |       |
 
 
 **cotopaxi.service_ping**
@@ -290,7 +292,7 @@ usage: python -m cotopaxi.device_identification usage: [-h] [--verbose] [--min M
                                 [--ip IP] [-S]
                                 pcap
 
-pcap file predictor, iot device identification
+Tool for classifying IoT devices based on captured network traffic
 
 positional arguments:
   pcap                  Packet capture file (in PCAP or PCAPNG format) with
@@ -305,6 +307,85 @@ optional arguments:
   --max MAX             maximum number of packets used to classify device
                         (default: 1000)
   --ip IP, -I IP        use IP filter to identify device
+  -S, --short           display only short result of classification
+
+
+```
+
+-------------------------------------------------------------------------------
+
+**cotopaxi.traffic_analyzer**
+
+Tool for passive identification of network protocol using captured network traffic
+
+Currently supported protocols:
+* AMQP
+* BGP
+* CMP
+* CoAP
+* DHCP
+* DLNA
+* DNS
+* DTLS
+* EIGRP
+* FTP
+* GNUTELLA
+* GRE
+* H323
+* HSRP
+* HTTP
+* HTCPCP
+* IGMP
+* IPP
+* IPsec
+* IRC
+* LLMNR
+* mDNS
+* MQTT
+* MQTT-SN
+* MSTP
+* NTLM
+* NTP
+* OCSP
+* OSPF
+* QUIC
+* RADIUS
+* RIP
+* RPC
+* RTSP
+* SIP
+* SMB
+* SMTP
+* SNMP
+* SSDP
+* SSH
+* TACACS
+* TELNET
+* TFTP
+* TLS
+* VRRP
+
+```
+usage: python -m cotopaxi.traffic analyzer usage: [-h] [--verbose] [--min MIN] [--max MAX]
+                                [--ip IP] [-S]
+                                pcap
+
+Tool for classifying network protocols used in traffic flows
+
+positional arguments:
+  pcap                  Packet capture file (in PCAP or PCAPNG format) with
+                        recorded traffic for network protocols identification
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --verbose, -V, --debug, -D
+                        turn on verbose/debug mode (more messages)
+  --min MIN             minimum number of packets to classify
+                        conversation(conversations with smaller number will
+                        not be classified) (default: 3)
+  --max MAX             maximum number of packets used to classify
+                        conversation (default: 1000)
+  --ip IP, -I IP        use IP filter to identify protocol
   -S, --short           display only short result of classification
 
 
@@ -661,6 +742,7 @@ To run unit tests for one of tools run (from upper cotopaxi dir):
     sudo python -m tests.test_amplifier_detector
     sudo python -m tests.test_client_proto_fuzzer
     python -m tests.test_device_identification
+    python -m tests.test_traffic_analyzer
     sudo python -m tests.test_protocol_fuzzer
     sudo python -m tests.test_resource_listing
     sudo python -m tests.test_server_fingerprinter

@@ -79,7 +79,7 @@ class HTTPTester(TCPBasedProtocolTester):
             return None
         try:
             for _ in range(1 + test_params.nr_retries):
-                in_data = tcp_sr1(test_params, build_http_query(test_params))
+                in_data = str(tcp_sr1(test_params, build_http_query(test_params)))
                 if in_data:
                     print_verbose(
                         test_params,

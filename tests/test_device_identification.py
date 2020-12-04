@@ -28,7 +28,7 @@ from .common_test_utils import scrap_output
 from .common_runner import TimerTestRunner
 
 
-class TestAmplifierDetector(unittest.TestCase):
+class TestDeviceIdentification(unittest.TestCase):
     def test_main_empty_neg(self):
         output = scrap_output(main, [])
         self.assertTrue(
@@ -46,9 +46,9 @@ class TestAmplifierDetector(unittest.TestCase):
             main, ["tests/traffic_samples/chrissanders.org_http_post.pcapng"]
         )
         self.assertIn("Loaded 21 packets from the provided file", output)
-        self.assertIn("Device was classified as", output)
+        self.assertIn("Traffic was classified as", output)
         self.assertIn("172.16.16.128", output)
-        self.assertIn("Finished device identification", output)
+        self.assertIn("Finished traffic analysis", output)
 
     def test_main_basic_arp_pos(self):
         output = scrap_output(
@@ -64,7 +64,7 @@ class TestAmplifierDetector(unittest.TestCase):
             ],
         )
         self.assertIn("Loaded 2 packets from the provided file", output)
-        self.assertIn("Finished device identification", output)
+        self.assertIn("Finished traffic analysis", output)
 
     def test_main_basic_ipv4_neg(self):
         output = scrap_output(
