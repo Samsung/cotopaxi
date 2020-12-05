@@ -268,6 +268,7 @@ def predict_lstm(data):
         -1, 10, 24
     )
     model = load_model("cotopaxi/identification_models/LSTM.hdf5")
+    print(model.predict(data))
     result = numpy.argmax(model.predict(data), axis=-1)
     unique, counts = numpy.unique(result, return_counts=True)
     devices = list()
@@ -315,7 +316,7 @@ def classify_device(
     return result_class
 
 
-def load_packets(pcap_filename):
+def load_packets(pcap_filename, limit_packets=1000):
     """Load packets from provided pcap file."""
     start_time = time.time()
     packets = []
@@ -328,6 +329,8 @@ def load_packets(pcap_filename):
             )
         reader = PcapReader(pcap_filename)  # pylint: disable=no-value-for-parameter
         for packet in reader:
+            if len(packets) >= limit_packets:
+                break
             packets.append(packet)
             if len(packets) % 10000 == 9999:
                 load_time = time.time() - start_time

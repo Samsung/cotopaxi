@@ -6,4 +6,4 @@ pycryptodomex
 PyYAML>=3.12
 scapy>=2.4.3
 setuptools
-validators
+validators==0.16

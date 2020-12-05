@@ -26,7 +26,7 @@ For Python 2.7:
 ```
     pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
 ```
-For Python > 3.6:
+For Python >= 3.6:
 ```
     git clone https://github.com/kalidasya/scapy-ssl_tls.git
     cd scapy-ssl_tls
@@ -35,9 +35,20 @@ For Python > 3.6:
 ```
 
 4. Install other requirements:
+
+For Python 2.7:
+
 ```
-sudo pip install -r requirements.txt 
+sudo python2.7 -m pip install -r requirements_python2.txt 
 ```
+
+For Python >= 3.6:
+
+```
+sudo python3.6 -m pip install --upgrade pip
+sudo python3.6 -m pip install -r requirements.txt 
+```
+
 5. Run installer:
 ```
 sudo python setup.py install
@@ -45,7 +56,7 @@ sudo python setup.py install
 
 ## Requirements:
 
-Currently Cotopaxi works with Python 2.7.* and with Python 3.6.*. 
+Currently Cotopaxi works with Python 2.7.* and with Python 3.6.* (not tested with other versions - please report, if you would like to use . 
 
 Installation of required libraries:
 
