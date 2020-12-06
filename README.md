@@ -718,7 +718,7 @@ pydocstyle cotopaxi
 python -m pylint cotopaxi --rcfile=.pylintrc
 python -m pylint tests --rcfile=tests/.pylintrc
 
-bandit cotopaxi
+bandit -r cotopaxi
 ```
 
 ## Unit tests
