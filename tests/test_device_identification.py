@@ -46,9 +46,9 @@ class TestDeviceIdentification(unittest.TestCase):
             main, ["tests/traffic_samples/chrissanders.org_http_post.pcapng"]
         )
         self.assertIn("Loaded 21 packets from the provided file", output)
-        self.assertIn("Traffic was classified as", output)
+        self.assertIn("Device was classified as", output)
         self.assertIn("172.16.16.128", output)
-        self.assertIn("Finished traffic analysis", output)
+        self.assertIn("Finished device identification", output)
 
     def test_main_basic_arp_pos(self):
         output = scrap_output(
@@ -64,7 +64,7 @@ class TestDeviceIdentification(unittest.TestCase):
             ],
         )
         self.assertIn("Loaded 2 packets from the provided file", output)
-        self.assertIn("Finished traffic analysis", output)
+        self.assertIn("Finished device identification", output)
 
     def test_main_basic_ipv4_neg(self):
         output = scrap_output(
