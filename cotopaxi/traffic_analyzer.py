@@ -27,26 +27,36 @@ import os
 import sys
 import time
 
-from scapy.all import Scapy_Exception, IP, IPv6, PcapReader, TCP, UDP
-import pandas
+from scapy.all import IP, IPv6, TCP, UDP
 import numpy
-from tensorflow.keras.models import load_model
+from xgboost import XGBClassifier
 
 from .common_utils import prepare_separator
-from .cotopaxi_tester import argparser_add_verbose, prepare_ips
-from .device_identification import df_from_scapy, ips_from_pcap, load_packets, normalizator, prepare_data
+from .cotopaxi_tester import argparser_add_verbose, CotopaxiException, prepare_ips
+from .device_identification import (
+    df_from_scapy,
+    ips_from_pcap,
+    load_packets,
+    normalizator,
+    prepare_data,
+)
 
 
 UNKNOWN_PROTOCOL = "Unknown protocol"
 
+
 def predict_xgb(data):
-    from xgboost import XGBClassifier
-
-    model = XGBClassifier()
-
     """Perform prediction using trained model."""
+    model = XGBClassifier()
     data = normalizator(prepare_data(data))
-    model.load_model("cotopaxi/identification_models/proto_XGB_20201112.model")
+    try:
+        model.load_model("cotopaxi/identification_models/proto_XGB_20201112.model")
+    except ValueError as exc:
+        raise CotopaxiException from exc(
+            "[!] Cannot load machine learning classifier!"
+            "    This may be caused by incompatible version of tensorflow"
+            "    (please install tensorflow version 2.2.0)!"
+        )
     result = model.predict(data)
     unique, counts = numpy.unique(result, return_counts=True)
     devices = list()
@@ -58,18 +68,9 @@ def predict_xgb(data):
     return result_class, result_dict, counts.sum()
 
 
-def classify_traffic(
-    packets,
-    ip_addr,
-    show_class=True,
-    show_probability=True,
-    min_packets=1,
-    max_packets=1000,
-):
-    """Classify traffic based on provided network packets."""
-
+def split_packets(packets, ip_addr):
+    """Split packets into bins by ports."""
     packets_bins_port = {}
-
     for packet in packets:
         if TCP in packet:
             transport_protocol = TCP
@@ -100,7 +101,20 @@ def classify_traffic(
             packets_bins_port[(src_port, dst_ip, dst_port)] = list(packet)
         else:
             packets_bins_port[(src_port, dst_ip, dst_port)].append(packet)
+    return packets_bins_port
 
+
+def classify_traffic(
+    packets,
+    ip_addr,
+    show_class=True,
+    show_probability=True,
+    min_packets=1,
+    max_packets=1000,
+):
+    """Classify traffic based on provided network packets."""
+    result_class = None
+    packets_bins_port = split_packets(packets, ip_addr)
     for (src_port, dst_ip, dst_port) in packets_bins_port:
         packets = packets_bins_port[(src_port, dst_ip, dst_port)]
         data = df_from_scapy(packets, ip_addr, limit_packets=max_packets)
@@ -130,12 +144,12 @@ def classify_traffic(
             network_protocol = "IPv6"
 
         print(
-            f"[.] Conversation: {ip_addr}:{src_port} <-> {dst_ip}:{dst_port} | net + trans layers: {network_protocol} | {transport_protocol}"
+            f"[.] Conversation: {ip_addr}:{src_port} <-> {dst_ip}:{dst_port} "
+            f"| net + trans layers: {network_protocol} | {transport_protocol}"
         )
         print(f"[!] Found {len(data)} packets in this conversation")
 
         result_class, result_dict, sum_counts = predict_xgb(data)
-
         if show_class:
             print(f"[*]   Traffic was classified as:\n         {result_class}")
 
@@ -143,8 +157,7 @@ def classify_traffic(
             print("[*]   Results of traffic classification:")
             for key, value in result_dict:
                 print(f"           {key:>20}: {100*value/sum_counts:.2f}%")
-
-    return None
+    return result_class
 
 
 def main(args):
