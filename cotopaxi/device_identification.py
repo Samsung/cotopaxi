@@ -34,11 +34,7 @@ import numpy
 from tensorflow.keras.models import load_model
 
 from .common_utils import prepare_separator
-from .cotopaxi_tester import argparser_add_verbose, prepare_ips
-
-
-class CotopaxiException(Exception):
-    """Critical exception used by Cotopaxi."""
+from .cotopaxi_tester import argparser_add_verbose, CotopaxiException, prepare_ips
 
 
 UNKNOWN_DEVICE_LABEL = "Unknown device (not in database or non-IoT)"
@@ -217,6 +213,7 @@ def tcp_dummies(data):
 
 
 def proto_dummies(data):
+    """Convert categorical variables into indicator variables."""
     cats = [0, 1, 2, 6, 17, 58]
     return (
         pandas.get_dummies(data, drop_first=True)
@@ -267,8 +264,14 @@ def predict_lstm(data):
     data = generate_from_data_step_1(normalizator(prepare_data(data)), 10).reshape(
         -1, 10, 24
     )
-    model = load_model("cotopaxi/identification_models/LSTM.hdf5")
-    print(model.predict(data))
+    try:
+        model = load_model("cotopaxi/identification_models/LSTM.hdf5")
+    except ValueError as exc:
+        raise CotopaxiException from exc(
+            "[!] Cannot load machine learning classifier!"
+            "    This may be caused by incompatible version of tensorflow"
+            "    (please install tensorflow version 2.2.0)!"
+        )
     result = numpy.argmax(model.predict(data), axis=-1)
     unique, counts = numpy.unique(result, return_counts=True)
     devices = list()
@@ -339,8 +342,8 @@ def load_packets(pcap_filename, limit_packets=1000):
                 )
     except KeyboardInterrupt:
         pass
-    except (IOError, Scapy_Exception, ValueError):
-        raise CotopaxiException(
+    except (IOError, Scapy_Exception, ValueError) as exc:
+        raise CotopaxiException from exc(
             "[!] Cannot load network packets from the provided file "
             "(please make sure it is in PCAP or PCAPNG format)!"
         )
