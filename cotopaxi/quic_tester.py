@@ -104,49 +104,50 @@ QUIC_PING_001 = (
 
 
 class QUICTester(ProtocolTester):
-    """Tester of QUIC protocol"""
+    """Tester of QUIC protocol."""
 
     def __init__(self):
+        """Initialize tester."""
         ProtocolTester.__init__(self)
 
     @staticmethod
     def protocol_short_name():
-        """Provides short (abbreviated) name of protocol"""
+        """Provide short (abbreviated) name of protocol."""
         return "QUIC"
 
     @staticmethod
     def protocol_full_name():
-        """Provides full (not abbreviated) name of protocol"""
+        """Provide full (not abbreviated) name of protocol."""
         return "Quick UDP Internet Connections"
 
     @staticmethod
     def default_port():
-        """Provides default port used by implemented protocol"""
+        """Provide default port used by implemented protocol."""
         return 443
 
     @staticmethod
     def transport_protocol():
-        """Provides Scapy class of transport protocol used by this tester (usually TCP or UDP)"""
+        """Provide Scapy class of transport protocol used by this tester (usually TCP or UDP)."""
         return UDP
 
     @staticmethod
     def request_parser():
-        """Provides Scapy class implementing parsing of protocol requests"""
+        """Provide Scapy class implementing parsing of protocol requests."""
         return UDP
 
     @staticmethod
     def response_parser():
-        """Provides Scapy class implementing parsing of protocol responses"""
+        """Provide Scapy class implementing parsing of protocol responses."""
         return UDP
 
     @staticmethod
     def implements_service_ping():
-        """Returns True if this tester implements service_ping for this protocol"""
+        """Return True if this tester implements service_ping for this protocol."""
         return True
 
     @staticmethod
     def ping(test_params, show_result=False):
-
+        """Check QUIC server availability by sending dedicated packets."""
         ping_packets = [QUIC_PING_000, QUIC_PING_001]
 
         for ping_packet in ping_packets:
@@ -161,7 +162,7 @@ class QUICTester(ProtocolTester):
             if 50 < len(response) < 70 or 1000 < len(response) < 2000:
                 return True
             else:
-                print ("Received unknown message len: {}".format(len(response)))
+                print("Received unknown message len: {}".format(len(response)))
             # parsed_response = scrap_response(test_params, response)
             # if check_dtls_response(test_params, parsed_response):
             #     return True
@@ -169,25 +170,25 @@ class QUICTester(ProtocolTester):
 
     @staticmethod
     def implements_fingerprinting():
-        """Returns True if this tester implements fingerprinting for this protocol"""
+        """Return True if this tester implements fingerprinting for this protocol."""
         return False
 
     @staticmethod
     def implements_resource_listing():
-        """Returns True if this tester implements resource for this protocol"""
+        """Return True if this tester implements resource for this protocol."""
         return False
 
     @staticmethod
     def implements_server_fuzzing():
-        """Returns True if this tester implements server fuzzing for this protocol"""
+        """Return True if this tester implements server fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_client_fuzzing():
-        """Returns True if this tester implements clients fuzzing for this protocol"""
+        """Return True if this tester implements clients fuzzing for this protocol."""
         return True
 
     @staticmethod
     def implements_vulnerability_testing():
-        """Returns True if this tester implements vulnerability testing for this protocol"""
+        """Return True if this tester implements vulnerability testing for this protocol."""
         return True
