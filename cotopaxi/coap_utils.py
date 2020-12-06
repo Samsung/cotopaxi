@@ -33,6 +33,7 @@ from .common_utils import (
     prepare_separator,
     print_verbose,
     show_verbose,
+    UDP_LOW_LAYERS_HEADERS_SIZE_IPV4,
     udp_sr1,
 )
 from .protocol_tester import UDPBasedProtocolTester
@@ -103,12 +104,15 @@ def coap_check_url(test_params, method, url):
         show_verbose(test_params, answer)
         print_verbose(test_params, parsed_response)
 
+        in_size = len(packet) + UDP_LOW_LAYERS_HEADERS_SIZE_IPV4
+        out_size = len(answer) + UDP_LOW_LAYERS_HEADERS_SIZE_IPV4
+
         if code != "Empty":
             print(
                 "SENT size:{} RECV size:{} AMPLIFICATION FACTOR:{:0.2f}%".format(
-                    len(packet),
-                    len(answer),
-                    amplification_factor(len(packet), len(answer)),
+                    in_size,
+                    out_size,
+                    amplification_factor(in_size, out_size),
                 )
             )
             return code

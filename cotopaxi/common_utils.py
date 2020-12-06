@@ -27,7 +27,7 @@ import ssl
 import sys
 from enum import Enum
 
-from scapy.all import Ether, DNS, IP, TCP, UDP, IPv6, Raw, sr1, sniff
+from scapy.all import DNS, IP, TCP, UDP, IPv6, Raw, sr1, sniff
 from scapy.layers.http import HTTPRequest
 from scapy.contrib.coap import CoAP
 from scapy.contrib.mqtt import MQTT
@@ -52,6 +52,9 @@ NET_MAX_PORT = 65535
 
 # Length of line for separator
 NR_CHARS_SEPARATOR = 80
+
+# Size of lower layer headers for UDP based protocols e.g. CoAP when using IPv4 protocol
+UDP_LOW_LAYERS_HEADERS_SIZE_IPV4 = 44
 
 
 def get_local_ip():
@@ -301,10 +304,9 @@ def udp_send_payload(test_params, payload):
                 )
                 test_params.report_received_packet(sent_time)
                 return IP() / UDP() / Raw(data)
-            else:
-                print_verbose(
-                    test_params, "Received response from another host (not target)!"
-                )
+            print_verbose(
+                test_params, "Received response from another host (not target)!"
+            )
     except socket.timeout:
         print_verbose(test_params, "Received no response!")
     return None
@@ -337,10 +339,9 @@ def ssdp_send_query(test_params, query):
                     )
                     test_params.report_received_packet(sent_time)
                     return data
-                else:
-                    print_verbose(
-                        test_params, "Received response from another host (not target)!"
-                    )
+                print_verbose(
+                    test_params, "Received response from another host (not target)!"
+                )
         except socket.timeout:
             print_verbose(test_params, "Received no response!")
 

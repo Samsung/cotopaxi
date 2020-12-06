@@ -69,7 +69,7 @@ class ReflectorSniffer(object):
             """Update packet with highest amplify factor."""
             self.packet_record_amplify = ampl_factor
             desc = [
-                "[+] Highest amplify packet factor: {}".format(ampl_factor),
+                "[+] Highest amplify packet factor: {:0.2f}%".format(ampl_factor),
                 "TO TARGET",
                 scrap_packet(to_target),
                 "FROM TARGET",
