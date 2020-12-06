@@ -52,7 +52,7 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
             test_params.test_stats.inactive_endpoints[Protocol.CoAP].append(
                 ip_port_and_url
             )
-            print (
+            print(
                 "[-] Url |{}| is not available on server {}:{} "
                 "for method {}".format(
                     url.decode("ascii"),
@@ -66,7 +66,7 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
             test_params.test_stats.active_endpoints[Protocol.CoAP].append(
                 ip_port_and_url
             )
-            print (
+            print(
                 "[+] Url |{}| received code |{}| on server {}:{} "
                 "for method {}".format(
                     url.decode("ascii"),
@@ -92,8 +92,21 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
 
 def perform_resource_listing_mdns(test_params, list_services):
     """Check whether listed mDNS services are available on server."""
-    for query in list_services:
-        mdns_query(test_params, query)
+    for service_name in list_services:
+        ip_port_and_url = "{}:{}/{}".format(
+            test_params.dst_endpoint.ip_addr,
+            test_params.dst_endpoint.port,
+            service_name,
+        )
+        response = mdns_query(test_params, service_name)
+        if response and service_name in response:
+            test_params.test_stats.active_endpoints[Protocol.mDNS].append(
+                ip_port_and_url
+            )
+        else:
+            test_params.test_stats.inactive_endpoints[Protocol.mDNS].append(
+                ip_port_and_url
+            )
 
 
 def perform_resource_listing_ssdp(test_params, list_services):
@@ -190,7 +203,7 @@ def main(args):
         )
     elif test_params.protocol == Protocol.SSDP:
         if options.method != "GET":
-            print ("Methods are not supported for SSDP protocol!")
+            print("Methods are not supported for SSDP protocol!")
         list_services = prepare_names(options.names_filepath)
         print_verbose(test_params, list_services)
         tester.perform_testing(
@@ -204,14 +217,14 @@ def main(args):
         )
     elif test_params.protocol == Protocol.mDNS:
         if options.method != "GET":
-            print ("Methods are not supported for mDNS protocol!")
+            print("Methods are not supported for mDNS protocol!")
         list_services = prepare_names(options.names_filepath)
         print_verbose(test_params, list_services)
         tester.perform_testing(
             "resource listing", perform_resource_listing_mdns, list_services
         )
     else:
-        print ("Please provide one of supported protocols (CoAP, mDNS or SSDP)!")
+        print("Please provide one of supported protocols (CoAP, mDNS or SSDP)!")
 
 
 if __name__ == "__main__":
