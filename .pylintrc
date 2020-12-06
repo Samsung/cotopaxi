@@ -140,7 +140,8 @@ disable=print-statement,
         superfluous-parens,
         no-member,
         bad-continuation,
-        bad-whitespace
+        bad-whitespace,
+        useless-object-inheritance
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
