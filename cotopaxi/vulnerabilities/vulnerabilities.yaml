@@ -300,3 +300,14 @@
   url: https://www.zeroscience.mk/en/vulnerabilities/ZSL-2019-5509.php
   payload_file: http/payload_beward_000_request.raw
   response_file: http/payload_beward_000_response.raw
+- name: ZYXEL_000
+  type: NetworkTrafficAmplification
+  cve_id: 
+  description: Zyxel Keenetic routers in multiple models and versions
+    can be used to perform Distributed Denial of Service attacks as network amplifier
+    with spoofing of the source IP address.
+  url: 
+  credit: Jakub Botwicz
+  nr_packets: 1
+  timeout_sec: 10
+  payload_file: coap/payload_zyxel_000.raw
