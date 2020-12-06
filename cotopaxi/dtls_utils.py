@@ -292,7 +292,7 @@ def show_dtls_packet(packet):
     """Display DTLS packet."""
     if packet.getlayer(Raw):
         dtls = DTLSRecord(packet[Raw].load)
-        print (dtls)
+        print(dtls)
 
 
 # raw DTLS 1.0 Client Hello message
@@ -413,7 +413,7 @@ def check_dtls_response(test_params, response):
                         TLS_HANDSHAKE_TYPES[response[DTLSHandshake].type]
                         != "hello_verify_request"
                     ):
-                        print (
+                        print(
                             "[+] DTLS server does not respond with Hello Verify Request "
                             "(found message: {})- \n"
                             "so it can potentially be used to perform DDoS attacks!".format(

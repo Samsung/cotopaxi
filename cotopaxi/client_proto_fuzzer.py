@@ -41,7 +41,7 @@ class ClientFuzzer(object):
 
     def start_server(self):
         """Start server used for testing clients."""
-        print (
+        print(
             "Starting server on IP {} port {}".format(
                 self.test_params.src_endpoint.ip_addr,
                 self.test_params.src_endpoint.port,
@@ -73,24 +73,22 @@ class ClientFuzzer(object):
                 self.test_params.test_stats.packets_sent += 1
                 if payload.name:
                     if payload.cve_id:
-                        print (
+                        print(
                             "Payload for vulnerability {} / {} sent.".format(
                                 payload.name, payload.cve_id
                             )
                         )
                     else:
-                        print (
-                            "Payload for vulnerability {} sent.".format(payload.name)
-                        )
+                        print("Payload for vulnerability {} sent.".format(payload.name))
                 else:
-                    print ("Payload {} sent!".format(payload.payload_file))
-            print (
+                    print("Payload {} sent!".format(payload.payload_file))
+            print(
                 "[.] Finished {} (all payloads sent).".format(
                     self.test_params.test_name
                 )
             )
         except KeyboardInterrupt:
-            print ("\nExiting...")
+            print("\nExiting...")
         finally:
             self.test_params.print_client_stats()
 
@@ -160,7 +158,7 @@ def main(args):
     )
 
     testcases = load_corpus(tester, args)
-    print ("Loaded {} payloads for fuzzing".format(len(testcases)))
+    print("Loaded {} payloads for fuzzing".format(len(testcases)))
 
     if tester.test_params.protocol in protocols_using(UDP):
         server = UDPFuzzer(tester.test_params)
@@ -169,7 +167,7 @@ def main(args):
         server = TCPFuzzer(tester.test_params)
         server.perform_fuzzing(testcases)
     else:
-        print (
+        print(
             "Protocol {} is not supported by this tool!".format(
                 tester.test_params.protocol
             )

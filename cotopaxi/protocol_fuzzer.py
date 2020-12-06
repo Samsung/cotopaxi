@@ -48,20 +48,18 @@ class FuzzingCase(Vulnerability):
     @staticmethod
     def wait_server_respawn(test_params, wait_time_sec=60, nr_iterations=2):
         """Wait for server to respawn after crash."""
-        print (
-            "Waiting {} seconds for the server to start again.".format(wait_time_sec)
-        )
+        print("Waiting {} seconds for the server to start again.".format(wait_time_sec))
         iteration = 0
         server_respawned = False
         while not server_respawned:
             time.sleep(wait_time_sec)
             if not service_ping(test_params):
-                print ("Server did not respawn (wait {})!".format(iteration + 1))
+                print("Server did not respawn (wait {})!".format(iteration + 1))
             else:
-                print ("Server is alive again (after {} waits)!".format(iteration + 1))
+                print("Server is alive again (after {} waits)!".format(iteration + 1))
                 return True
             iteration += 1
-        print (
+        print(
             "Server did not respawn after {} x {} sec!\nExiting!".format(
                 nr_iterations, wait_time_sec
             )
@@ -76,7 +74,7 @@ class FuzzingCase(Vulnerability):
         if not alive_before:
             alive_before = service_ping(test_params)
             if not alive_before:
-                print (
+                print(
                     "[+] Server {}:{} is not responding before sending payload".format(
                         test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
                     )
@@ -89,7 +87,7 @@ class FuzzingCase(Vulnerability):
                     ),
                 )
         if not alive_before and not test_params.ignore_ping_check:
-            print (
+            print(
                 "[.] Fuzzing stopped for {}:{} because server is not responding\n"
                 "    (use --ignore-ping-check if you want to continue anyway)!".format(
                     test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
@@ -102,29 +100,29 @@ class FuzzingCase(Vulnerability):
         payload_sent_time = time.time()
         test_result = sr1_file(test_params, self.payload_file, test_params.verbose)
         print_verbose(test_params, prepare_separator("-"))
-        print ("[.] Payload {} sent".format(self.payload_file))
+        print("[.] Payload {} sent".format(self.payload_file))
         if test_result is not None:
             test_timeouts.append(
                 (time.time() - payload_sent_time, self.payload_file, test_result)
             )
-            print (prepare_separator("-", post_separator_text="Response:"))
+            print(prepare_separator("-", post_separator_text="Response:"))
             try:
                 proto_handler = PROTOCOL_TESTERS[test_params.protocol].response_parser()
                 packet = proto_handler(test_result[Raw].load)
                 packet.show()
             except (TypeError, IndexError, struct.error):
                 pass
-            print (prepare_separator("-"))
+            print(prepare_separator("-"))
         else:
-            print ("Received no response from server")
-            print (prepare_separator("-"))
+            print("Received no response from server")
+            print(prepare_separator("-"))
         alive_after = service_ping(test_params)
         flag = True
         if not alive_after:
             alive_after = service_ping(test_params)
             flag = False
             if not alive_after and alive_before and not test_params.ignore_ping_check:
-                print (
+                print(
                     "[+] Server {}:{} is dead after sending payload".format(
                         test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
                     )
@@ -175,12 +173,12 @@ def perform_protocol_fuzzing(test_params, test_cases):
 
     if test_timeouts:
         test_timeouts.sort(reverse=True)
-        print (prepare_separator())
-        print ("\nPayloads with longest Round-Trip Time (RTT):")
-        print (prepare_separator("-", pre_separator_text="RTT (sec) | Payload"))
+        print(prepare_separator())
+        print("\nPayloads with longest Round-Trip Time (RTT):")
+        print(prepare_separator("-", pre_separator_text="RTT (sec) | Payload"))
         for _, timeout in zip(range(len(test_cases) // 10), test_timeouts):
-            print ("  {:0.5f}  | {}".format(timeout[0], timeout[1]))
-        print (prepare_separator("-"))
+            print("  {:0.5f}  | {}".format(timeout[0], timeout[1]))
+        print(prepare_separator("-"))
 
 
 def load_corpus(tester, args):

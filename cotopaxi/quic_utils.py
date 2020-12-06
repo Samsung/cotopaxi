@@ -155,7 +155,7 @@ class QUICTester(UDPBasedProtocolTester):
             if 50 < len(response) < 70 or 1000 < len(response) < 2000:
                 return True
             else:
-                print ("Received unknown message len: {}".format(len(response)))
+                print("Received unknown message len: {}".format(len(response)))
             # parsed_response = scrap_response(test_params, response)
             # if check_dtls_response(test_params, parsed_response):
             #     return True

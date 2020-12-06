@@ -56,6 +56,10 @@ from .rtsp_utils import RTSPTester
 from .ssdp_utils import SSDPTester
 
 
+class CotopaxiException(Exception):
+    """Critical exception used by Cotopaxi."""
+
+
 PROTOCOL_TESTERS = {
     Protocol.AMQP: AMQPTester,
     Protocol.CoAP: CoAPTester,
@@ -147,9 +151,7 @@ def argparser_add_protocols(parser, test_name, use_generic_proto):
 
 def argparser_add_dest(parser):
     """Add verbose parameter to arg parser."""
-    parser.add_argument(
-        "dest_ip", action="store", help="destination IP address"
-    )
+    parser.add_argument("dest_ip", action="store", help="destination IP address")
     parser.add_argument(
         "--port", "--dest_port", "-P", action="store", help="destination port"
     )
@@ -336,15 +338,15 @@ def message_loss(sent, received):
 
 def print_disclaimer():
     """Show legal disclaimer."""
-    print (prepare_separator())
-    print (
+    print(prepare_separator())
+    print(
         """This tool can cause some devices or servers to stop acting in the intended way -
 for example leading to crash or hang of tested entities or flooding
 with network traffic other entities!
 Make sure you have permission from the owners of tested devices or servers
 before running this tool!"""
     )
-    print (prepare_separator())
+    print(prepare_separator())
     time.sleep(SLEEP_TIME_ON_DISCLAIMER)
 
 
@@ -385,8 +387,8 @@ class TestParams(object):
 
     def print_stats(self):
         """Print statistics gathered during tests."""
-        print (prepare_separator(post_separator_text="Test statistics:"))
-        print (
+        print(prepare_separator(post_separator_text="Test statistics:"))
+        print(
             "Messages sent: {}, responses received: {}, "
             "{:.0f}% message loss, test time: {:.0f} ms".format(
                 self.test_stats.packets_sent,
@@ -398,7 +400,7 @@ class TestParams(object):
             )
         )
         if self.test_stats.packets_rtt:
-            print (
+            print(
                 "Round-Trip Time (min/avg/max): {} / {} / {} ms".format(
                     min(self.test_stats.packets_rtt),
                     sum(self.test_stats.packets_rtt) / len(self.test_stats.packets_rtt),
@@ -407,17 +409,17 @@ class TestParams(object):
             )
         if not self.positive_result_name:
             return
-        print (prepare_separator(post_separator_text="Test results:"))
+        print(prepare_separator(post_separator_text="Test results:"))
         active_endpoints = set()
         potential_endpoints = set()
         inactive_endpoints = set()
-        print ("{}:".format(self.positive_result_name))
+        print("{}:".format(self.positive_result_name))
         for proto in self.test_stats.active_endpoints:
             proto_results = self.test_stats.active_endpoints[proto]
             if proto_results:
-                print ("    For {}: {}".format(proto, proto_results))
+                print("    For {}: {}".format(proto, proto_results))
                 active_endpoints.update(set(proto_results))
-        print (
+        print(
             "Total number of {}: {}".format(
                 self.positive_result_name.lower(), len(active_endpoints)
             )
@@ -429,7 +431,7 @@ class TestParams(object):
             ) in self.test_stats.inactive_endpoints.items():
                 inactive_endpoints.update(set(inactive_endpoint))
             if potential_endpoints:
-                print (
+                print(
                     "{}: {}".format(
                         self.potential_result_name, len(potential_endpoints)
                     )
@@ -442,17 +444,17 @@ class TestParams(object):
                     )
                 potential_endpoints.update(set(proto_results))
             if potential_results:
-                print (self.potential_result_name + ":\n")
-                print ("\n".join(potential_results))
+                print(self.potential_result_name + ":\n")
+                print("\n".join(potential_results))
         if self.negative_result_name:
             inactive_endpoints.difference_update(active_endpoints)
             inactive_endpoints.difference_update(potential_endpoints)
-            print ("{}: {}".format(self.negative_result_name, len(inactive_endpoints)))
+            print("{}: {}".format(self.negative_result_name, len(inactive_endpoints)))
 
     def print_client_stats(self):
         """Print statistics gathered during tests of clients."""
-        print (prepare_separator(post_separator_text="Test statistics:"))
-        print (
+        print(prepare_separator(post_separator_text="Test statistics:"))
+        print(
             "Requests received: {}, payloads sent: {}, "
             "test time: {:.0f} ms".format(
                 self.test_stats.packets_sent,
@@ -602,16 +604,16 @@ class CotopaxiTester(object):
             self.test_params.ignore_ping_check = False
 
         if options.verbose:
-            print ("options: {}".format(options))
-            print ("dest_addr: {}".format(options.dest_addr))
-            print ("dest_port: {}".format(options.dest_port))
-            print ("protocol: {}".format(options.protocol))
+            print("options: {}".format(options))
+            print("dest_addr: {}".format(options.dest_addr))
+            print("dest_port: {}".format(options.dest_port))
+            print("protocol: {}".format(options.protocol))
 
         if validators.domain(options.dest_addr) is True:
             try:
                 self.list_ips = prepare_ips(socket.gethostbyname(options.dest_addr))
             except socket.gaierror:
-                print ("[!] Cannot resolve hostname: {}".format(options.dest_addr))
+                print("[!] Cannot resolve hostname: {}".format(options.dest_addr))
                 sys.exit(2)
         else:
             self.list_ips = prepare_ips(options.dest_addr)
@@ -619,12 +621,12 @@ class CotopaxiTester(object):
         self.list_ports = prepare_ports(options.dest_port)
 
         if options.verbose:
-            print ("src_ip: {}".format(self.test_params.src_endpoint.ip_addr))
-            print ("src_port:  {}".format(self.test_params.src_endpoint.port))
-            print ("list_ips: {}".format(self.list_ips))
-            print ("list_ports: {}".format(self.list_ports))
-            print ("protocol: {}".format(self.test_params.protocol))
-            print ("ignore-ping-check: {}".format(self.test_params.ignore_ping_check))
+            print("src_ip: {}".format(self.test_params.src_endpoint.ip_addr))
+            print("src_port:  {}".format(self.test_params.src_endpoint.port))
+            print("list_ips: {}".format(self.list_ips))
+            print("list_ports: {}".format(self.list_ports))
+            print("protocol: {}".format(self.test_params.protocol))
+            print("ignore-ping-check: {}".format(self.test_params.ignore_ping_check))
         return options
 
     def perform_testing(self, test_name, test_function, test_cases=None):
@@ -635,7 +637,7 @@ class CotopaxiTester(object):
         ):
             print_disclaimer()
 
-        print ("[.] Started {}".format(test_name))
+        print("[.] Started {}".format(test_name))
         try:
             for dest_ip in self.list_ips:
                 for dest_port in self.list_ports:
@@ -646,13 +648,13 @@ class CotopaxiTester(object):
                         test_function(self.test_params, test_cases)
                     else:
                         test_function(self.test_params)
-            print (
+            print(
                 "[.] Finished {} (for all addresses, ports and protocols)".format(
                     test_name
                 )
             )
         except KeyboardInterrupt:
-            print ("\nExiting...")
+            print("\nExiting...")
         finally:
             self.test_params.print_stats()
 
@@ -683,10 +685,10 @@ class CotopaxiClientTester(object):
             ].default_port()
 
         if options.verbose:
-            print ("options: {}".format(options))
-            print ("server_ip: {}".format(self.test_params.src_endpoint.ip_addr))
-            print ("server_port:  {}".format(self.test_params.src_endpoint.port))
-            print ("protocol: {}".format(self.test_params.protocol))
+            print("options: {}".format(options))
+            print("server_ip: {}".format(self.test_params.src_endpoint.ip_addr))
+            print("server_port:  {}".format(self.test_params.src_endpoint.port))
+            print("protocol: {}".format(self.test_params.protocol))
         return options
 
 
@@ -706,7 +708,7 @@ def prepare_ips(ips_input):
             for ip_addr in IPY_IP(address_desc, make_net=1)
         ]
     except (TypeError, ValueError) as value_error:
-        print ("Cannot parse IP address: {}".format(value_error))
+        print("Cannot parse IP address: {}".format(value_error))
         sys.exit(2)
     test_ips = sorted(set(map(str, test_ips)))
     return test_ips
@@ -719,7 +721,7 @@ def parse_port(port_desc):
             port = int(port_desc)
             return port
     except (TypeError, ValueError) as value_error:
-        print ("Could not parse port: {}".format(value_error))
+        print("Could not parse port: {}".format(value_error))
     return None
 
 
@@ -746,9 +748,9 @@ def prepare_ports(port_input):
 
         for port in ports:
             if port < 0 or port > NET_MAX_PORT:
-                print ("Port not in range: {}".format(port))
+                print("Port not in range: {}".format(port))
                 sys.exit(2)
         return ports
     except (TypeError, ValueError) as error:
-        print ("Cannot parse port: {}".format(error))
+        print("Cannot parse port: {}".format(error))
         sys.exit(2)

@@ -51,7 +51,7 @@ def main(args):
                 vuln.payload_file = "cotopaxi/vulnerabilities/" + vuln.payload_file
                 test_vulns.append(vuln)
 
-    print ("Loaded {} vulnerabilities for test".format(len(test_vulns)))
+    print("Loaded {} vulnerabilities for test".format(len(test_vulns)))
 
     if tester.test_params.protocol in protocols_using(UDP):
         server = UDPFuzzer(tester.test_params)
@@ -60,7 +60,7 @@ def main(args):
         server = TCPFuzzer(tester.test_params)
         server.perform_fuzzing(test_vulns)
     else:
-        print (
+        print(
             "Protocol {} is not supported by this tool!".format(
                 tester.test_params.protocol
             )

@@ -53,7 +53,7 @@ def service_ping(test_params, show_result=False):
                     else:
                         endpoints = test_params.test_stats.inactive_endpoints
                     endpoints[protocol].append(endpoint_string(test_params))
-                    print (
+                    print(
                         '[+] Host {}:{} {} to {} "protocol ping" message'.format(
                             test_params.dst_endpoint.ip_addr,
                             test_params.dst_endpoint.port,

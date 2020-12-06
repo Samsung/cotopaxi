@@ -574,7 +574,7 @@ class DTLSScanner(object):
     def scan(self, target, starttls=None):
         """Initiate scanning process (active)."""
         for scan_method in (f for f in dir(self) if f.startswith("_scan_")):
-            print (" Starting scan: %s" % (scan_method.replace("_scan_", "")))
+            print(" Starting scan: %s" % (scan_method.replace("_scan_", "")))
             getattr(self, scan_method)(
                 target, starttls=starttls, test_params=self.capabilities.test_params
             )
@@ -608,14 +608,14 @@ class DTLSScanner(object):
                         strconn["sport"] = pkt[UDP].sport
                         strconn["dport"] = pkt[UDP].dport
 
-                    print (
+                    print(
                         "Connection: %(src)s:%(sport)d <==> %(dst)s:%(dport)d" % strconn
                     )
-                    print ("* EVENT - " + "\n* EVENT - ".join(e[0] for e in events))
+                    print("* EVENT - " + "\n* EVENT - ".join(e[0] for e in events))
             return
 
         if iface:
-            print ("Choosen interface = {} ".format(iface))
+            print("Choosen interface = {} ".format(iface))
         #     conf.iface = iface
         while True:
             bpf = None
@@ -655,7 +655,7 @@ class DTLSScanner(object):
                 test_params.report_received_packet(sent_time)
                 self.capabilities.insert(resp, client=False)
             except socket.error as sock_err:
-                print (repr(sock_err))
+                print(repr(sock_err))
 
     def xxx_scan_certificates(self, target, starttls=None, test_params=None):
         """Identify server certificates in DTLS."""
@@ -695,7 +695,7 @@ class DTLSScanner(object):
             ]
         )
         # show_verbose(test_params, pkt)
-        print (pkt)
+        print(pkt)
         try:
             client = DTLSClient(target, starttls=starttls, test_params=test_params)
             pkt_hello[DTLSClientHello].cookie = client.cookie
@@ -710,7 +710,7 @@ class DTLSScanner(object):
             test_params.report_received_packet(sent_time)
             self.capabilities.insert(resp, client=False)
         except socket.error as sock_err:
-            print (repr(sock_err))
+            print(repr(sock_err))
 
     @staticmethod
     def _check_cipher(
@@ -740,7 +740,7 @@ class DTLSScanner(object):
             resp = client.recvall(timeout=0.5)
             test_params.report_received_packet(sent_time)
         except socket.error as sock_err:
-            print (repr(sock_err))
+            print(repr(sock_err))
             return None
         return resp
 
@@ -806,7 +806,7 @@ class DTLSScanner(object):
                 resp = client.recvall(timeout=0.5)
                 self.capabilities.insert(resp, client=False)
             except socket.error as sock_err:
-                print (repr(sock_err))
+                print(repr(sock_err))
 
     def _scan_scsv(self, target, starttls=None, test_params=None):
         """Verify SCSV support by DTLS server."""
@@ -836,7 +836,7 @@ class DTLSScanner(object):
                     "DOWNGRADE / POODLE - FALLBACK_SCSV - not honored", resp
                 )
         except socket.error as sock_err:
-            print (repr(sock_err))
+            print(repr(sock_err))
 
     def xxx_scan_heartbleed(
         self,
@@ -865,7 +865,7 @@ class DTLSScanner(object):
             if resp.haslayer(TLSHeartBeat) and resp[TLSHeartBeat].length > 8:
                 self.report_issue("HEARTBLEED - vulnerable", resp)
         except socket.error as sock_err:
-            print (repr(sock_err))
+            print(repr(sock_err))
             return None
         return resp
 
@@ -898,7 +898,7 @@ class DTLSScanner(object):
                     "DTLS EXTENSION SECURE RENEGOTIATION - not supported", resp
                 )
         except socket.error as sock_err:
-            print (repr(sock_err))
+            print(repr(sock_err))
             return None
         return resp
 
@@ -907,7 +907,7 @@ def active_scanning(test_params):
     """Perform active scanning based on provided test params."""
     alive_before = service_ping(test_params)
     if not alive_before and not test_params.ignore_ping_check:
-        print (
+        print(
             "[+] Server {}:{} is not responding before starting scan - skipping this host!"
             "\n    (use --ignore-ping-check if you want to continue anyway)".format(
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
@@ -917,16 +917,16 @@ def active_scanning(test_params):
     scanner = DTLSScanner(test_params)
     scanner.scan((test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port))
     print_verbose(test_params, scanner.capabilities)
-    print (
+    print(
         "\nHost: {}:{}".format(
             test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
         )
     )
-    print (
+    print(
         "\n[*] Supported ciphers: %s/%s"
         % (len(scanner.capabilities.info.server.ciphers), len(DTLS_CIPHER_SUITES))
     )
-    print (
+    print(
         " * "
         + "\n * ".join(
             (
@@ -941,11 +941,11 @@ def active_scanning(test_params):
             )
         )
     )
-    print (
+    print(
         "\n[*] Supported protocol versions: %s/%s"
         % (len(scanner.capabilities.info.server.versions), len(DTLS_VERSIONS))
     )
-    print (
+    print(
         " * "
         + "\n * ".join(
             (
@@ -954,14 +954,14 @@ def active_scanning(test_params):
             )
         )
     )
-    print (
+    print(
         "\n[*] Supported compressions methods: %s/%s"
         % (
             len(scanner.capabilities.info.server.compressions),
             len(DTLS_COMPRESSION_METHODS),
         )
     )
-    print (
+    print(
         " * "
         + "\n * ".join(
             (
@@ -971,8 +971,8 @@ def active_scanning(test_params):
         )
     )
     events = scanner.capabilities.get_events()
-    print ("\n[*] Events: %s" % len(events))
-    print ("* EVENT - " + "\n* EVENT - ".join(e[0] for e in events))
+    print("\n[*] Events: %s" % len(events))
+    print("* EVENT - " + "\n* EVENT - ".join(e[0] for e in events))
 
 
 def main(args):

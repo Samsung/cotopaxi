@@ -72,7 +72,7 @@ class ProtocolTester(ABC):
     def ping(test_params, show_result=False):
         """Perform service ping for this protocol."""
         if show_result:
-            print ("Started ping for AGP protocol")
+            print("Started ping for AGP protocol")
         if not test_params:
             return None
         return False

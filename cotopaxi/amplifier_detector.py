@@ -110,12 +110,12 @@ class ReflectorSniffer(object):
                         len(self.last_packet_in), len(packet)
                     )
                     if self.input_options.verbose:
-                        print (
+                        print(
                             "Amplification factor of current packet: "
                             "{:0.2f}%".format(ampl_factor)
                         )
                     if ampl_factor > self.stats.packet_record_amplify:
-                        print (
+                        print(
                             self.stats.update_record_amplify(
                                 packet, self.last_packet_in, ampl_factor
                             )
@@ -185,17 +185,17 @@ def main(args):
     if dest_port is not None and dest_port > 0:
         filter_string += " and port " + str(dest_port)
 
-    print ("[.] Starting sniffing with filter: {}".format(filter_string))
+    print("[.] Starting sniffing with filter: {}".format(filter_string))
 
     try:
         if options.nr > 0:
-            print ("Press CTRL-C to finish")
+            print("Press CTRL-C to finish")
             sniff(filter=filter_string, prn=sniffer.filter_action, count=options.nr)
-        print ("[.] Finished sniffing")
+        print("[.] Finished sniffing")
     except KeyboardInterrupt:
-        print ("\nExiting...")
+        print("\nExiting...")
     finally:
-        print (sniffer)
+        print(sniffer)
 
 
 if __name__ == "__main__":

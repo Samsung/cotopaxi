@@ -124,13 +124,13 @@ def coap_fingerprint(test_params):
     test_params.verbose = False
     alive_before = CoAPTester.ping(test_params)
     result = get_result_string(alive_before)
-    print (
+    print(
         "[.] Host {}:{} is {} before test!".format(
             test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, result
         )
     )
     if not alive_before and not test_params.ignore_ping_check:
-        print (
+        print(
             "[.] CoAP fingerprinting stopped for {}:{} because server is not responding\n"
             "    (use --ignore-ping-check if you want to continue anyway)!".format(
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
@@ -158,15 +158,15 @@ def coap_fingerprint(test_params):
     alive_after = CoAPTester.ping(test_params)
     result = get_result_string(alive_after)
 
-    print (
+    print(
         "[.] Host {}:{} is {} after test!".format(
             test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, result
         )
     )
     if prev_verbose:
-        print ("\nResults of fingerprinting:")
+        print("\nResults of fingerprinting:")
         for idx, result in enumerate(test_results):
-            print ("{0:02d} {1}".format(idx, str(result)))
+            print("{0:02d} {1}".format(idx, str(result)))
 
     classification_result = coap_classifier(test_results)
 
@@ -183,7 +183,7 @@ def coap_fingerprint(test_params):
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
             )
         )
-    print (addr_port_result)
+    print(addr_port_result)
 
 
 def dtls_fingerprint(test_params):
@@ -199,7 +199,7 @@ def dtls_fingerprint(test_params):
         ),
     )
     if not alive_before and not test_params.ignore_ping_check:
-        print (
+        print(
             "[.] DTLS fingerprinting stopped for {}:{} because server is not responding\n"
             "    (use --ignore-ping-check if you want to continue anyway)!".format(
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
@@ -246,10 +246,10 @@ def dtls_fingerprint(test_params):
     #            print "{0:02d}|{1}".format(result_nr, str(result_parsed))
 
     if test_params.verbose:
-        print ("\nResults of fingerprinting:")
+        print("\nResults of fingerprinting:")
         for idx, result in enumerate(test_results):
-            print (30 * "-")
-            print ("{0:02d}|{1}".format(idx, result))
+            print(30 * "-")
+            print("{0:02d}|{1}".format(idx, result))
 
     classification_result = dtls_classifier(test_results_parsed)
     if classification_result != RESULT_UNKNOWN:
@@ -266,7 +266,7 @@ def dtls_fingerprint(test_params):
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
             )
         )
-    print (
+    print(
         "\n[+] DTLS server {}:{} is using software: {}".format(
             test_params.dst_endpoint.ip_addr,
             test_params.dst_endpoint.port,
