@@ -142,7 +142,7 @@ active_scanner       |       |       |&#9745;&#9745;|        |       |       |  
 
 Tool for checking availability of network endpoints at given IP and port ranges
 ```
-usage: sudo python -m cotopaxi.service_ping.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: sudo python -m cotopaxi.service_ping [-h] [--retries RETRIES] [--timeout TIMEOUT]
                        [--verbose]
                        [--protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                        [--src-ip SRC_IP] [--src-port SRC_PORT]
@@ -201,7 +201,7 @@ Currently supported servers:
     *  OpenSSL,
     *  TinyDTLS
 ```
-usage: sudo python -m cotopaxi.server_fingerprinter.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: sudo python -m cotopaxi.server_fingerprinter [-h] [--retries RETRIES] [--timeout TIMEOUT]
                                [--verbose] [--protocol {CoAP,DTLS}]
                                [--src-ip SRC_IP] [--src-port SRC_PORT]
                                [--ignore-ping-check]
@@ -410,7 +410,7 @@ Tool for checking availability of resource named url on server at given IP and p
 Sample URL lists are available in the _urls_ directory
 
 ```
-usage: sudo python -m cotopaxi.resource_listing.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: sudo python -m cotopaxi.resource_listing [-h] [--retries RETRIES] [--timeout TIMEOUT]
                            [--verbose] [--protocol {CoAP,HTTP,mDNS,RTSP,SSDP}]
                            [--src-ip SRC_IP] [--src-port SRC_PORT]
                            [--ignore-ping-check]
@@ -459,7 +459,7 @@ optional arguments:
 Black-box fuzzer for testing protocol servers
 
 ```
-usage: sudo python -m cotopaxi.protocol_fuzzer.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: sudo python -m cotopaxi.protocol_fuzzer [-h] [--retries RETRIES] [--timeout TIMEOUT]
                           [--verbose]
                           [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                           [--hide-disclaimer] [--src-ip SRC_IP]
@@ -513,7 +513,7 @@ optional arguments:
 Black-box fuzzer for testing protocol clients
 
 ```
-usage: sudo python -m cotopaxi.client_proto_fuzzer.py [-h] [--server-ip SERVER_IP]
+usage: sudo python -m cotopaxi.client_proto_fuzzer [-h] [--server-ip SERVER_IP]
                               [--server-port SERVER_PORT] [--verbose]
                               [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                               [--corpus-dir CORPUS_DIR]
@@ -539,7 +539,7 @@ optional arguments:
 
 Tool for checking vulnerability of network endpoints at given IP and port ranges
 ```
-usage: sudo python -m cotopaxi.cotopaxi.vulnerability_tester -h
+usage: sudo python -m cotopaxi.vulnerability_tester -h
 usage: vulnerability_tester.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
                                [--verbose]
                                [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
@@ -597,7 +597,7 @@ optional arguments:
 Tool for checking vulnerability of network clients connecting to server provided by this tool
 
 ```
-usage: sudo python -m cotopaxi.client_vuln_tester.py [-h] [--server-ip SERVER_IP]
+usage: sudo python -m cotopaxi.client_vuln_tester [-h] [--server-ip SERVER_IP]
                              [--server-port SERVER_PORT] [--verbose]
                              [--protocol {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                              [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
