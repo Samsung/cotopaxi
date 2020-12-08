@@ -281,7 +281,10 @@ def udp_sr1_file(test_params, test_filename):
 
 def udp_send_payload(test_params, payload):
     """Send UDP payload using standard Python function."""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    if test_params.ip_version == 4:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    elif test_params.ip_version == 6:
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.sendto(
         bytes(payload),
         (test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port),
