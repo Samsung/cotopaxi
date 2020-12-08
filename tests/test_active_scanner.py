@@ -91,6 +91,9 @@ class TestActiveScanner(CotopaxiToolServerTester, unittest.TestCase):
             port = config["DTLS_TEST_SERVERS"][dtls_server + "_port"]
             print ("test_server_ip: {} port: {}".format(test_server_ip, port))
             output = scrap_output(main, [test_server_ip, port, "-P", "DTLS"])
+            self.assertIn("PSK_WITH_AES_256_CBC_SHA384", output)
+            self.assertIn("DTLS_1_1 (0xfefd)", output)
+            self.assertIn("NULL (0x0000)", output)
             self.assertIn("Finished active security scanning", output)
             self.assertIn("Starting scan: supported_protocol_versions", output)
             self.assertIn("Supported protocol versions", output)
