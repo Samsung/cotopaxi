@@ -306,7 +306,10 @@ class DTLSInfo(object):
         server.fallback_scsv: %s
         server.heartbeat: %s
 
-        server.certificates: %s
+        server.certificates: 
+------------- CERTLIST START --------------
+%s
+------------- CERTLIST STOP  --------------
 >
         """ % (
             len(self.history),
@@ -322,7 +325,7 @@ class DTLSInfo(object):
             self.info.server.sessions_established,
             self.info.server.fallback_scsv,
             self.info.server.heartbeat,
-            repr(self.info.server.certificates),
+            ("-----\n").join(self.info.server.certificates),
         )
 
     def report_issue(self, description, data):
@@ -516,7 +519,7 @@ class DTLSInfo(object):
 
         if record.haslayer(TLSCertificateList):
             print_verbose(self.test_params, "Updating stats for TLSCertificateList")
-            dtlsinfo.certificates.add(record[TLSCertificateList])
+            dtlsinfo.certificates.add(record[TLSCertificateList].show(dump=True))
 
         if record.haslayer(TLSFinished):
             print_verbose(self.test_params, "Updating stats for TLSFinished")
@@ -971,6 +974,12 @@ def active_scanning(test_params):
         )
     )
     events = scanner.capabilities.get_events()
+    print(
+        "\n[*] Server certificates: %s \n * (to see details use verbose mode)"
+        % (
+            len(scanner.capabilities.info.server.certificates)
+        )
+    )
     print("\n[*] Events: %s" % len(events))
     print("* EVENT - " + "\n* EVENT - ".join(e[0] for e in events))
 
