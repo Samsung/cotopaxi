@@ -39,7 +39,6 @@ from scapy.all import (
     StrLenField,
     XShortEnumField,
 )
-from scapy.compat import plain_str
 from scapy_ssl_tls.ssl_tls import (
     DTLSClientHello,
     DTLSRecord,
@@ -274,13 +273,12 @@ class DTLSClient(object):
                 data = self._sock.recvfrom(size)
                 if not data:
                     break
-                plain_data = plain_str(data[0])
-                resp.append(plain_data)
+                resp.append(data[0])
                 # print("recvall - chunk size = {}".format(len(data[0])))
             except socket.timeout:
                 break
         # print(resp)
-        resp_packet = DTLS("".join(resp))
+        resp_packet = DTLS("".encode().join(resp))
         # resp_packet.show()
         return resp_packet
 
@@ -367,11 +365,11 @@ DTLS_1_0_CLIENT_KEY_EXCHANGE_MBED_CLIENT = (
 )
 
 DTLS_1_0_CLIENT_APP_DATA_MBED_CLIENT = (
-    "17fefd000100000000000100194d40f2faefbc6d7c84c52f4053fe" "cd0e0f6897637a464da099"
+    "17fefd000100000000000100194d40f2faefbc6d7c84c52f4053fecd0e0f6897637a464da099"
 )
 
 DTLS_1_0_CLIENT_ENCRYPTED_ALERT_MBED_CLIENT = (
-    "15fefd00010000000000020012b425d3df55e0a0f580e701" "8ae483f05b69f5"
+    "15fefd00010000000000020012b425d3df55e0a0f580e7018ae483f05b69f5"
 )
 
 DTLS_1_0_CERT_FRAGMENT = (
@@ -578,13 +576,8 @@ def prepare_dtls_test_packets():
         dtls_1_0_hello_malformed = file_handle.read()
     test_packets.append(dtls_1_0_hello_malformed)
 
-    dtls_finger_file_format = (
-        os.path.dirname(__file__)
-        + "/fingerprinting/dtls/fingerprint_000_packet_{:03}.raw"
-    )
-
-    packet_nr = 0
-    for packet in test_packets:
+    # packet_nr = 0
+    # for packet in test_packets:
         # print(packet_nr)
         # print("Packet size = {}".format(len(str(packet))))
         # print(packet)
@@ -601,7 +594,7 @@ def prepare_dtls_test_packets():
         # P3.6
         # print(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
         # encoded.append(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
-        packet_nr += 1
+        # packet_nr += 1
 
     encoded = [codecs.encode(bytes(packet), "hex") for packet in test_packets]
     return encoded
