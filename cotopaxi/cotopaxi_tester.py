@@ -350,13 +350,13 @@ before running this tool!"""
     time.sleep(SLEEP_TIME_ON_DISCLAIMER)
 
 
-def check_caps():
+def check_caps(message="This tool"):
     """Check privileges required to run scapy sniffing functions."""
     try:
         sniff(count=1, timeout=1)
     except socket.error:
         sys.exit(
-            "\nThis tool requires admin permissions on network interfaces.\n"
+            "\n" + message + " requires admin permissions on network interfaces.\n"
             "On Linux and Unix run it with sudo, use root account (UID=0)"
             " or add CAP_NET_ADMIN, CAP_NET_RAW manually!\n"
             "On Windows run as Administrator.\n"
@@ -536,7 +536,6 @@ class CotopaxiTester(object):
         protocol_choice=None,
     ):
         """Create empty CotopaxiTester object."""
-        check_caps()
         self.test_params = TestParams(test_name)
         self.list_ips = []
         self.list_ports = []
@@ -589,6 +588,7 @@ class CotopaxiTester(object):
         self.test_params.protocol = Protocol[options.protocol.replace("-", "")]
         try:
             if options.src_ip:
+                check_caps("Spoofing source IP")
                 self.test_params.src_endpoint.ip_addr = options.src_ip
         except AttributeError:
             pass
@@ -664,7 +664,6 @@ class CotopaxiClientTester(object):
 
     def __init__(self, test_name=""):
         """Create CotopaxiClientTester object with default values."""
-        check_caps()
         self.test_params = TestParams(test_name)
         self.argparser = create_client_tester_argparser()
         argparser_add_protocols(self.argparser, test_name, False)
@@ -683,6 +682,8 @@ class CotopaxiClientTester(object):
             self.test_params.src_endpoint.port = PROTOCOL_TESTERS[
                 self.test_params.protocol
             ].default_port()
+        if self.test_params.src_endpoint.port < 1024:
+            check_caps("Listening on port lower than 1024")
 
         if options.verbose:
             print("options: {}".format(options))

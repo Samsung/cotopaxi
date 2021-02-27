@@ -26,12 +26,12 @@ For Python 2.7:
 ```
     pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
 ```
-For Python >= 3.6:
+For Python 3.6-3.8:
 ```
     git clone https://github.com/kalidasya/scapy-ssl_tls.git
     cd scapy-ssl_tls
     git checkout py3_update
-    sudo python3.6 setup.py install
+    sudo python3 setup.py install
 ```
 
 4. Install other requirements:
@@ -42,11 +42,11 @@ For Python 2.7:
 sudo python2.7 -m pip install -r requirements_python2.txt 
 ```
 
-For Python >= 3.6:
+For Python 3.6, 3.8:
 
 ```
-sudo python3.6 -m pip install --upgrade pip
-sudo python3.6 -m pip install -r requirements.txt 
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m pip install -r requirements.txt 
 ```
 
 5. Run installer:
@@ -56,7 +56,7 @@ sudo python setup.py install
 
 ## Requirements:
 
-Currently Cotopaxi works with Python 2.7.* and with Python 3.6.* (not tested with other versions - please report, if you would like to use . 
+Currently Cotopaxi works with Python 2.7.* and with Python 3.6-3.8 (some dependencies like tensorflow do not work on 3.9). 
 
 Installation of required libraries:
 
@@ -142,7 +142,7 @@ active_scanner       |       |       |&#9745;&#9745;|        |       |       |  
 
 Tool for checking availability of network endpoints at given IP and port ranges
 ```
-usage: sudo python -m cotopaxi.service_ping [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: python -m cotopaxi.service_ping [-h] [--retries RETRIES] [--timeout TIMEOUT]
                        [--verbose]
                        [--protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                        [--src-ip SRC_IP] [--src-port SRC_PORT]
@@ -171,7 +171,7 @@ optional arguments:
                         ALL includes all supported protocols)
   --src-ip SRC_IP, -SI SRC_IP
                         source IP address (return result will not be
-                        received!)
+                        received!) 
   --src-port SRC_PORT, -SP SRC_PORT
                         source port (if not specified random port will be
                         used)
@@ -201,7 +201,7 @@ Currently supported servers:
     *  OpenSSL,
     *  TinyDTLS
 ```
-usage: sudo python -m cotopaxi.server_fingerprinter [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: python -m cotopaxi.server_fingerprinter [-h] [--retries RETRIES] [--timeout TIMEOUT]
                                [--verbose] [--protocol {CoAP,DTLS}]
                                [--src-ip SRC_IP] [--src-port SRC_PORT]
                                [--ignore-ping-check]
@@ -410,7 +410,7 @@ Tool for checking availability of resource named url on server at given IP and p
 Sample URL lists are available in the _urls_ directory
 
 ```
-usage: sudo python -m cotopaxi.resource_listing [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: python -m cotopaxi.resource_listing [-h] [--retries RETRIES] [--timeout TIMEOUT]
                            [--verbose] [--protocol {CoAP,HTTP,mDNS,RTSP,SSDP}]
                            [--src-ip SRC_IP] [--src-port SRC_PORT]
                            [--ignore-ping-check]
@@ -459,7 +459,7 @@ optional arguments:
 Black-box fuzzer for testing protocol servers
 
 ```
-usage: sudo python -m cotopaxi.protocol_fuzzer [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: python -m cotopaxi.protocol_fuzzer [-h] [--retries RETRIES] [--timeout TIMEOUT]
                           [--verbose]
                           [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                           [--hide-disclaimer] [--src-ip SRC_IP]
@@ -513,10 +513,12 @@ optional arguments:
 Black-box fuzzer for testing protocol clients
 
 ```
-usage: sudo python -m cotopaxi.client_proto_fuzzer [-h] [--server-ip SERVER_IP]
+usage: (sudo) python -m cotopaxi.client_proto_fuzzer [-h] [--server-ip SERVER_IP]
                               [--server-port SERVER_PORT] [--verbose]
                               [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                               [--corpus-dir CORPUS_DIR]
+
+(sudo required for listening on ports below 1024)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -539,7 +541,7 @@ optional arguments:
 
 Tool for checking vulnerability of network endpoints at given IP and port ranges
 ```
-usage: sudo python -m cotopaxi.vulnerability_tester -h
+usage: python -m cotopaxi.vulnerability_tester -h
 usage: vulnerability_tester.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
                                [--verbose]
                                [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
@@ -597,13 +599,14 @@ optional arguments:
 Tool for checking vulnerability of network clients connecting to server provided by this tool
 
 ```
-usage: sudo python -m cotopaxi.client_vuln_tester [-h] [--server-ip SERVER_IP]
+usage: (sudo) python -m cotopaxi.client_vuln_tester [-h] [--server-ip SERVER_IP]
                              [--server-port SERVER_PORT] [--verbose]
                              [--protocol {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
                              [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
                              [--cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]]
                              [--list]
 
+(sudo required for listening on ports below 1024)
 optional arguments:
   -h, --help            show this help message and exit
   --server-ip SERVER_IP, -SI SERVER_IP
@@ -655,7 +658,7 @@ optional arguments:
 Tool for checking security properties of network endpoints at given IP and port ranges
 
 ```
-usage: sudo python -m cotopaxi.active_scanner [-h] [--retries RETRIES] [--timeout TIMEOUT]
+usage: python -m cotopaxi.active_scanner [-h] [--retries RETRIES] [--timeout TIMEOUT]
                          [--verbose] [--protocol {DTLS}] [--src-ip SRC_IP]
                          [--src-port SRC_PORT] [--ignore-ping-check]
                          dest_addr dest_port
