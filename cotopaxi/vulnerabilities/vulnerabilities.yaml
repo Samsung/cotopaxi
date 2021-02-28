@@ -152,6 +152,14 @@
   url: https://bugs.eclipse.org/bugs/show_bug.cgi?id=544824
   credit: Jakub Botwicz
   payload_file: dtls/payload_tinydtls_002.raw
+- name: TINYDTLS_003
+  type: Crash
+  cve_id: ''
+  description: TinyDTLS DTLS server incorrectly handles certificate request messages
+    leading to buffer overflow and crash of the server.
+  url: https://www.eclipse.org/lists/tinydtls-dev/msg00206.html
+  credit: Stephan Zeisberg
+  payload_file: dtls/payload_tinydtls_003.raw
 - name: TINYSVCMDNS_000
   type: Crash
   cve_id: CVE-2017-12087
