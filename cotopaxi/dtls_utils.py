@@ -382,6 +382,12 @@ DTLS_1_0_CERT_FRAGMENT = (
     "0474657374311c301a06092a864886f70d01090116"
 )
 
+DTLS_1_1_TINYDTLS = (
+    "16FEFD00000000000000000054010000480000000000000048FEFD00000000341190B"
+    "773DDD36E43C67A71A59F498A84E746B7D55950C1F591451B00000004C0AEC0A80100"
+    "001A001300020102001400020102000A000400020017000B00020100"
+)
+
 
 def check_dtls_response(test_params, response):
     """Check whether response is DTLS packet."""
@@ -578,23 +584,23 @@ def prepare_dtls_test_packets():
 
     # packet_nr = 0
     # for packet in test_packets:
-        # print(packet_nr)
-        # print("Packet size = {}".format(len(str(packet))))
-        # print(packet)
-        # print("-")
-        # print(bytes(str(packet), encoding='ascii'))
-        # print("-")
+    # print(packet_nr)
+    # print("Packet size = {}".format(len(str(packet))))
+    # print(packet)
+    # print("-")
+    # print(bytes(str(packet), encoding='ascii'))
+    # print("-")
 
-        # P2.7
-        # print("encoded.append('" + codecs.encode(bytes(packet), "hex") + "')")
-        # encoded.append(codecs.encode(bytes(packet), "hex"))
-        # with open(dtls_finger_file_format.format(packet_nr), "w") as file_handle:
-        #    file_handle.write(bytes(packet))
+    # P2.7
+    # print("encoded.append('" + codecs.encode(bytes(packet), "hex") + "')")
+    # encoded.append(codecs.encode(bytes(packet), "hex"))
+    # with open(dtls_finger_file_format.format(packet_nr), "w") as file_handle:
+    #    file_handle.write(bytes(packet))
 
-        # P3.6
-        # print(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
-        # encoded.append(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
-        # packet_nr += 1
+    # P3.6
+    # print(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
+    # encoded.append(codecs.encode(bytes(str(packet), encoding='utf-8'), "hex"))
+    # packet_nr += 1
 
     encoded = [codecs.encode(bytes(packet), "hex") for packet in test_packets]
     return encoded
@@ -725,6 +731,7 @@ class DTLSTester(UDPBasedProtocolTester):
         ping_packets = [
             DTLS_1_0_HELLO_NMAP,
             DTLS_1_0_HELLO_BOTAN_CLIENT,
+            DTLS_1_1_TINYDTLS,
             DTLS_1_2_HELLO_OPENSSL_CLIENT,
         ]
 
