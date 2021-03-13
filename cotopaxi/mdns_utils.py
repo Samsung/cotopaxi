@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for mDNS protocol handling."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
-#                Michał Radwański (Samsung R&D Poland)
+#       Authors: Jakub Botwicz,
+#                Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #
@@ -96,7 +97,8 @@ class MulticastDNSSniffer(object):
                         ),
                     )
                     if dns_response[DNS].ancount > 0:
-                        # print_verbose(self.test_params, "dns_response[DNS].an = {}".format(dns_response[DNS].an))
+                        # print_verbose(self.test_params,
+                        # "dns_response[DNS].an = {}".format(dns_response[DNS].an))
                         print_verbose(
                             self.test_params,
                             "dns_response[DNS].an[0].rrname = {}".format(
@@ -232,12 +234,18 @@ class MDNSTester(UDPBasedProtocolTester):
         thread = threading.Thread(target=mdns_send_query, args=(test_params, query))
         thread.start()
         print_verbose(test_params, "filter: {}".format(mdns_sniffer.filter_string()))
-        sniff(
-            filter=mdns_sniffer.filter_string(),
-            prn=mdns_sniffer.filter_action,
-            count=10000,
-            timeout=test_params.timeout_sec + 2,
-        )
+        try:
+            sniff(
+                filter=mdns_sniffer.filter_string(),
+                prn=mdns_sniffer.filter_action,
+                count=10000,
+                timeout=test_params.timeout_sec + 2,
+            )
+        except socket.error:
+            print_verbose(
+                test_params,
+                "[!] Skipping mDNS ping due to lack of admin caps for sniffing!",
+            )
         print_verbose(
             test_params, "received mDNS response: {}".format(mdns_sniffer.server_alive)
         )
