@@ -319,3 +319,11 @@
   nr_packets: 1
   timeout_sec: 10
   payload_file: coap/payload_zyxel_000.raw
+- name: FALCON_000
+  type: Crash
+  cve_id:
+  description: The vulnerability is caused by a buffer overflow in a memcpy operation
+    when parsing specailly crafted KNXnet/IP packets in the Group messages monitor (aka. Falcon).
+  url: https://github.com/sbaresearch/advisories/tree/public/2015/knAx_20150101
+  credit: Aljosha Judmayer (SBA Research)
+  payload_file: knx/payload_cve-2015-8299_crash.raw

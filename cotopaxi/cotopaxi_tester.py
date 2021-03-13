@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Generic tester for Cotopaxi tools."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
-#                Michał Radwański (Samsung R&D Poland)
+#       Authors: Jakub Botwicz,
+#                Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #
@@ -48,6 +49,7 @@ from .coap_utils import CoAPTester
 from .dtls_utils import DTLSTester
 from .htcpcp_utils import HTCPCPTester
 from .http_utils import HTTPTester
+from .knx_utils import KNXTester
 from .mdns_utils import MDNSTester
 from .mqtt_utils import MQTTTester
 from .mqttsn_utils import MQTTSNTester
@@ -66,6 +68,7 @@ PROTOCOL_TESTERS = {
     Protocol.DTLS: DTLSTester,
     Protocol.HTCPCP: HTCPCPTester,
     Protocol.HTTP: HTTPTester,
+    Protocol.KNX: KNXTester,
     Protocol.mDNS: MDNSTester,
     Protocol.MQTT: MQTTTester,
     Protocol.MQTTSN: MQTTSNTester,
@@ -353,7 +356,7 @@ before running this tool!"""
 def check_caps(message="This tool"):
     """Check privileges required to run scapy sniffing functions."""
     try:
-        sniff(count=1, timeout=1)
+        sniff(count=1, timeout=0.01)
     except socket.error:
         sys.exit(
             "\n" + message + " requires admin permissions on network interfaces.\n"

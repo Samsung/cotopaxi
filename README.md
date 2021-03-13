@@ -1,7 +1,7 @@
 
 # Cotopaxi
 
-Set of tools for security testing of Internet of Things devices using protocols: AMQP, CoAP, DTLS, HTCPCP, mDNS, MQTT, MQTT-SN, QUIC, RTSP, SSDP.
+Set of tools for security testing of Internet of Things devices using protocols: AMQP, CoAP, DTLS, HTCPCP, KNX, mDNS, MQTT, MQTT-SN, QUIC, RTSP, SSDP.
 
 ## License:
 
@@ -42,7 +42,7 @@ For Python 2.7:
 sudo python2.7 -m pip install -r requirements_python2.txt 
 ```
 
-For Python 3.6, 3.8:
+For Python 3.6-3.8:
 
 ```
 sudo python3 -m pip install --upgrade pip
@@ -122,20 +122,19 @@ We would like to thank above listed authors for sharing this corpus!
 
 Protocols supported by different tools (left box describes working implementation in Python 2 and right one for Python 3): 
 
-Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  mDNS | MQTT  |MQTT-SN| QUIC  | RTSP  | SSDP
----------------------|-------|-------|-------|-------|--------|-------|-------|-------|-------|-----
-service_ping         |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-server_fingerprinter |       |&#9745;&#9745;|&#9745;&#9745;|        |       |       |       |       |       |
-device_identification|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
-traffic_analyzer     |&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
-credential_cracker   |       |  N/A  |  N/A  |  N/A   |  N/A  |       |       |  N/A  |  N/A  |  N/A
-resource_listing     |       |&#9745;&#9745;|  N/A  |        |&#9745;&#9745;|       |       |       |&#9745;&#9745;|&#9745;&#9745;
-protocol_fuzzer      |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-client_proto_fuzzer  |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-vulnerability_tester |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-client_vuln_tester   |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-amplifier_detector   |  N/A  |&#9745;&#9745;|&#9745;&#9745;|  N/A   |&#9745;&#9745;|  N/A  |&#9745;&#9745;|&#9745;&#9745;|  N/A  |&#9745;&#9745;
-active_scanner       |       |       |&#9745;&#9745;|        |       |       |       |       |       |
+Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP |  KNX  |  mDNS | MQTT  |MQTT-SN| QUIC  | RTSP  | SSDP
+---------------------|-------|-------|-------|--------|-------|-------|-------|-------|-------|-------|-----
+service_ping         |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+server_fingerprinter |       |&#9745;&#9745;|&#9745;&#9745;|        |       |       |       |       |       |       |
+device_identification|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
+traffic_analyzer     |&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
+resource_listing     |       |&#9745;&#9745;|  N/A  |        |       |&#9745;&#9745;|       |       |       |&#9745;&#9745;|&#9745;&#9745;
+protocol_fuzzer      |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+client_proto_fuzzer  |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+vulnerability_tester |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+client_vuln_tester   |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+amplifier_detector   |  N/A  |&#9745;&#9745;|&#9745;&#9745;|  N/A   |  N/A   |&#9745;&#9745;|  N/A  |&#9745;&#9745;|&#9745;&#9745;|  N/A  |&#9745;&#9745;
+active_scanner       |       |       |&#9745;&#9745;|        |       |       |       |       |       |       |
 
 
 **cotopaxi.service_ping**
@@ -144,7 +143,7 @@ Tool for checking availability of network endpoints at given IP and port ranges
 ```
 usage: python -m cotopaxi.service_ping [-h] [--retries RETRIES] [--timeout TIMEOUT]
                        [--verbose]
-                       [--protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                       [--protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
                        [--src-ip SRC_IP] [--src-port SRC_PORT]
                        dest_addr dest_port
 
@@ -165,7 +164,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+  --protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
                         protocol to be tested (UDP includes all UDP-based
                         protocols, while TCP includes all TCP-based protocols,
                         ALL includes all supported protocols)
@@ -350,6 +349,7 @@ Currently supported protocols:
 * IPP
 * IPsec
 * IRC
+* KNX
 * LLMNR
 * mDNS
 * MQTT
@@ -461,7 +461,7 @@ Black-box fuzzer for testing protocol servers
 ```
 usage: python -m cotopaxi.protocol_fuzzer [-h] [--retries RETRIES] [--timeout TIMEOUT]
                           [--verbose]
-                          [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                          [--protocol {CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
                           [--hide-disclaimer] [--src-ip SRC_IP]
                           [--src-port SRC_PORT] [--ignore-ping-check]
                           [--corpus-dir CORPUS_DIR]
@@ -485,7 +485,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+  --protocol {CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
                         protocol to be tested
   --hide-disclaimer, -HD
                         hides legal disclaimer (shown before starting
@@ -515,7 +515,7 @@ Black-box fuzzer for testing protocol clients
 ```
 usage: (sudo) python -m cotopaxi.client_proto_fuzzer [-h] [--server-ip SERVER_IP]
                               [--server-port SERVER_PORT] [--verbose]
-                              [--protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                              [--protocol {CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
                               [--corpus-dir CORPUS_DIR]
 
 (sudo required for listening on ports below 1024)
@@ -528,7 +528,7 @@ optional arguments:
                         port that will be used to set up server
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+  --protocol {CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
                         protocol to be tested
   --corpus-dir CORPUS_DIR, -C CORPUS_DIR
                         path to directory with fuzzing payloads (corpus) (each
@@ -544,7 +544,7 @@ Tool for checking vulnerability of network endpoints at given IP and port ranges
 usage: python -m cotopaxi.vulnerability_tester -h
 usage: vulnerability_tester.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
                                [--verbose]
-                               [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                               [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
                                [--hide-disclaimer] [--src-ip SRC_IP]
                                [--src-port SRC_PORT] [--ignore-ping-check]
                                [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
@@ -569,7 +569,7 @@ optional arguments:
                         timeout in seconds
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
                         protocol to be tested (UDP includes all UDP-based
                         protocols, while TCP includes all TCP-based protocols,
                         ALL includes all supported protocols)
@@ -601,7 +601,7 @@ Tool for checking vulnerability of network clients connecting to server provided
 ```
 usage: (sudo) python -m cotopaxi.client_vuln_tester [-h] [--server-ip SERVER_IP]
                              [--server-port SERVER_PORT] [--verbose]
-                             [--protocol {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}]
+                             [--protocol {CoAP,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
                              [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
                              [--cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]]
                              [--list]
@@ -615,7 +615,7 @@ optional arguments:
                         port that will be used to set up server
   --verbose, -V, --debug, -D
                         Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,HTCPCP,HTTP,mDNS,MQTT,QUIC,RTSP,SSDP}
+  --protocol {CoAP,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,HTCPCP,HTTP,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
                         protocol to be tested
   --vuln {ALL,BEWARD_000,BOTAN_000,...} ...]
                         list of vulnerabilities to be tested (by SOFT_NUM id)
@@ -710,11 +710,11 @@ https://scapy.readthedocs.io/en/latest/troubleshooting.html#
 
 ## Source code quality
 
-Before uploading your contribution using github Pull Request please check your code using listed below tools:
+Before uploading your contribution using github Pull Request please check your code using tools listed below:
 
 ```
-black -t py27 cotopaxi
-black -t py27 tests
+black -t py36 cotopaxi
+black -t py36 tests
 
 pydocstyle cotopaxi
 
@@ -752,16 +752,16 @@ To run all unit tests using pytest with coverage analysis and branch analysis ru
 
 To run unit tests for one of tools run (from upper cotopaxi dir):
 ```
-    sudo python -m tests.test_active_scanner
+    python -m tests.test_active_scanner
     sudo python -m tests.test_amplifier_detector
-    sudo python -m tests.test_client_proto_fuzzer
+    python -m tests.test_client_proto_fuzzer
     python -m tests.test_device_identification
     python -m tests.test_traffic_analyzer
-    sudo python -m tests.test_protocol_fuzzer
+    python -m tests.test_protocol_fuzzer
     sudo python -m tests.test_resource_listing
-    sudo python -m tests.test_server_fingerprinter
-    sudo python -m tests.test_service_ping
-    sudo python -m tests.test_vulnerability_tester
+    python -m tests.test_server_fingerprinter
+    python -m tests.test_service_ping
+    python -m tests.test_vulnerability_tester
 ```
 
 Most of tests are performed against remote tests servers and require preparing test environment, 

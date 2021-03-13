@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Set of common utils used by different Cotopaxi tools."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
-#                Michał Radwański (Samsung R&D Poland)
+#       Authors: Jakub Botwicz,
+#                Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #
@@ -145,6 +146,7 @@ class Protocol(Enum):
     QUIC = 12
     AMQP = 13
     MQTTSN = 14
+    KNX = 15
 
 
 def proto_mapping_request(protocol):
@@ -162,6 +164,7 @@ def proto_mapping_request(protocol):
         Protocol.SSDP: HTTPRequest,
         Protocol.HTCPCP: HTTPRequest,
         Protocol.HTTP: HTTPRequest,
+        Protocol.KNX: TCP,
     }[protocol]
 
 
