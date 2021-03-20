@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Unit tests for device_identification."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Mariusz Księżak (Samsung R&D Poland),
-#                Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Mariusz Księżak (Samsung R&D Poland), Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -21,11 +21,15 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys
 import unittest
 
-from cotopaxi.device_identification import main
-from .common_test_utils import scrap_output
-from .common_runner import TimerTestRunner
+try:
+    from cotopaxi.device_identification import main
+    from .common_test_utils import scrap_output
+    from .common_runner import TimerTestRunner
+except SyntaxError:
+    sys.exit("[!] This set of test must be run using Python 3!")
 
 
 class TestDeviceIdentification(unittest.TestCase):

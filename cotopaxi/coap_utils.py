@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for CoAP protocol handling."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
-#                Michał Radwański (Samsung R&D Poland)
+#       Authors: Jakub Botwicz, Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #
@@ -59,9 +59,10 @@ def coap_scrap_response(resp_packet):
             del resp_packet[IP].id
         if resp_packet.haslayer(UDP):
             del resp_packet[UDP].chksum
-            coap = CoAP(resp_packet[UDP].load)
-            coap.show()
-    except (NameError) as exc:
+            if resp_packet[UDP].load:
+                coap = CoAP(resp_packet[UDP].load)
+                coap.show()
+    except (NameError, TypeError) as exc:
         print("Exception: {}".format(exc))
     finally:
         sys.stdout, save_stdout = save_stdout, sys.stdout
@@ -265,7 +266,6 @@ class CoAPTester(UDPBasedProtocolTester):
                     ):
                         return True
                     coap_response = coap_scrap_response(response_packet)
-                    # print(coap_response)
                     print_verbose(test_params, coap_response)
                     if (
                         "ver       = 1" in coap_response

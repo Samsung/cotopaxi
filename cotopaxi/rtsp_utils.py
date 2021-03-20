@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for RTSP protocol handling."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
-#                Michał Radwański (Samsung R&D Poland)
+#       Authors: Jakub Botwicz, Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #

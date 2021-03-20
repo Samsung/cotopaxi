@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Unit tests for DTLS utils."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Author: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -53,7 +54,7 @@ class TestDTLSTester(TestProtocolTester):
     def test_dtls_parse_neg(self):
         dtls_packet = DTLS("")
         dtls_packet_text = scrap_dtls_response(dtls_packet)
-        print (dtls_packet_text)
+        print(dtls_packet_text)
 
 
 if __name__ == "__main__":

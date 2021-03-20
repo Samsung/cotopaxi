@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for DTLS protocol handling."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
+#       Authors: Jakub Botwicz, Michał Radwański,
 #                tintinweb@oststrom.com <github.com/tintinweb>
-#                Michał Radwański (Samsung R&D Poland)
 #
 #    This file is part of Cotopaxi.
 #
@@ -658,6 +658,95 @@ def dtls_convert_description(response):
 def dtls_convert_length(response):
     """Convert DTLS server response to attribute length used by classifier."""
     return len(response)
+
+
+def dtls_fingerprint(test_params):
+    """Fingerprinting of server for DTLS protocol."""
+    # coap_vuln_file_format = "cotopaxi/fingerprinting/coap/coap_finger_000_packet_{:03}.raw"
+
+    alive_before = DTLSTester.ping(test_params)
+    result = get_result_string(alive_before)
+    print_verbose(
+        test_params,
+        "[.] Host {}:{} is {} before test!".format(
+            test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, result
+        ),
+    )
+    if not alive_before and not test_params.ignore_ping_check:
+        print(
+            "[.] DTLS fingerprinting stopped for {}:{} because server is not responding\n"
+            "    (use --ignore-ping-check if you want to continue anyway)!".format(
+                test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
+            )
+        )
+        test_params.test_stats.inactive_endpoints[Protocol.DTLS].append(
+            "{}:{}".format(
+                test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
+            )
+        )
+        return
+    print_verbose(
+        test_params,
+        "[.] Started fingerprinting of DTLS server {}:{}".format(
+            test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
+        ),
+    )
+
+    test_packets = load_dtls_test_packets()
+
+    test_results = len(test_packets) * [None]
+    test_results_parsed = [DTLSResults() for _ in test_packets]
+
+    for idx, packet_data in enumerate(test_packets):
+        response_data = udp_send(test_params, packet_data)
+        if response_data is not None:
+            test_results[idx] = scrap_dtls_response(response_data)
+        else:
+            test_results[idx] = "No response"
+
+    alive_after = DTLSTester.ping(test_params)
+    result = get_result_string(alive_after)
+    print_verbose(
+        test_params,
+        "[.] Host {}:{} is {} after test!".format(
+            test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port, result
+        ),
+    )
+
+    for result, result_parsed in zip(test_results, test_results_parsed):
+        if result != "No response":
+            result_parsed.convert(result)
+    #        if verbose:
+    #            print "{0:02d}|{1}".format(result_nr, str(result_parsed))
+
+    if test_params.verbose:
+        print("\nResults of fingerprinting:")
+        for idx, result in enumerate(test_results):
+            print(30 * "-")
+            print("{0:02d}|{1}".format(idx, result))
+
+    classification_result = dtls_classifier(test_results_parsed)
+    if classification_result != RESULT_UNKNOWN:
+        test_params.test_stats.active_endpoints[Protocol.DTLS].append(
+            "{}:{} is using {}".format(
+                test_params.dst_endpoint.ip_addr,
+                test_params.dst_endpoint.port,
+                classification_result,
+            )
+        )
+    else:
+        test_params.test_stats.potential_endpoints[Protocol.DTLS].append(
+            "{}:{}".format(
+                test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
+            )
+        )
+    print(
+        "\n[+] DTLS server {}:{} is using software: {}".format(
+            test_params.dst_endpoint.ip_addr,
+            test_params.dst_endpoint.port,
+            classification_result,
+        )
+    )
 
 
 class DTLSResults(object):

@@ -21,6 +21,7 @@
 #
 
 import socket
+import struct
 
 from .common_utils import print_verbose, tcp_sr1
 from .protocol_tester import TCPBasedProtocolTester
@@ -62,8 +63,8 @@ class KNXTester(TCPBasedProtocolTester):
                     in_data = tcp_sr1(test_params, test_message)
                     if in_data:
                         if len(in_data) >= 4:
-                            telegram_length = in_data[0] << 0 | in_data[1]
-                            telegram_type = in_data[2] << 8 | in_data[3]
+                            telegram_length = struct.unpack(">H", in_data[:2])[0]
+                            telegram_type = struct.unpack(">H", in_data[-2:])[0]
                             print_verbose(
                                 test_params, "telegram_length: " + str(telegram_length)
                             )

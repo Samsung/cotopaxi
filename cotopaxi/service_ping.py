@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tool for checking availability of network service."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
-#                Michał Radwański (Samsung R&D Poland)
+#       Authors: Jakub Botwicz, Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #
@@ -21,6 +21,7 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import socket
 import sys
 
 from .common_utils import print_verbose
@@ -63,8 +64,9 @@ def service_ping(test_params, show_result=False):
                     )
         if ping_result == "responds":
             return True
-    except TypeError as type_exception:
+    except socket.error as type_exception:
         print_verbose(test_params, "Type error: '{0}'.".format(type_exception))
+        print(type_exception)
 
     return False
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for AMQP protocol handling."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -60,7 +61,7 @@ class AMQPTester(HTTPTester):
         try:
             for _ in range(1 + test_params.nr_retries):
                 for test_message in ping_packets:
-                    in_data = tcp_sr1(test_params, test_message)
+                    in_data = str(tcp_sr1(test_params, test_message))
                     if in_data:
                         print_verbose(
                             test_params,

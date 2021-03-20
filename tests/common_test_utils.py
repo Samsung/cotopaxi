@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Common test functions."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -61,12 +62,12 @@ def scrap_output(func, data):
 
 
 def load_test_servers():
-    print ("Loading config for test servers")
+    print("Loading config for test servers")
     config = configparser.ConfigParser()
     config.read(os.path.dirname(__file__) + "/test_config.ini")
     test_server_ip = config["COMMON"]["DEFAULT_IP"]
     if test_server_ip is None or test_server_ip == "1.1.1.1" or test_server_ip == "":
-        print (
+        print(
             "\nRemote tests are not performed!\nPlease provide address of test server(s) in "
             "cotopaxi/tests/test_config.ini to perform remote tests!\n\n"
         )
@@ -74,7 +75,7 @@ def load_test_servers():
 
 
 def load_test_servers_list():
-    print ("Loading list of test servers from YAML")
+    print("Loading list of test servers from YAML")
     with open(os.path.dirname(__file__) + "/test_servers.yaml", "r") as stream:
         test_servers = yaml.safe_load(stream)
         return test_servers
@@ -89,13 +90,13 @@ def poke_tcp_server(server_port):
             sock.connect(("127.0.0.1", server_port))
             try:
                 sock.send("123".encode(encoding="ascii"))
-                print ("data sent (P3)")
+                print("data sent (P3)")
             except (AttributeError, UnicodeDecodeError):
                 sock.send(bytes("123"))
-                print ("data sent (P2)")
+                print("data sent (P2)")
             finally:
                 sock.close()
-                print ("socket closed")
+                print("socket closed")
         except (socket.timeout, socket.error):
             time.sleep(0.1)
 
@@ -103,23 +104,11 @@ def poke_tcp_server(server_port):
 class CotopaxiToolTester(object):
     config = load_test_servers()
     test_servers = load_test_servers_list()
-    print ("Loaded test servers")
+    print("Loaded test servers")
     local_ip = get_local_ip()
 
     def __init__(self, *args, **kwargs):
         self.main = None
-
-    @classmethod
-    def setUpClass(cls):
-        try:
-            scrap_output(check_caps(), [])
-        except SystemExit:
-            exit(
-                "This test suite requires admin permissions on network interfaces.\n"
-                "On Linux and Unix run it with sudo, use root account (UID=0) "
-                "or add CAP_NET_ADMIN, CAP_NET_RAW manually!\n"
-                "On Windows run as Administrator."
-            )
 
     @timeout_decorator.timeout(5)
     def test_main_help_pos(self):

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Scanner for identyfing issues in DTLS servers or traffic."""
+"""Scanner for identifying issues in DTLS servers or traffic."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland),
+#       Authors: Jakub Botwicz,
 #                tintinweb@oststrom.com <github.com/tintinweb>
 #
 #    This file is part of Cotopaxi.
@@ -28,45 +29,49 @@ import socket
 import sys
 from scapy.all import bind_layers, IP, sniff, UDP
 
-# from scapy.layers.x509 import X509_Cert
-from scapy_ssl_tls.ssl_tls import (
-    DTLSRecord,
-    DTLSClientHello,
-    DTLSHandshake,
-    DTLSHelloVerify,
-    TLSHeartBeat,
-    EnumStruct,
-    SSLv2_CIPHER_SUITES,
-    TLSAlert,
-    TLS_HANDSHAKE_TYPES,
-    TLSChangeCipherSpec,
-    TLSContentType,
-    TLSCiphertext,
-    TLSHelloRequest,
-    TLSHandshakeType,
-    TLSClientHello,
-    TLSHelloRetryRequest,
-    TLSExtRenegotiationInfo,
-    TLSExtSignatureAlgorithms,
-    TLS13Certificate,
-    TLSCertificateList,
-    TLSServerKeyExchange,
-    TLSServerHelloDone,
-    TLSClientKeyExchange,
-    TLSFinished,
-    TLSSessionTicket,
-    TLSCertificateRequest,
-    TLSCertificateVerify,
-    TLSEncryptedExtensions,
-    TLSAlertDescription,
-    TLSExtHeartbeat,
-    TLSHeartbeatMode,
-    TLSSignatureScheme,
-    TLSExtension,
-    TLSCipherSuite,
-    TLS_SIGNATURE_SCHEMES,
-)
-import scapy_ssl_tls.ssl_tls_keystore as tlsk
+try:
+    from scapy_ssl_tls.ssl_tls import (
+        DTLSRecord,
+        DTLSClientHello,
+        DTLSHandshake,
+        DTLSHelloVerify,
+        TLSHeartBeat,
+        EnumStruct,
+        SSLv2_CIPHER_SUITES,
+        TLSAlert,
+        TLS_HANDSHAKE_TYPES,
+        TLSChangeCipherSpec,
+        TLSContentType,
+        TLSCiphertext,
+        TLSHelloRequest,
+        TLSHandshakeType,
+        TLSClientHello,
+        TLSHelloRetryRequest,
+        TLSExtRenegotiationInfo,
+        TLSExtSignatureAlgorithms,
+        TLS13Certificate,
+        TLSCertificateList,
+        TLSServerKeyExchange,
+        TLSServerHelloDone,
+        TLSClientKeyExchange,
+        TLSFinished,
+        TLSSessionTicket,
+        TLSCertificateRequest,
+        TLSCertificateVerify,
+        TLSEncryptedExtensions,
+        TLSAlertDescription,
+        TLSExtHeartbeat,
+        TLSHeartbeatMode,
+        TLSSignatureScheme,
+        TLSExtension,
+        TLSCipherSuite,
+        TLS_SIGNATURE_SCHEMES,
+    )
+    import scapy_ssl_tls.ssl_tls_keystore as tlsk
+except (ImportError, ModuleNotFoundError):
+    from .common_utils import SCAPY_SSL_TLS_NOT_INSTALLED
+
+    sys.exit(SCAPY_SSL_TLS_NOT_INSTALLED)
 
 from .common_utils import print_verbose, Protocol, show_verbose
 from .cotopaxi_tester import CotopaxiTester
@@ -487,7 +492,6 @@ class DTLSInfo(object):
         print_verbose(self.test_params, "------------- RECORD START --------------")
         show_verbose(self.test_params, record)
         print_verbose(self.test_params, "------------- RECORD STOP --------------")
-
         if client or record.haslayer(DTLSClientHello):
             dtlsinfo = self.info.client
         elif (
@@ -549,11 +553,9 @@ class DTLSInfo(object):
     def _process(self, pkt, client=None):
         if not pkt or not (pkt.haslayer(DTLSRecord)):
             return
-
         print_verbose(self.test_params, "------------- START --------------")
         show_verbose(self.test_params, pkt)
         print_verbose(self.test_params, "------------- STOP --------------")
-
         if pkt.haslayer(DTLS):
             records = pkt[DTLS].records
         else:
@@ -561,7 +563,6 @@ class DTLSInfo(object):
 
         for record in records:
             self.process_record(pkt, record, client)
-
         # track packet
         self.history.append(pkt)
 
@@ -615,7 +616,6 @@ class DTLSScanner(object):
                         "Connection: %(src)s:%(sport)d <==> %(dst)s:%(dport)d" % strconn
                     )
                     print("* EVENT - " + "\n* EVENT - ".join(e[0] for e in events))
-            return
 
         if iface:
             print("Choosen interface = {} ".format(iface))
@@ -976,9 +976,7 @@ def active_scanning(test_params):
     events = scanner.capabilities.get_events()
     print(
         "\n[*] Server certificates: %s \n * (to see details use verbose mode)"
-        % (
-            len(scanner.capabilities.info.server.certificates)
-        )
+        % (len(scanner.capabilities.info.server.certificates))
     )
     print("\n[*] Events: %s" % len(events))
     print("* EVENT - " + "\n* EVENT - ".join(e[0] for e in events))

@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """Script for running all test servers in Cotopaxi testbed."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Author: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -61,19 +62,19 @@ for server in SERVERS:
     cmd_split = server["cmd"].replace(":", " ").split()
     server_alive = False
     if cmd_split in PROCESSESS:
-        print ("Server {} is alive.\n".format(server_name))
+        print("Server {} is alive.\n".format(server_name))
         if "check_cmd" in server.keys() and "check_result" in server.keys():
             check_cmd = server["check_cmd"]
             check_result = server["check_result"]
             result = subprocess.check_output(check_cmd.split())
-            print ("Expected result: {}".format(check_result))
-            print ("Received result: {}".format(result))
+            print("Expected result: {}".format(check_result))
+            print("Received result: {}".format(result))
             if check_result in result:
-                print ("Server {} is responding correctly.\n".format(server_name))
+                print("Server {} is responding correctly.\n".format(server_name))
                 server_alive = True
             else:
                 server_alive = False
-                print (
+                print(
                     "Server {} is NOT responding correctly and will be killed!\n".format(
                         server_name
                     )
@@ -90,7 +91,7 @@ for server in SERVERS:
         else:
             server_alive = True
     if not server_alive:
-        print ("Server {} is dead - running up!\n".format(server_name))
+        print("Server {} is dead - running up!\n".format(server_name))
         working_directory = server.get("cwd")
         prev_directory = None
         if working_directory:

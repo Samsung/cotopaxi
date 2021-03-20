@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tool for classifying IoT devices based on captured network traffic."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Mariusz Księżak (Samsung R&D Poland),
-#                Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Mariusz Księżak (Samsung R&D Poland), Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -356,6 +356,8 @@ def load_packets(pcap_filename, limit_packets=1000):
 
 def main(args):
     """Start device identification based on command line parameters."""
+    if sys.version_info[0] < 3:
+        raise Exception("This tool must be run using Python 3!")
     parser = argparse.ArgumentParser(
         description="Tool for classifying IoT devices based on captured network traffic"
     )

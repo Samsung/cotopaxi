@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Unit tests for service_ping."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -40,18 +41,6 @@ class TestServicePing(CotopaxiToolServerTester, unittest.TestCase):
         unittest.TestCase.__init__(self, *args, **kwargs)
         self.main = main
 
-    @classmethod
-    def setUpClass(cls):
-        try:
-            scrap_output(check_caps(), [])
-        except SystemExit:
-            exit(
-                "This test suite requires admin permissions on network interfaces.\n"
-                "On Linux and Unix run it with sudo, use root account (UID=0) "
-                "or add CAP_NET_ADMIN, CAP_NET_RAW manually!\n"
-                "On Windows run as Administrator."
-            )
-
     def test_main_empty_neg(self):
         output = scrap_output(main, [])
         self.assertTrue(
@@ -72,25 +61,25 @@ class TestServicePing(CotopaxiToolServerTester, unittest.TestCase):
         self.assertIn("show this help message and exit", output)
 
     def test_main_basic_params_pos(self):
-        output = scrap_output(main, ["::1", "10", "-P", "DTLS", "-T", "0.001"])
+        output = scrap_output(main, ["::1", "10", "-P", "CoAP", "-T", "0.001"])
         self.assertIn("[+] Host ::1", output)
         self.assertIn("respond to ", output)
         self.assertIn(" message", output)
 
     def test_main_basic_params_ipv6_pos(self):
-        output = scrap_output(main, ["127.0.0.1", "10", "-P", "DTLS", "-T", "0.001"])
+        output = scrap_output(main, ["127.0.0.1", "10", "-P", "CoAP", "-T", "0.001"])
         self.assertIn("[+] Host 127.0.0.1:10", output)
         self.assertIn("respond to ", output)
         self.assertIn(" message", output)
 
     def test_service_ping_pos(self):
         local_ip = get_local_ip()
-        print ("ip: {}".format(local_ip))
+        print("ip: {}".format(local_ip))
 
         config = load_test_servers()
 
         test_server_ip = config["COMMON"]["DEFAULT_IP"]
-        print ("test_server_ip: {}".format(test_server_ip))
+        print("test_server_ip: {}".format(test_server_ip))
 
         test_params = TestParams()
         test_params.dst_endpoint.ip_addr = test_server_ip
@@ -98,7 +87,7 @@ class TestServicePing(CotopaxiToolServerTester, unittest.TestCase):
 
         list_test_servers = load_test_servers_list()
         if not list_test_servers:
-            print (
+            print(
                 "No remote servers in test_servers.yaml - remote tests not performed!"
             )
             return
@@ -117,7 +106,7 @@ class TestServicePing(CotopaxiToolServerTester, unittest.TestCase):
                     message = "Server: {} port: {} result: {}".format(
                         server_name, test_params.dst_endpoint.port, result
                     )
-                    print (message)
+                    print(message)
                     self.assertTrue(result, message + " (not responding to ping)")
 
     def test_service_ping_mdns_pos(self):

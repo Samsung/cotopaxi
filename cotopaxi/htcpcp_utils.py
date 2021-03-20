@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for HTCPCP protocol handling."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Author: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -54,7 +55,7 @@ class HTCPCPTester(HTTPTester):
             return None
         try:
             for _ in range(1 + test_params.nr_retries):
-                in_data = tcp_sr1(test_params, HTCPCP_BREW)
+                in_data = str(tcp_sr1(test_params, HTCPCP_BREW))
                 if in_data:
                     print_verbose(
                         test_params,

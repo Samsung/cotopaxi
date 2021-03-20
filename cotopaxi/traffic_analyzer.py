@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tool for classifying network flows based on captured network traffic."""
 #
-#    Copyright (C) 2020. All Rights Reserved.
+#    Copyright (C) 2020-2021 Cotopaxi Contributors. All Rights Reserved.
 #       Authors: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.

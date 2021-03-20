@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Protocol tester for QUIC protocol."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #

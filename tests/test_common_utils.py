@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Unit tests for common_utils."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Author: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -33,25 +34,25 @@ from .common_runner import TimerTestRunner
 class TestCommonUtils(unittest.TestCase):
     def test_get_local_ip_pos(self):
         local_ip = get_local_ip()
-        print ("ip: {}".format(local_ip))
-        print ("len(ip): {}".format(len(local_ip)))
-        print ("ip.count('.'): {}".format(local_ip.count(".")))
+        print("ip: {}".format(local_ip))
+        print("len(ip): {}".format(len(local_ip)))
+        print("ip.count('.'): {}".format(local_ip.count(".")))
         self.assertIsNotNone(local_ip)
         self.assertGreater(len(local_ip), 7)
         self.assertEqual(local_ip.count("."), 3)
 
     def test_get_local_ipv6_pos(self):
         local_ip = get_local_ipv6_address()
-        print ("ipv6: {}".format(local_ip))
-        print ("len(ipv6): {}".format(len(local_ip)))
-        print ("ipv6.count(':'): {}".format(local_ip.count(":")))
+        print("ipv6: {}".format(local_ip))
+        print("len(ipv6): {}".format(len(local_ip)))
+        print("ipv6.count(':'): {}".format(local_ip.count(":")))
         self.assertIsNotNone(local_ip)
         # self.assertGreater(len(local_ip), 7)
         self.assertGreater(local_ip.count(":"), 0)
 
     def test_get_random_high_port_pos(self):
         port = get_random_high_port()
-        print ("port: {}".format(port))
+        print("port: {}".format(port))
         self.assertIsNotNone(port)
         self.assertGreater(int(port), 1024)
         self.assertLess(int(port), 65535)

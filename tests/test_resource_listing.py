@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Unit tests for resource_listing."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Author: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -133,15 +134,15 @@ class TestResourceListing(unittest.TestCase, CotopaxiToolServerTester):
 
     def test_resource_listing_coap_pos(self):
         local_ip = get_local_ip()
-        print ("ip: {}".format(local_ip))
+        print("ip: {}".format(local_ip))
 
         config = load_test_servers()
         if "CoAP_TEST_SERVERS" not in config or not config["CoAP_TEST_SERVERS"]:
-            print ("No remote CoAP servers - remote tests not performed!")
+            print("No remote CoAP servers - remote tests not performed!")
             return
         test_server_ip = config["COMMON"]["DEFAULT_IP"]
         port = config["CoAP_TEST_SERVERS"]["coapthon_port"]
-        print ("test_server_ip: {} port: {}".format(test_server_ip, port))
+        print("test_server_ip: {} port: {}".format(test_server_ip, port))
         output = scrap_output(
             main,
             [

@@ -3,8 +3,7 @@
 #
 #    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz,
-#                Michał Radwański
+#       Authors: Jakub Botwicz, Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #
@@ -32,7 +31,11 @@ from scapy.all import DNS, IP, TCP, UDP, IPv6, Raw, sr1, sniff
 from scapy.layers.http import HTTPRequest
 from scapy.contrib.coap import CoAP
 from scapy.contrib.mqtt import MQTT
-from scapy_ssl_tls.ssl_tls import DTLSRecord as DTLS
+
+try:
+    from scapy_ssl_tls.ssl_tls import DTLSRecord as DTLS
+except ImportError:
+    from scapy.layers.tls.record import TLS as DTLS
 
 try:
     from StringIO import StringIO
@@ -56,6 +59,11 @@ NR_CHARS_SEPARATOR = 80
 
 # Size of lower layer headers for UDP based protocols e.g. CoAP when using IPv4 protocol
 UDP_LOW_LAYERS_HEADERS_SIZE_IPV4 = 44
+
+SCAPY_SSL_TLS_NOT_INSTALLED = (
+    "[!] Testing DTLS protocol requires installation of "
+    "scapy-ssl_tls according to README!"
+)
 
 
 def get_local_ip():

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Unit tests for protocol fuzzer."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Author: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -33,18 +34,6 @@ class TestProtocolFuzzer(CotopaxiToolServerTester, unittest.TestCase):
         CotopaxiToolServerTester.__init__(self, *args, **kwargs)
         unittest.TestCase.__init__(self, *args, **kwargs)
         self.main = main
-
-    @classmethod
-    def setUpClass(cls):
-        try:
-            scrap_output(check_caps(), [])
-        except SystemExit:
-            exit(
-                "This test suite requires admin permissions on network interfaces.\n"
-                "On Linux and Unix run it with sudo, use root account (UID=0) "
-                "or add CAP_NET_ADMIN, CAP_NET_RAW manually!\n"
-                "On Windows run as Administrator."
-            )
 
     def test_main_empty_neg(self):
         output = scrap_output(main, [])
@@ -92,19 +81,19 @@ class TestProtocolFuzzer(CotopaxiToolServerTester, unittest.TestCase):
         self.assertIn("Finished protocol fuzzing", output)
         self.assertIn("Make sure you have permission", output)
 
-    def test_protocol_fuzzer_pos(self):
+    def test_protocol_fuzzer_coap_pos(self):
         local_ip = get_local_ip()
-        print ("ip: {}".format(local_ip))
+        print("ip: {}".format(local_ip))
 
         config = load_test_servers()
         if "CoAP_TEST_SERVERS" not in config or not config["CoAP_TEST_SERVERS"]:
-            print ("No remote CoAP servers - remote tests not performed!")
+            print("[!] No remote CoAP servers - remote tests not performed for CoAP!")
             return
         test_server_ip = config["COMMON"]["DEFAULT_IP"]
         coap_servers = ["aiocoap"]
         for coap_server in coap_servers:
             port = config["CoAP_TEST_SERVERS"][coap_server + "_port"]
-            print ("test_server_ip: {} port: {}".format(test_server_ip, port))
+            print("test_server_ip: {} port: {}".format(test_server_ip, port))
             output = scrap_output(
                 main,
                 [
@@ -122,10 +111,20 @@ class TestProtocolFuzzer(CotopaxiToolServerTester, unittest.TestCase):
             self.assertNotIn("Messages sent: 0", output)
             self.assertNotIn("0 / 0 / 0 ms", output)
 
+    def test_protocol_fuzzer_dtls_pos(self):
+        local_ip = get_local_ip()
+        print("ip: {}".format(local_ip))
+
+        config = load_test_servers()
+        test_server_ip = config["COMMON"]["DEFAULT_IP"]
+        if "DTLS_TEST_SERVERS" not in config or not config["DTLS_TEST_SERVERS"]:
+            print("No remote DTLS servers - remote tests not performed for DTLS!")
+            return
+
         dtls_servers = ["gnutls"]
         for dtls_server in dtls_servers:
             port = config["DTLS_TEST_SERVERS"][dtls_server + "_port"]
-            print ("test_server_ip: {} port: {}".format(test_server_ip, port))
+            print("test_server_ip: {} port: {}".format(test_server_ip, port))
             output = scrap_output(
                 main,
                 [
@@ -143,10 +142,19 @@ class TestProtocolFuzzer(CotopaxiToolServerTester, unittest.TestCase):
             self.assertNotIn("Messages sent: 0", output)
             self.assertNotIn("0 / 0 / 0 ms", output)
 
+    def test_protocol_fuzzer_mqtt_pos(self):
+        local_ip = get_local_ip()
+        print("ip: {}".format(local_ip))
+
+        config = load_test_servers()
+        if "MQTT_TEST_SERVERS" not in config or not config["MQTT_TEST_SERVERS"]:
+            print("[!] No remote MQTT servers - remote tests not performed for MQTT!")
+            return
+        test_server_ip = config["COMMON"]["DEFAULT_IP"]
         mqtt_servers = ["mosquitto"]
         for mqtt_server in mqtt_servers:
             port = config["MQTT_TEST_SERVERS"][mqtt_server + "_port"]
-            print ("test_server_ip: {} port: {}".format(test_server_ip, port))
+            print("test_server_ip: {} port: {}".format(test_server_ip, port))
             output = scrap_output(
                 main,
                 [

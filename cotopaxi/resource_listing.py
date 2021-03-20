@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tool for checking availability of specified url on server at given IP and port ranges."""
-
+#
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #   Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#      Authors: Jakub Botwicz (Samsung R&D Poland),
-#               Michał Radwański (Samsung R&D Poland)
+#      Authors: Jakub Botwicz, Michał Radwański
 #
 #   This file is part of Cotopaxi.
 #

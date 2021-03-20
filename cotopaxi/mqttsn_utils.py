@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Set of common utils for MQTT-SN protocol handling."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz (Samsung R&D Poland)
+#       Authors: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
 #
@@ -20,6 +21,7 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import codecs
 import socket
 import struct
 from hexdump import dehex
@@ -48,12 +50,12 @@ def mqttsn_request(test_params, out_packet):
     """Send MQTT-SN request to broker and waiting for response."""
     try:
         for i in range(1 + test_params.nr_retries):
-            in_data = udp_sr1(test_params, str(out_packet))
+            in_data = udp_sr1(test_params, bytes(out_packet))
             if in_data is None:
                 continue
             for response_packet in in_data:
                 if response_packet.haslayer(UDP):
-                    response_hex = response_packet[UDP].load.encode("hex")
+                    response_hex = codecs.encode(response_packet[UDP].load, "hex")
                     if response_hex == MQTTSN_GATEWAY_INFO:
                         print_verbose(
                             test_params,

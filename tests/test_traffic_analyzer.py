@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for traffic_analyzer."""
 #
+#    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Authors: Jakub Botwicz
 #
@@ -20,11 +21,15 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys
 import unittest
 
-from cotopaxi.traffic_analyzer import main
-from .common_test_utils import scrap_output
-from .common_runner import TimerTestRunner
+try:
+    from cotopaxi.traffic_analyzer import main
+    from .common_test_utils import scrap_output
+    from .common_runner import TimerTestRunner
+except SyntaxError:
+    sys.exit("[!] This set of test must be run using Python 3!")
 
 
 class TestTrafficAnalyzer(unittest.TestCase):

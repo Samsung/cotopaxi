@@ -3,8 +3,7 @@
 #
 #    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
 #    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
-#       Authors: Jakub Botwicz,
-#                Michał Radwański
+#       Authors: Jakub Botwicz, Michał Radwański
 #
 #    This file is part of Cotopaxi.
 #
@@ -40,13 +39,13 @@ from .common_utils import (
     prepare_separator,
     print_verbose,
     Protocol,
+    SCAPY_SSL_TLS_NOT_INSTALLED,
     ssdp_send_query,
     tcp_sr1,
     udp_sr1,
 )
 from .amqp_utils import AMQPTester
 from .coap_utils import CoAPTester
-from .dtls_utils import DTLSTester
 from .htcpcp_utils import HTCPCPTester
 from .http_utils import HTTPTester
 from .knx_utils import KNXTester
@@ -65,7 +64,6 @@ class CotopaxiException(Exception):
 PROTOCOL_TESTERS = {
     Protocol.AMQP: AMQPTester,
     Protocol.CoAP: CoAPTester,
-    Protocol.DTLS: DTLSTester,
     Protocol.HTCPCP: HTCPCPTester,
     Protocol.HTTP: HTTPTester,
     Protocol.KNX: KNXTester,
@@ -76,6 +74,13 @@ PROTOCOL_TESTERS = {
     Protocol.QUIC: QUICTester,
     Protocol.SSDP: SSDPTester,
 }
+
+try:
+    from .dtls_utils import DTLSTester
+
+    PROTOCOL_TESTERS[Protocol.DTLS] = DTLSTester
+except (ImportError, ModuleNotFoundError):
+    print(SCAPY_SSL_TLS_NOT_INSTALLED)
 
 
 def protocols_using(transport_protocol):
