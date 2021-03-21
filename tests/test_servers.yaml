@@ -1,0 +1,292 @@
+- name: 'aicoap'
+  cmd: 'python3 ./coap_sandbox/aiocoap-0.3/server.py'
+  finger: False
+  ping: True
+  port: 20000
+  protocol: CoAP
+  version: 0.3
+- name: 'cantcoap'
+  cmd: './coap_sandbox/cantcoap_server 0.0.0.0 20001'
+  finger: False
+  ping: False
+  port: 20001
+  protocol: CoAP
+- name: 'coapthon'
+  version: "latest (2019-03)"
+  cmd: 'python ./coap_sandbox/CoAPthon-master/coapserver.py -p 20002'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20002/basic'
+  kill_cmd: "ps -ef | grep 20002 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: True
+  port: 20002
+  protocol: CoAP
+- name: 'coapthon3'
+  version: "latest (2019-03)"
+  cmd: 'python3 ./coap_sandbox/CoAPthon3-master/coapserver.py -p 20003'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20003/basic'
+  kill_cmd: "ps -ef | grep 20003 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: False
+  port: 20003
+  protocol: CoAP
+- name: 'coapthon'
+  version: 1.0
+  cmd: 'python ./coap_sandbox/CoAPthon-1.0/coapserver.py'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20020/basic 2>&1'
+  kill_cmd: "ps -ef | grep 20020 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: '4.04'
+  finger: False
+  ping: False
+  port: 20020
+  protocol: CoAP
+- name: 'coapthon'
+  version: 2.0
+  cmd: 'python ./coap_sandbox/CoAPthon-2.0/coapserver.py'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20021/basic'
+  kill_cmd: "ps -ef | grep 20021 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: False
+  port: 20021
+  protocol: CoAP
+- name: 'coapthon'
+  version: 3.0
+  cmd: 'python ./coap_sandbox/CoAPthon-3.0/coapserver.py -i 0.0.0.0 -p 20022'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20022/basic'
+  kill_cmd: "ps -ef | grep 20022 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: False
+  port: 20022
+  protocol: CoAP
+- name: 'coapthon'
+  version: 3.1
+  cmd: 'python ./coap_sandbox/CoAPthon-3.1/coapserver.py -i 0.0.0.0 -p 20023'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20023/basic'
+  kill_cmd: "ps -ef | grep 20023 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: False
+  port: 20023
+  protocol: CoAP
+- name: 'coapthon'
+  version: "4.0.0"
+  cmd: 'python ./coap_sandbox/CoAPthon-4.0.0/coapserver.py -i 0.0.0.0 -p 20024'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20024/basic'
+  kill_cmd: "ps -ef | grep 20024 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: False
+  port: 20024
+  protocol: CoAP
+- name: 'coapthon'
+  version: "4.0.1"
+  cmd: 'python ./coap_sandbox/CoAPthon-4.0.1/coapserver.py -i 0.0.0.0 -p 20025'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20025/basic'
+  kill_cmd: "ps -ef | grep 20025 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: False
+  port: 20025
+  protocol: CoAP
+- name: 'coapthon'
+  version: "4.0.2"
+  cmd: 'python ./coap_sandbox/CoAPthon-4.0.2/coapserver.py -i 0.0.0.0 -p 20026'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20026/basic'
+  kill_cmd: "ps -ef | grep 200026 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: True
+  port: 20026
+  protocol: CoAP
+- name: 'coapthon3'
+  version: "1.0"
+  cmd: 'python ./coap_sandbox/CoAPthon3-1.0/coapserver.py -i 0.0.0.0 -p 20027'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20027/basic'
+  kill_cmd: "ps -ef | grep 200027 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: False
+  port: 20027
+  protocol: CoAP
+- name: 'coapthon3'
+  version: "1.0.1"
+  cmd: 'python ./coap_sandbox/CoAPthon3-1.0.1/coapserver.py -i 0.0.0.0 -p 20028'
+  check_cmd: 'coap-client -B 1 coap://127.0.0.1:20028/basic'
+  kill_cmd: "ps -ef | grep 200028 | grep -v SCREEN | grep -v color | awk '{print $2}' | xargs kill -1 $1"
+  check_result: 'Basic Resource'
+  finger: False
+  ping: True
+  port: 20028
+  protocol: CoAP
+- name: 'ecoap'
+  version: "unknown"
+  cmd: './coap_sandbox/ecoap-master/test-srv'
+  finger: False
+  ping: False
+  port: 20004
+  protocol: CoAP
+- name: 'freecoap'
+  version: "unknown"
+  cmd: './coap_sandbox/FreeCoAP_reg_server 0.0.0.0 20005'
+  finger: False
+  ping: True
+  port: 20005
+  protocol: CoAP
+- name: 'libcoap'
+  version: "unknown"
+  cmd: '/home/ubuntu/coap_sandbox/libcoap/examples/.libs/lt-coap-server'
+  finger: False
+  ping: True
+  port: 20006
+  protocol: CoAP
+- name: 'wakaama'
+  version: "latest (2019-03)"
+  cmd: './coap_sandbox/wakaama-master/build/lwm2mserver -4 -l 20007'
+  finger: False
+  ping: True
+  port: 20007
+  protocol: CoAP
+- name: 'microcoap'
+  version: "unknown"
+  cmd: './coap_sandbox/microcoap-master/coap'
+  finger: False
+  ping: True
+  port: 20008
+  protocol: CoAP
+- name: 'mongoose'
+  version: "latest (2019-03)"
+  cmd: 'coap_sandbox/mongoose-master/examples/coap_server/coap_server'
+  finger: False
+  ping: True
+  port: 20009
+  protocol: CoAP
+- name: 'iotivity'
+  version: "latest (2019-03)"
+  cmd: './coap_sandbox/iotivity_examples/simpleserver'
+  finger: False
+  ping: True
+  port: 5683
+  protocol: CoAP
+- name: 'botan'
+  version: "2.9.0"
+  cmd: './dtls_sandbox/botan-2.9.0/botan tls_server dtls_sandbox/server-cert.pem dtls_sandbox/server-key.pem --port=10000 --type=udp'
+  finger: False
+  ping: False
+  port: 10000
+  protocol: DTLS
+  version: 2.9.0
+- name: 'gnutls'
+  version: "3.5.19"
+  cmd: './gnutls-3.5.19/doc/examples/ex-serv-dtls'
+  cwd: 'dtls_sandbox'
+  finger: False
+  ping: True
+  port: 10001
+  protocol: DTLS
+- name: 'goldy'
+  version: "latest (2019-03)"
+  cmd: './dtls_sandbox/goldy -l 0.0.0.0:10002 -b localhost:10000 -c ./dtls_sandbox/server-cert.pem -k ./dtls_sandbox/server-key.pem'
+  finger: False
+  ping: True
+  port: 10002
+  protocol: DTLS
+  version: 0.2
+- name: 'libressl'
+  version: "2.8.3"
+  cmd: '/home/ubuntu/dtls_sandbox/libressl-2.8.3/apps/openssl/.libs/lt-openssl s_server -cert ./dtls_sandbox/server-cert.pem  -key ./dtls_sandbox/server-key.pem -dtls1 -accept 10003'
+  finger: False
+  ping: True
+  port: 10003
+  protocol: DTLS
+- name: 'matrixssl'
+  version: "latest (2019-03)"
+  cmd: './dtls_sandbox/matrixssl-master/apps/dtls/dtlsServer -p 10004'
+  finger: False
+  ping: True
+  port: 10004
+  protocol: DTLS
+- name: 'mbedts'
+  version: "2.16.0"
+  cmd: './dtls_sandbox/mbedtls-2.16.0/build/programs/ssl/dtls_server'
+  finger: False
+  ping: True
+  port: 10005
+  protocol: DTLS
+- name: 'mbedts'
+  version: "1.1.0j"
+  cmd: 'openssl s_server -cert ./dtls_sandbox/server-cert.pem -key ./dtls_sandbox/server-key.pem -dtls -accept 10006 -listen'
+  finger: False
+  ping: True
+  port: 10006
+  protocol: DTLS
+- name: 'tinydtls'
+  cmd: './dtls_sandbox/tinydtls_0.9_develop/tests/dtls-server -p 10007 -v 9'
+  finger: False
+  ping: True
+  port: 10007
+  protocol: DTLS
+  version: "0.9 (devel)"
+- name: 'tinydtls'
+  cmd: './dtls_sandbox/tinydtls-0.8.2/tests/dtls-server -p 10009 -v 9'
+  finger: False
+  ping: False
+  port: 10009
+  protocol: DTLS
+  version: 0.8.2
+- name: 'tinydtls'
+  cmd: './dtls_sandbox/tinydtls_0.9_master/tests/dtls-server -p 10010 -v 9'
+  finger: False
+  ping: False
+  port: 10010
+  protocol: DTLS
+  version: "0.9"
+- name: "wolfssl"
+  version: 3.15.7
+  cmd: '/home/ubuntu/dtls_sandbox/wolfssl-3.15.7/examples/server/.libs/lt-server -i -u -p 10008 -b'
+  cwd: 'dtls_sandbox/wolfssl-3.15.7'
+  finger: False
+  ping: False
+  port: 10008
+  protocol: DTLS
+- name: "mosquitto"
+  version: 1.4.8
+  cmd: '/usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf'
+  finger: False
+  ping: True
+  port: 30000
+  protocol: MQTT
+- name: "fluent-bit"
+  version: "1.0.4"
+  cmd: 'mqtt_sandbox/fluent-bit-1.0.4/build/bin/fluent-bit -i mqtt -t data -o stdout -m "*" --config=mqtt_sandbox/fluent-bit-1.0.4/conf/in_mqtt.conf'
+  finger: False
+  ping: True
+  port: 30002
+  protocol: MQTT
+- name: "libcoap"
+  cmd: '/home/ubuntu/dtls_sandbox/libcoap_dtls/examples/coap-server -A 0.0.0.0 -v 9 -p 50000 -c dtls_sandbox/server-cert.pem'
+  finger: False
+  ping: False
+  port: 50000
+  protocol: DTLS
+- name: "avahi"
+  cmd: 'avahi-publish-service light _coap._udp 5683 "/mylight" --sub _floor1._sub._coap._udp -vv'
+  finger: False
+  ping: False
+  port: 5683
+  protocol: mDNS
+- name: "tinysvcmdns"
+  cmd: 'mdns_sandbox/tinysvcmdns_ASAN/testmdnsd'
+  finger: False
+  ping: False
+  port: 5353
+  protocol: mDNS
+- name: "madmaze_htcpcp"
+  cmd: 'LD_PRELOAD=/home/ubuntu/tools/preeny/src/defork.so htcpcp_sandbox/madmaze_HTCPCP/htcpcp_server 40000'
+  finger: False
+  ping: False
+  port: 40000
+  protocol: HTCPCP
+  version: "2011-08-03"

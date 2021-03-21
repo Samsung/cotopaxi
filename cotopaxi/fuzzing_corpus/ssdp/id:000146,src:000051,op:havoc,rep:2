@@ -1,0 +1,7 @@
+M-SEARCH * HTTP/1.1
+SM_ID:T1
+SM_ID:%s
+ÿ%P
+SM_ID:%s
+ÿ%s
+ÿ

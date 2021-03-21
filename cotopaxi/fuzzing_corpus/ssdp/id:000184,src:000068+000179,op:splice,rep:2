@@ -1,0 +1,18 @@
+M-SEARCH * HTTP/1.1
+M-S.1
+H 
+XT:
+.1
+H * 
+M-S 
+XT:
+.1
+H 
+XT
+XT:
+.1
+H 
+XT:
+.:
+.1
+XT:

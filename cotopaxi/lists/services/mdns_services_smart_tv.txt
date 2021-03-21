@@ -1,0 +1,3 @@
+_androidtvremote._tcp.local
+_googlecast._tcp.local
+_services._dns-sd._udp.local

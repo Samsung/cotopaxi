@@ -1,0 +1,10 @@
+AcEW kawa:kaffe:0
+: 0
+: t
+Accept-Additions: c 
+-J W kawa:k:pot0
+: t
+Accept-Additions: c 
+-J *0
+:ot
+A

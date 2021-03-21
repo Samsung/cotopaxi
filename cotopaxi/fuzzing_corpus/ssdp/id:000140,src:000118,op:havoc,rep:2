@@ -1,0 +1,4 @@
+M-SEARCH * HTTP/1.1
+sd:ARCH1.P/1.1
+sd:coveAR1
+O0:M.

@@ -1,0 +1,57 @@
+½		W:pokawa:
+Accept-Additions: c 
+Accept-Additions: c 
+-J :o
+: t
+Accept-Additions: c 
+a:ot
+Accept-Additions: p: t
+Accept-Additions: c 
+-ns:
+i	W:pokawa:
+Accept-Additions: c 
+Accept-Additions: c 
+-J :ot
+Accept-Additions: ns::
+: t
+Accept-Additions: c 
+a:ot
+Accept-Additions: p: t
+Accept-Additions: c 
+-nns::
+: 0
+: t
+Accept-Additions: c 
+s: pot0
+: 0
+: t
+Accept-Additions: c 
+-J :ot
+Accept-Additions: ns:0
+: t
+Accept-Additions: c 
+a:ot
+Accept-Additions: pot0
+: 0
+: t
+Accept-Additions: c 
+-J :
+s:a: t
+Accept-Additions: c 
+-J wa:ot
+Aons:0
+: 0
+: t
+Accept-Additions: c 
+-J :ot
+Accept-Additions: ns:0
+: t
+Accept-Additions: c 
+-J wa:ot
+Accept-Additions: pot0
+: 0
+: t
+Accept-Additions: c 
+-J :
+Accept-Additions:a:ot
+Ac

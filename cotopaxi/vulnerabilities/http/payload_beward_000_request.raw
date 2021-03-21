@@ -1,0 +1,3 @@
+GET /cgi-bin/view/image HTTP/1.1
+Authorization: Basic YWRtaW46YWRtaW4=
+

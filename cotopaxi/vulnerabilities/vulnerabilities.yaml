@@ -1,0 +1,329 @@
+- name: BOTAN_000
+  type: NetworkTrafficAmplification
+  cve_id: ''
+  description: Botan DTLS server in versions 2.9.0 (and probably earlier ones) can
+    be used to perform Distributed Denial of Service attacks as network amplifier
+    with spoofing of the source IP address.
+  url: https://github.com/randombit/botan/issues/1833
+  credit: Jakub Botwicz
+  nr_packets: 6
+  timeout_sec: 10
+  payload_file: dtls/payload_botan_000.raw
+- name: COAPTHON_000
+  type: Crash
+  cve_id: CVE-2018-12679
+  description: CoAPthon library is vulnerable to Denial of Service attacks caused
+    by maliciously crafted CoAP messages.
+  url: https://github.com/Tanganelli/CoAPthon/issues/135
+  credit: Jakub Botwicz
+  payload_file: coap/coap_payload_cve-2018-12680.raw
+- name: COAPTHON3_000
+  type: Crash
+  cve_id: CVE-2018-12679
+  description: CoAPthon3 library is vulnerable to Denial of Service attacks caused
+    by maliciously crafted CoAP messages.
+  url: https://github.com/Tanganelli/CoAPthon3/issues/16
+  credit: Jakub Botwicz
+  payload_file: coap/coap_payload_cve-2018-12679.raw
+- name: CONTIKI_000
+  type: Crash
+  cve_id: CVE-2018-19417
+  description: MQTT client in Contiki OS and Contiki-NG <= 4.1 is vulnerable to
+    stack-based buffer overflow.
+  url: https://github.com/contiki-ng/contiki-ng/issues/600
+  credit: Jakub Botwicz
+  payload_file: mqtt/payload_cve-2018-19417.raw
+- name: ER_COAP_000
+  type: Crash
+  cve_id: ''
+  description: Erbium CoAP server is vulnerable to memory corruption leading to
+    crash of the server.
+  url: https://github.com/contiki-os/contiki/issues/2240
+  credit: Stephan Zeisberg
+  payload_file: coap/coap_payload_er_coap_000.raw
+- name: ER_COAP_001
+  type: Crash
+  cve_id: ''
+  description: Erbium CoAP server is vulnerable to memory corruption leading to
+    crash of the server.
+  url: https://github.com/contiki-os/contiki/issues/2238
+  credit: Stephan Zeisberg
+  payload_file: coap/coap_payload_er_coap_001.raw
+- name: ER_COAP_002
+  type: Crash
+  cve_id: ''
+  description: Erbium CoAP server is vulnerable to memory corruption leading to
+    crash of the server.
+  url: https://github.com/contiki-os/contiki/issues/2239
+  credit: Stephan Zeisberg
+  payload_file: coap/coap_payload_er_coap_002.raw
+- name: FLUENTBIT_000
+  type: Crash
+  cve_id: CVE-2019-9749
+  description: Fluent Bit MQTT input plugin acting as MQTT broker (server) incorrectly
+    handles incoming network messages leading to crash of the whole Fluent Bit server
+    via SIGSEGV signal.
+  url: https://github.com/fluent/fluent-bit/issues/1135
+  credit: Jakub Botwicz
+  payload_file: mqtt/payload_fluent-bit_000.raw
+- name: IOTIVITY_000
+  type: NetworkTrafficAmplification
+  cve_id: CVE-2019-9750
+  description: IoTivity server  can be used to perform Distributed Denial of Service
+    attacks acting as network amplifier with spoofing of the source IP address.
+  url: https://jira.iotivity.org/browse/IOT-3267
+  credit: Jakub Botwicz
+  nr_packets: 6
+  timeout_sec: 10
+  payload_file: coap/coap_payload_iotivity_000.raw
+- name: MADMAZE-HTCPCP_000
+  type: Crash
+  cve_id: ''
+  description: HTCPCP server incorrectly handles incoming network messages
+    leading to a NULL pointer dereference resulting in a crash of the server.
+  url: https://github.com/madmaze/HTCPCP/issues/13
+  credit: Jakub Botwicz
+  payload_file: htcpcp/payload_madmaze-htcpcp_000.raw
+- name: MATRIXSSL_000
+  type: NetworkTrafficAmplification
+  cve_id: ''
+  description: MatrixSSL DTLS server in the 4.2.1 version and all previous versions
+    can be used to perform Distributed Denial of Service attacks as network amplifier
+    with spoofing of the source IP address.
+  url: https://github.com/matrixssl/matrixssl/issues/31
+  credit: Jakub Botwicz
+  nr_packets: 7
+  timeout_sec: 30
+  payload_file: dtls/payload_matrixssl_000.raw
+- name: MATRIXSSL_001
+  type: Crash
+  cve_id: CVE-2019-14431
+  description: MatrixSSL DTLS server in version 4.2.1 and all previous versions is vulnerable to
+    heap-buffer overwrite, that may be used to perform Remote Code Execution attacks.
+  url: https://github.com/matrixssl/matrixssl/issues/30
+  credit: Jakub Botwicz
+  payload_file: dtls/payload_matrixssl_001.raw
+- name: MATRIXSSL_002
+  type: Crash
+  cve_id: ''
+  description: MatrixSSL DTLS server in the 4.2.1 version and all previous versions
+    is vulnerable to memory corruption (heap-buffer overread) leading to a crash of the server.
+  url: https://github.com/matrixssl/matrixssl/issues/32
+  credit: Jakub Botwicz
+  payload_file: dtls/payload_matrixssl_002.raw
+- name: MATRIXSSL_003
+  type: Crash
+  cve_id: ''
+  description: MatrixSSL DTLS server in versions 4.2.1 and 4.1.0 is vulnerable to
+    memory corruption (free on invalid pointer) leading to a crash of the server.
+  url: https://github.com/matrixssl/matrixssl/issues/33
+  credit: Jakub Botwicz
+  payload_file: dtls/payload_matrixssl_003.raw
+- name: SSDP-RESPONDER_000
+  type: Crash
+  cve_id: CVE-2019-14323
+  description: 'SSDP responder (from version 1.0 up to latest 1.5) incorrectly handles
+    incoming network messages leading to a stack-based buffer overwrite by 1 byte.'
+  url: https://github.com/troglobit/ssdp-responder/issues/1
+  credit: Jakub Botwicz
+  payload_file: ssdp/payload_ssdp-resp_000.raw
+- name: TINYDTLS_000
+  type: Crash
+  cve_id: CVE-2017-7243
+  description: 'Eclipse tinydtls 0.8.2 for Eclipse IoT allows remote attackers to
+    cause a denial of service (DTLS peer crash) by sending a ''Change cipher spec''
+    packet without pre-handshake.'
+  url: https://www.cvedetails.com/cve/CVE-2017-7243/
+  credit: sangsup.lee (k1rh4) , sunwoo.kim(hamzzi)
+  payload_file: dtls/dtls_payload_cve-2017-7243.raw
+- name: TINYDTLS_001
+  type: Crash
+  cve_id: ''
+  description: TinyDTLS DTLS server incorrectly handles incoming network messages
+    leading to buffer overread and crash of the server.
+  url: https://bugs.eclipse.org/bugs/show_bug.cgi?id=544819
+  credit: Jakub Botwicz
+  payload_file: dtls/payload_tinydtls_001.raw
+- name: TINYDTLS_002
+  type: Crash
+  cve_id: ''
+  description: TinyDTLS DTLS server incorrectly handles incoming network messages
+    leading to buffer overread and crash of the server.
+  url: https://bugs.eclipse.org/bugs/show_bug.cgi?id=544824
+  credit: Jakub Botwicz
+  payload_file: dtls/payload_tinydtls_002.raw
+- name: TINYDTLS_003
+  type: Crash
+  cve_id: ''
+  description: TinyDTLS DTLS server incorrectly handles certificate request messages
+    leading to buffer overflow and crash of the server.
+  url: https://www.eclipse.org/lists/tinydtls-dev/msg00206.html
+  credit: Stephan Zeisberg
+  payload_file: dtls/payload_tinydtls_003.raw
+- name: TINYSVCMDNS_000
+  type: Crash
+  cve_id: CVE-2017-12087
+  description: An exploitable heap overflow vulnerability exists in the tinysvcmdns
+    library version 2016-07-18. A specially crafted packet can make the library overwrite
+    an arbitrary amount of data on the heap with attacker controlled values. An attacker
+    needs send a dns packet to trigger this vulnerability.
+  url: https://nvd.nist.gov/vuln/detail/CVE-2017-12087
+  credit: Lilith (>^.^)> Wyatt and Claudio Bozzato of Cisco Talos
+  payload_file: mdns/payload_cve-2017-12087.raw
+- name: TINYSVCMDNS_001
+  type: Crash
+  cve_id: CVE-2017-12130
+  description: An exploitable NULL pointer dereference vulnerability exists in the
+    tinysvcmdns library version 2017-11-05. A specially crafted packet can make the
+    library dereference a NULL pointer leading to a server crash and denial of service.
+    An attacker needs to send a DNS query to trigger this vulnerability.
+  url: https://nvd.nist.gov/vuln/detail/CVE-2017-12130
+  credit: Claudio Bozzato, Yves Younan, Lilith Wyatt <(^_^)> and Aleksandar Nikolic of Cisco Talos
+  payload_file: mdns/payload_cve-2017-12130.raw
+- name: TINYSVCMDNS_002
+  type: Crash
+  cve_id: CVE-2019-9747
+  description: 'Maliciously crafted mDNS (Multicast DNS) packet triggers infinite
+    loop while parsing mDNS query.'
+  url: https://bitbucket.org/geekman/tinysvcmdns/issues/11/denial-of-service-vulnerability-infinite
+  credit: Jakub Botwicz
+  payload_file: mdns/payload_tinysvcmdns_hang_000.raw
+- name: WAKAAMA_000
+  type: MemoryLeak
+  cve_id: CVE-2019-9004
+  description: Wakaama LWM2M server incorrectly handles incoming packets leading
+    to a memory leak. Processing of the single crafted packet leads to leaking (wasting)
+    24 bytes of memory.This can lead to stopping of the LWM2M server after exhausting
+    all available memory.
+  url: https://github.com/eclipse/wakaama/issues/425
+  credit: Jakub Botwicz
+  payload_file: coap/coap_payload_wakaama_000.raw
+- name: TP-LINK_000
+  type: InformationDisclosure
+  cve_id: CVE-2018-18428
+  description: The TP-Link TL-SC3130 suffers from an unauthenticated and unauthorized live RTSP stream disclosure.
+  credit: Gjoko 'LiquidWorm' Krstic @zeroscience
+  url: https://www.exploit-db.com/exploits/45632
+  payload_file: rtsp/payload_cve-2018-18428.raw
+  response_file: rtsp/response_cve-2018-18428.raw
+- name: TP-LINK_001
+  type: Crash
+  cve_id:
+  description: The TP-Link WR740N Wireless N Router network device is exposed to a remote
+    denial of service vulnerability when processing a HTTP request.
+  credit: Gjoko 'LiquidWorm' Krstic @zeroscience
+  url: https://www.zeroscience.mk/en/vulnerabilities/ZSL-2013-5135.php
+  payload_file: http/payload_tplink-001.raw
+- name: FLIR_000
+  type: InformationDisclosure
+  cve_id:
+  description: The FLIR AX8 thermal sensor camera suffers an unauthenticated and unauthorized live RTSP video stream access.
+  credit: Gjoko 'LiquidWorm' Krstic @zeroscience
+  url: https://www.zeroscience.mk/en/vulnerabilities/ZSL-2018-5492.php
+  payload_file: rtsp/payload_flir_000.raw
+  response_file: rtsp/response_flir_000.raw
+- name: FOSCAM_000
+  type: Crash
+  cve_id: CVE-2018-19077
+  description: The Foscam camera RTSP service (RtspServer) has an implementation flaw when 
+    processing the 'Content-Length' header. Negative numbers are processed incorrectly and
+    lead to either RtspServer crash due to out of bound memory read or to a busy loop where
+    the single request is processed forever in a tight loop.
+  credit: Harry Sintonen (F-Secure Corporation)
+  url: https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt
+  payload_file: rtsp/payload_cve-2018-19077.raw
+- name: FOSCAM_001
+  type: InformationDisclosure
+  cve_id: CVE-2018-19067
+  description: All Foscam models have hidden and hard-coded credentials that allow 
+    access to the device regardless of the currently configured users.
+    The username factory~ and password Ak47@99 enable access to some of the device
+    web user interface functionalities. The functionalities allowed vary depending on
+    the model of the device.
+  credit: Harry Sintonen (F-Secure Corporation)
+  url: https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt
+  payload_file: http/payload_cve-2018-19067.raw
+  response_file: http/response_cve-2018-19067.raw
+- name: HIKVISION_000
+  type: Crash
+  cve_id: CVE-2014-4878
+  description: Hikvision DVRs and derivative products are vulnerable to a buffer overflow in 
+    the handling of RTSP request bodies, allowing for remote code execution or denial of service.
+    The RTSP request handler uses a fixed size buffer of 2048 bytes for consuming the RTSP request
+    body, which leads to a buffer overflow condition when sending a larger body.
+  credit: Mark Schloesser (Rapid7 Labs)
+  url: https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/
+  payload_file: rtsp/payload_cve-2014-4878.raw
+- name: HIKVISION_001
+  type: Crash
+  cve_id: CVE-2014-4879
+  description: Hikvision DVRs and derivative products are vulnerable to a buffer overflow in 
+    the handling of RTSP request bodies, allowing for remote code execution or denial of service.
+    The RTSP request handler uses fixed size buffers when parsing the HTTP headers, which leads
+    to a buffer overflow condition when sending a large header key.
+  credit: Mark Schloesser (Rapid7 Labs)
+  url: https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/
+  payload_file: rtsp/payload_cve-2014-4879.raw
+- name: HIKVISION_002
+  type: Crash
+  cve_id: CVE-2014-4880
+  description: Hikvision DVRs and derivative products are vulnerable to a buffer overflow in 
+    the handling of RTSP request bodies, allowing for remote code execution or denial of service.
+    The RTSP request handler uses fixed size buffers when parsing the "Basic Auth" header 
+    of a RTSP transaction.
+  credit: Mark Schloesser (Rapid7 Labs)
+  url: https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/
+  payload_file: rtsp/payload_cve-2014-4880.raw
+- name: UBIQUITTI_000
+  type: Crash
+  cve_id: CVE-2019-12727
+  description: On Ubiquiti airCam 3.1.4 devices, a Denial of Service vulnerability exists 
+    in the RTSP Service provided by the ubnt-streamer binary. The issue can be triggered via
+    malformed RTSP requests that lead to an invalid memory read. To exploit the vulnerability,
+    an attacker must craft an RTSP request with a large number of headers.
+  credit: Juan Manuel Fernández 'X-C3LL' (Ka0labs)
+  url: https://github.com/X-C3LL/PoC-CVEs/blob/master/Aircam-DoS/Aircam-DoS.py
+  payload_file: rtsp/payload_cve-2019-12727.raw
+- name: GSTREAMER_000
+  type: Crash
+  cve_id: CVE-2019-9928
+  description: GStreamer before 1.16.0 has a heap-based buffer overflow in the RTSP connection 
+    parser via a crafted response from a server.
+  credit: ???
+  url: https://gstreamer.freedesktop.org/security/sa-2019-0001.html
+  payload_file: rtsp/payload_cve-2019-9928.raw
+- name: NETFLIX_000
+  type: Crash
+  cve_id: CVE-2019-10028
+  description: Netflix DIAL reference server allows to perform arbitrary length read of a memory location
+    when processing crafted request.
+  credit: For All Secure, Zion Basque, Paul Emge
+  url: https://blog.forallsecure.com/forallsecure-uncovers-vulnerability-in-netflix-dial-software
+  payload_file: http/payload_cve-2019-10028.raw
+- name: BEWARD_000
+  type: InformationDisclosure
+  cve_id:
+  description: BEWARD N100 camera suffers from an unauthenticated and unauthorized live RTSP video stream access.
+  credit: Gjoko 'LiquidWorm' Krstic @zeroscience
+  url: https://www.zeroscience.mk/en/vulnerabilities/ZSL-2019-5509.php
+  payload_file: http/payload_beward_000_request.raw
+  response_file: http/payload_beward_000_response.raw
+- name: ZYXEL_000
+  type: NetworkTrafficAmplification
+  cve_id: 
+  description: Zyxel Keenetic routers in multiple models and versions
+    can be used to perform Distributed Denial of Service attacks as network amplifier
+    with spoofing of the source IP address.
+  url: 
+  credit: Jakub Botwicz
+  nr_packets: 1
+  timeout_sec: 10
+  payload_file: coap/payload_zyxel_000.raw
+- name: FALCON_000
+  type: Crash
+  cve_id:
+  description: The vulnerability is caused by a buffer overflow in a memcpy operation
+    when parsing specailly crafted KNXnet/IP packets in the Group messages monitor (aka. Falcon).
+  url: https://github.com/sbaresearch/advisories/tree/public/2015/knAx_20150101
+  credit: Aljosha Judmayer (SBA Research)
+  payload_file: knx/payload_cve-2015-8299_crash.raw
