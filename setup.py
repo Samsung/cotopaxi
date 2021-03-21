@@ -120,7 +120,7 @@ setup(
         "Topic :: System",
         "Topic :: System :: Networking",
     ],
-    python_requires=">=2.7, <=3.8",
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.9.*, <4',
     project_urls={
         "Bug Reports": "https://github.com/Samsung/cotopaxi/issues",
         "Source Code": "https://github.com/Samsung/cotopaxi",

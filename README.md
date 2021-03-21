@@ -14,9 +14,16 @@ Y88b  d88P Y88..88P Y88b. Y88..88P 888 d88P 888  888 .d8""8b. 888
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
 ![GitHub top language](https://img.shields.io/github/languages/top/Samsung/cotopaxi)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Lines of code](https://img.shields.io/tokei/lines/github/samsung/cotopaxi)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cotopaxi)
 ![LGTM Grade](https://img.shields.io/lgtm/grade/python/github/Samsung/cotopaxi)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![GitHub search hit counter](https://img.shields.io/github/search/Samsung/cotopaxi/*)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/cotopaxi)
+![GitHub all releases](https://img.shields.io/github/downloads/Samsung/cotopaxi/total)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Samsung/cotopaxi)
+![GitHub issues](https://img.shields.io/github/issues/Samsung/cotopaxi)
+
 
 Set of tools for security testing of Internet of Things devices using protocols: AMQP, CoAP, DTLS, HTCPCP, KNX, mDNS, MQTT, MQTT-SN, QUIC, RTSP, SSDP.
 
@@ -67,6 +74,7 @@ Optional:
 
 4. Install extras
 
+(ml - Machine Learning tools, dev - development tools, all - all of the above)
 ```
 pip install -e .[ml]
 ```

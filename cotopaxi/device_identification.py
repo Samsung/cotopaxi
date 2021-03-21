@@ -37,7 +37,7 @@ try:
 except ImportError:
     sys.exit(
         "This tool requires pandas and tensorflow!\n"
-        "Please install them using: pip install -r requirements.txt or pip install -e .[ml]"
+        "Please install them using: pip install cotopaxi[ml] or pip install -r requirements.txt"
     )
 
 from .common_utils import prepare_separator
