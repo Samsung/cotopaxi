@@ -28,8 +28,15 @@ import sys
 import time
 
 from scapy.all import IP, IPv6, TCP, UDP
-import numpy
-from xgboost import XGBClassifier
+
+try:
+    import numpy
+    from xgboost import XGBClassifier
+except ImportError:
+    sys.exit(
+        "This tool requires numpy and xgboost!\n"
+        "Please install them using: pip install -r requirements.txt or pip install -e .[ml]"
+    )
 
 from .common_utils import prepare_separator
 from .cotopaxi_tester import argparser_add_verbose, CotopaxiException, prepare_ips
@@ -50,7 +57,10 @@ def predict_xgb(data):
     model = XGBClassifier()
     data = normalizator(prepare_data(data))
     try:
-        model.load_model("cotopaxi/identification_models/proto_XGB_20201112.model")
+        model.load_model(
+            os.path.dirname(__file__)
+            + "/identification_models/proto_XGB_20201112.model"
+        )
     except ValueError as exc:
         raise CotopaxiException from exc(
             "[!] Cannot load machine learning classifier!"
@@ -162,6 +172,8 @@ def classify_traffic(
 
 def main(args):
     """Start traffic analysis based on command line parameters."""
+    if sys.version_info[0] < 3:
+        raise Exception("This tool must be run using Python 3!")
     parser = argparse.ArgumentParser(
         description="Tool for classifying network protocols used in traffic flows"
     )

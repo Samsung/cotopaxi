@@ -76,6 +76,11 @@ PROTOCOL_TESTERS = {
 }
 
 try:
+    ModuleNotFoundError
+except NameError:
+    ModuleNotFoundError = ImportError
+
+try:
     from .dtls_utils import DTLSTester
 
     PROTOCOL_TESTERS[Protocol.DTLS] = DTLSTester

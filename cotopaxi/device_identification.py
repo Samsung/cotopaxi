@@ -29,9 +29,16 @@ import sys
 import time
 
 from scapy.all import Scapy_Exception, IP, IPv6, PcapReader, TCP, UDP
-import pandas
-import numpy
-from tensorflow.keras.models import load_model
+
+try:
+    import numpy
+    import pandas
+    from tensorflow.keras.models import load_model
+except ImportError:
+    sys.exit(
+        "This tool requires pandas and tensorflow!\n"
+        "Please install them using: pip install -r requirements.txt or pip install -e .[ml]"
+    )
 
 from .common_utils import prepare_separator
 from .cotopaxi_tester import argparser_add_verbose, CotopaxiException, prepare_ips
@@ -265,7 +272,9 @@ def predict_lstm(data):
         -1, 10, 24
     )
     try:
-        model = load_model("cotopaxi/identification_models/LSTM.hdf5")
+        model = load_model(
+            os.path.dirname(__file__) + "/identification_models/LSTM.hdf5"
+        )
     except ValueError as exc:
         raise CotopaxiException from exc(
             "[!] Cannot load machine learning classifier!"
