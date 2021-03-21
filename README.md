@@ -1,5 +1,22 @@
+```
+ .d8888b.           888                                       d8b 
+d88P  Y88b          888                                       Y8P 
+888    888          888
+888         .d88b.  888888 .d88b.  88888b.   8888b.  888  888 888 
+888        d88""88b 888   d88""88b 888 "88b     "88b 'Y8bd8P' 888 
+888    888 888  888 888   888  888 888  888 .d888888   X88K   888 
+Y88b  d88P Y88..88P Y88b. Y88..88P 888 d88P 888  888 .d8""8b. 888 
+ "Y8888P"   "Y88P"   "Y888 "Y88P"  88888P"  "Y888888 888  888 888 
+                                   888
+                                   888
+                                   888
+```
 
-# Cotopaxi
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
+![GitHub top language](https://img.shields.io/github/languages/top/Samsung/cotopaxi)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![LGTM Grade](https://img.shields.io/lgtm/grade/python/github/Samsung/cotopaxi)
+![GitHub search hit counter](https://img.shields.io/github/search/Samsung/cotopaxi/*)
 
 Set of tools for security testing of Internet of Things devices using protocols: AMQP, CoAP, DTLS, HTCPCP, KNX, mDNS, MQTT, MQTT-SN, QUIC, RTSP, SSDP.
 
@@ -8,17 +25,55 @@ Set of tools for security testing of Internet of Things devices using protocols:
 Cotopaxi uses GNU General Public License, version 2:
 https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 
-## Installation:
+## Installation using pip:
+
+To install minimal Cotopaxi version (without Machine Learning and development tools): 
+
+```
+pip install cotopaxi
+```
+
+Minimal version + Machine Learning libraries (numpy, pandas, sklearn, xgboost):
+```
+pip install cotopaxi[ml]
+```
+
+Minimal version + development tools:
+```
+pip install cotopaxi[dev]
+```
+
+Almost complete installation (without scapy-ssl_tls):
+```
+pip install cotopaxi[all]
+```
+
+## Installation from source:
 
 1. Clone code from git:
 ``` 
 git clone https://github.com/Samsung/cotopaxi 
 ```
 2. Enter cotopaxi directory
-```    
+```
 cd cotopaxi 
 ```
-3. Install scapy-ssl_tls (in case of any problems with scapy and scapy-ssl_tls see section below)
+3. Run installer:
+```
+python setup.py install
+```
+
+Optional:
+
+4. Install extras
+
+```
+pip install -e .[ml]
+```
+
+5. Install scapy-ssl_tls (in case of any problems with scapy and scapy-ssl_tls see section below)
+
+Installation of scapy-ssl_tls is OPTIONAL - required only if you want to test endpoints using DTLS protocol. 
 
 For Python 2.7:
  
@@ -31,27 +86,7 @@ For Python 3.6-3.8:
     git clone https://github.com/kalidasya/scapy-ssl_tls.git
     cd scapy-ssl_tls
     git checkout py3_update
-    sudo python3 setup.py install
-```
-
-4. Install other requirements:
-
-For Python 2.7:
-
-```
-sudo python2.7 -m pip install -r requirements_python2.txt 
-```
-
-For Python 3.6-3.8:
-
-```
-sudo python3 -m pip install --upgrade pip
-sudo python3 -m pip install -r requirements.txt 
-```
-
-5. Run installer:
-```
-sudo python setup.py install
+    python3 setup.py install
 ```
 
 ## Requirements:
@@ -60,7 +95,7 @@ Currently Cotopaxi works with Python 2.7.* and with Python 3.6-3.8 (some depende
 
 Installation of required libraries:
 
-1. scapy-ssl_tls 
+### scapy-ssl_tls 
 
 For Python 2.7:
  
@@ -72,9 +107,27 @@ Common problems:
 * If you encounter error: `error: [Errno 2] No such file or directory: 'LICENSE'`, try repeating command - surprisingly it works.
 * If you encounter error: `NameError: name 'os' is not defined` - add missing `import os` to `scapy/layers/ssl_tls.py`.
 
-All other required packages can be installed using requirements.txt file:
+### Manual installation of other requirements:
+
+For Python 2.7:
+
 ```
-    pip install -r cotopaxi/requirements.txt
+sudo python2.7 -m pip install -r requirements_python2.txt 
+```
+
+For Python 3.6-3.8:
+
+(for installing MINIMAL set of libraries EXCLUDING large Machine Learning libraries (pandas, sklearn, tensorflow, xgboost) required for device_identification and traffic_analyzer)
+
+```
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m pip install -r requirements_minimal.txt 
+```
+
+(for installing FULL set of libraries INCLUDING large Machine Learning libraries (pandas, sklearn, tensorflow, xgboost) required for device_identification and traffic_analyzer)
+```
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m pip install -r requirements.txt 
 ```
 
 All required packages for developement of Cotopaxi (including libraries for unit tests) can be installed using requirements_devel.txt file:
@@ -745,8 +798,8 @@ To run all unit tests using pytest with coverage analysis and branch analysis ru
     sudo python2.7 -m coverage html
     firefox htmlcov/index.html
 
-    sudo python3.6 -m coverage run --source cotopaxi --branch -m pytest -v
-    sudo python3.6 -m coverage html
+    sudo python3 -m coverage run --source cotopaxi --branch -m pytest -v
+    sudo python3 -m coverage html
     firefox htmlcov/index.html
 ```
 
@@ -764,6 +817,6 @@ To run unit tests for one of tools run (from upper cotopaxi dir):
     python -m tests.test_vulnerability_tester
 ```
 
-Most of tests are performed against remote tests servers and require preparing test environment, 
+Most of the tests are performed against remote tests servers and require preparing test environment, 
 providing settings in tests/test_config.ini and tests/test_servers.yaml.
 
