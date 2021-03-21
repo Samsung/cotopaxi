@@ -664,10 +664,6 @@ class DTLSScanner(object):
         """Identify server certificates in DTLS."""
         # with open("512b-dsa-example-cert.der", "r") as file_handle:
         #     test_packet = file_handle.read().strip()
-        #     print("Test packet = ")
-        #     print(test_packet)
-        #     print("==============")
-        # test_packet = "123123123"
         # print("_scan_certificates")
         pkt_hello = DTLSRecord(
             sequence=0,
@@ -697,7 +693,6 @@ class DTLSScanner(object):
                 )
             ]
         )
-        # show_verbose(test_params, pkt)
         print(pkt)
         try:
             client = DTLSClient(target, starttls=starttls, test_params=test_params)
@@ -705,13 +700,14 @@ class DTLSScanner(object):
             pkt_hello[DTLSClientHello].cookie_length = client.cookie_length
             sent_time = test_params.report_sent_packet()
             client.sendall(pkt_hello)
-            resp = client.recvall(timeout=0.1)
+            resp1 = client.recvall(timeout=0.1)
             test_params.report_received_packet(sent_time)
+            self.capabilities.insert(resp1, client=False)
             sent_time = test_params.report_sent_packet()
             client.sendall(pkt)
-            resp = client.recvall(timeout=0.5)
+            resp2 = client.recvall(timeout=0.5)
             test_params.report_received_packet(sent_time)
-            self.capabilities.insert(resp, client=False)
+            self.capabilities.insert(resp2, client=False)
         except socket.error as sock_err:
             print(repr(sock_err))
 
@@ -856,21 +852,21 @@ class DTLSScanner(object):
             )
             sent_time = self.test_params.report_sent_packet()
             client.sendall(pkt)
-            resp = client.recvall(timeout=0.5)
+            resp1 = client.recvall(timeout=0.5)
             self.test_params.report_received_packet(sent_time)
             pkt = DTLSRecord(version=version) / TLSHeartBeat(
                 length=2 ** 14 - 1, data="bleed..."
             )
             sent_time = self.test_params.report_sent_packet()
             client.sendall(str(pkt))
-            resp = client.recvall(timeout=0.5)
+            resp2 = client.recvall(timeout=0.5)
             self.test_params.report_received_packet(sent_time)
-            if resp.haslayer(TLSHeartBeat) and resp[TLSHeartBeat].length > 8:
-                self.report_issue("HEARTBLEED - vulnerable", resp)
+            if resp2.haslayer(TLSHeartBeat) and resp2[TLSHeartBeat].length > 8:
+                self.report_issue("HEARTBLEED - vulnerable", resp2)
         except socket.error as sock_err:
             print(repr(sock_err))
             return None
-        return resp
+        return resp2
 
     def xxx_scan_secure_renegotiation(
         self,
@@ -906,7 +902,7 @@ class DTLSScanner(object):
         return resp
 
 
-def active_scanning(test_params):
+def active_scanning(test_params, test_cases):
     """Perform active scanning based on provided test params."""
     alive_before = service_ping(test_params)
     if not alive_before and not test_params.ignore_ping_check:

@@ -111,9 +111,7 @@ def coap_check_url(test_params, method, url):
         if code != "Empty":
             print(
                 "SENT size:{} RECV size:{} AMPLIFICATION FACTOR:{:0.2f}%".format(
-                    in_size,
-                    out_size,
-                    amplification_factor(in_size, out_size),
+                    in_size, out_size, amplification_factor(in_size, out_size),
                 )
             )
             return code

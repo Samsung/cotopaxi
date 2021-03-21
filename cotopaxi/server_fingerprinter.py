@@ -180,7 +180,7 @@ def coap_fingerprint(test_params):
     print(addr_port_result)
 
 
-def service_fingerprint(test_params):
+def service_fingerprint(test_params, test_cases):
     """Check service availability by sending 'ping' packet and waiting for response."""
     if protocol_enabled(Protocol.CoAP, test_params.protocol):
         coap_fingerprint(test_params)
