@@ -71,7 +71,7 @@ def service_ping(test_params, show_result=False):
     return False
 
 
-def perform_service_ping(test_params):
+def perform_service_ping(test_params, test_cases):
     """Check service availability by sending 'ping' packet and waiting for response."""
     return service_ping(test_params, True)
 

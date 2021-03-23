@@ -51,7 +51,7 @@ class FuzzingCase(Vulnerability):
         print("Waiting {} seconds for the server to start again.".format(wait_time_sec))
         iteration = 0
         server_respawned = False
-        while not server_respawned:
+        while not server_respawned and iteration < nr_iterations:
             time.sleep(wait_time_sec)
             if not service_ping(test_params):
                 print("Server did not respawn (wait {})!".format(iteration + 1))

@@ -76,6 +76,11 @@ PROTOCOL_TESTERS = {
 }
 
 try:
+    ModuleNotFoundError
+except NameError:
+    ModuleNotFoundError = ImportError
+
+try:
     from .dtls_utils import DTLSTester
 
     PROTOCOL_TESTERS[Protocol.DTLS] = DTLSTester
@@ -652,10 +657,7 @@ class CotopaxiTester(object):
                     self.test_params.dst_endpoint.ip_addr = dest_ip
                     self.test_params.dst_endpoint.port = dest_port
                     self.test_params.set_ip_version()
-                    if test_cases:
-                        test_function(self.test_params, test_cases)
-                    else:
-                        test_function(self.test_params)
+                    test_function(self.test_params, test_cases)
             print(
                 "[.] Finished {} (for all addresses, ports and protocols)".format(
                     test_name

@@ -21,7 +21,7 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
+import os
 import sys
 from scapy.all import TCP, UDP
 
@@ -42,13 +42,17 @@ def main(args):
         for vuln_name in VULNS:
             vuln = VULNS[vuln_name]
             if vuln.protocol == tester.test_params.protocol:
-                vuln.payload_file = "cotopaxi/vulnerabilities/" + vuln.payload_file
+                vuln.payload_file = (
+                    os.path.dirname(__file__) + "/vulnerabilities/" + vuln.payload_file
+                )
                 test_vulns.append(vuln)
     else:
         for vuln_name in VULNS:
             vuln = VULNS[vuln_name]
             if vuln_name in selected_vulns:
-                vuln.payload_file = "cotopaxi/vulnerabilities/" + vuln.payload_file
+                vuln.payload_file = (
+                    os.path.dirname(__file__) + "/vulnerabilities/" + vuln.payload_file
+                )
                 test_vulns.append(vuln)
 
     print("Loaded {} vulnerabilities for test".format(len(test_vulns)))
