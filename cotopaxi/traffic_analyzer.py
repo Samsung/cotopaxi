@@ -62,11 +62,11 @@ def predict_xgb(data):
             + "/identification_models/proto_XGB_20201112.model"
         )
     except ValueError as exc:
-        raise CotopaxiException from exc(
+        raise CotopaxiException(
             "[!] Cannot load machine learning classifier!"
             "    This may be caused by incompatible version of tensorflow"
             "    (please install tensorflow version 2.2.0)!"
-        )
+        ) from exc
     result = model.predict(data)
     unique, counts = numpy.unique(result, return_counts=True)
     devices = list()

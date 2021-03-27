@@ -276,11 +276,11 @@ def predict_lstm(data):
             os.path.dirname(__file__) + "/identification_models/LSTM.hdf5"
         )
     except ValueError as exc:
-        raise CotopaxiException from exc(
+        raise CotopaxiException(
             "[!] Cannot load machine learning classifier!"
             "    This may be caused by incompatible version of tensorflow"
             "    (please install tensorflow version 2.2.0)!"
-        )
+        ) from exc
     result = numpy.argmax(model.predict(data), axis=-1)
     unique, counts = numpy.unique(result, return_counts=True)
     devices = list()
@@ -339,7 +339,9 @@ def load_packets(pcap_filename, limit_packets=1000):
                 "[!] You can interrupt loading at any time using CTRL+C and classification "
                 "will continue using already loaded packets."
             )
-        reader = PcapReader(pcap_filename)  # pylint: disable=no-value-for-parameter
+        # pylint: disable=no-value-for-parameter
+        # (this problem is caused by a trick used in scapy, but in fact there is only 1 param)
+        reader = PcapReader(pcap_filename)  # lgtm[py/call/wrong-number-class-arguments]
         for packet in reader:
             if len(packets) >= limit_packets:
                 break
@@ -352,10 +354,10 @@ def load_packets(pcap_filename, limit_packets=1000):
     except KeyboardInterrupt:
         pass
     except (IOError, Scapy_Exception, ValueError) as exc:
-        raise CotopaxiException from exc(
+        raise CotopaxiException(
             "[!] Cannot load network packets from the provided file "
             "(please make sure it is in PCAP or PCAPNG format)!"
-        )
+        ) from exc
     load_time = time.time() - start_time
     print(
         f"[.] Loaded {len(packets)} packets from the provided file (in {load_time:.2f} sec)"
