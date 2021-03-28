@@ -49,7 +49,7 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
         )
 
         if coap_check_result == coap_code_not_existing:
-            test_params.test_stats.inactive_endpoints[Protocol.CoAP].append(
+            test_params.test_stats.inactive_endpoints[Protocol.COAP].append(
                 ip_port_and_url
             )
             print(
@@ -63,7 +63,7 @@ def perform_resource_listing_coap(test_params, tuple_url_methods):
             )
         else:
             coap_return_code = coap_check_result
-            test_params.test_stats.active_endpoints[Protocol.CoAP].append(
+            test_params.test_stats.active_endpoints[Protocol.COAP].append(
                 ip_port_and_url
             )
             print(
@@ -100,11 +100,11 @@ def perform_resource_listing_mdns(test_params, list_services):
         )
         response = mdns_query(test_params, service_name)
         if response and service_name in response:
-            test_params.test_stats.active_endpoints[Protocol.mDNS].append(
+            test_params.test_stats.active_endpoints[Protocol.MDNS].append(
                 ip_port_and_url
             )
         else:
-            test_params.test_stats.inactive_endpoints[Protocol.mDNS].append(
+            test_params.test_stats.inactive_endpoints[Protocol.MDNS].append(
                 ip_port_and_url
             )
 
@@ -185,7 +185,7 @@ def main(args):
     )
     options = tester.parse_args(args)
     test_params = tester.test_params
-    if test_params.protocol == Protocol.CoAP:
+    if test_params.protocol == Protocol.COAP:
         if options.method == ["ALL"]:
             list_methods = ["GET", "POST", "PUT", "DELETE"]
         elif isinstance(options.method, list):
@@ -215,7 +215,7 @@ def main(args):
         tester.perform_testing(
             "resource listing", perform_resource_listing_rtsp, list_services
         )
-    elif test_params.protocol == Protocol.mDNS:
+    elif test_params.protocol == Protocol.MDNS:
         if options.method != "GET":
             print("Methods are not supported for mDNS protocol!")
         list_services = prepare_names(options.names_filepath)

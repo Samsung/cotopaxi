@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Unit tests for AMQP utils."""
+"""Unit tests for HTTP2 utils."""
 #
 #    Copyright (C) 2021 Cotopaxi Contributors. All Rights Reserved.
-#    Copyright (C) 2020 Samsung Electronics. All Rights Reserved.
 #       Author: Jakub Botwicz
 #
 #    This file is part of Cotopaxi.
@@ -22,15 +21,16 @@
 #
 
 import unittest
-from cotopaxi.amqp_utils import AMQPTester
+
+from cotopaxi.http2_utils import HTTP2Tester
 from .common_runner import TimerTestRunner
 from .test_protocol_tester import TestProtocolTester
 
 
-class TestAMQPTester(TestProtocolTester):
+class TestHTTP2Tester(TestProtocolTester):
     def __init__(self, *args, **kwargs):
         TestProtocolTester.__init__(self, *args, **kwargs)
-        self.tester = AMQPTester()
+        self.tester = HTTP2Tester()
 
 
 if __name__ == "__main__":

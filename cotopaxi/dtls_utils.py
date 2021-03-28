@@ -70,12 +70,13 @@ import scapy_ssl_tls.ssl_tls_registry as registry
 from IPy import IP as IPY_IP
 
 from .common_utils import (
-    print_verbose,
-    show_verbose,
-    INPUT_BUFFER_SIZE,
-    udp_sr1,
     get_local_ip,
     get_random_high_port,
+    INPUT_BUFFER_SIZE,
+    print_verbose,
+    Protocol,
+    show_verbose,
+    udp_sr1,
 )
 from .protocol_tester import UDPBasedProtocolTester
 
@@ -388,6 +389,13 @@ DTLS_1_1_TINYDTLS = (
     "001A001300020102001400020102000A000400020017000B00020100"
 )
 
+RESULT_UNKNOWN = "Unknown"
+
+
+def get_result_string(value):
+    """Convert result value into string."""
+    return "alive" if value else "dead"
+
 
 def check_dtls_response(test_params, response):
     """Check whether response is DTLS packet."""
@@ -620,6 +628,37 @@ def load_dtls_test_packets():
         test_packets.append(test_packet)
 
     return test_packets
+
+
+def dtls_classifier(test_results):
+    """Classifier created as import of WEKA J48 tree."""
+    # packet_4_version = no_response
+    # | packet_9_description = empty: openssl(10.0)
+    # | packet_9_description = protocol_version: libressl(10.0)
+    # | packet_9_description = handshake_failure: tinydtls(10.0)
+    # packet_4_version = empty: matrix(10.0)
+    # packet_4_version = DTLS_1_0: gnutls(10.0)
+    # packet_4_version = DTLS_1_1
+    # | packet_8_version = no_response: goldy(10.0)
+    # | packet_8_version = DTLS_1_1: mbed(10.0)
+    classification_result = RESULT_UNKNOWN
+    if test_results[4].version == "no_response":
+        if test_results[9].description == "empty":
+            classification_result = "openssl"
+        elif test_results[9].description == "protocol_version":
+            classification_result = "libressl"
+        elif test_results[9].description == "handshake_failure":
+            classification_result = "tinydtls"
+    elif test_results[4].version == "empty":
+        classification_result = "matrix"
+    elif test_results[4].version == "DTLS_1_0":
+        classification_result = "gnutls"
+    elif test_results[4].version == "DTLS_1_1":
+        if test_results[8].version == "no_response":
+            classification_result = "mbed TLS (~2.4)"
+        elif test_results[8].version == "DTLS_1_1":
+            classification_result = "mbed TLS (~2.16)"
+    return classification_result
 
 
 def dtls_convert_version(response):

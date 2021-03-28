@@ -30,6 +30,8 @@ from enum import Enum
 from scapy.all import DNS, IP, TCP, UDP, IPv6, Raw, sr1, sniff
 from scapy.layers.http import HTTPRequest
 from scapy.contrib.coap import CoAP
+from scapy.contrib.http2 import H2Seq as HTTP2Message
+
 from scapy.contrib.mqtt import MQTT
 
 try:
@@ -114,7 +116,8 @@ def show_verbose(test_params, packet, protocol=None):
         try:
             proto_handler = proto_mapping_request(protocol)
             packet = proto_handler(packet)
-        except KeyError:
+        except KeyError as exc:
+            print(exc)
             return "Response is not parsable!"
     parsed_response = ""
     if test_params.verbose:
@@ -142,10 +145,10 @@ class Protocol(Enum):
     ALL = 0
     UDP = 1
     TCP = 2
-    CoAP = 3
+    COAP = 3
     MQTT = 4
     DTLS = 5
-    mDNS = 6
+    MDNS = 6
     SSDP = 7
     HTCPCP = 8
     RTSP = 9
@@ -155,6 +158,8 @@ class Protocol(Enum):
     AMQP = 13
     MQTTSN = 14
     KNX = 15
+    HTTP2 = 16
+    GRPC = 17
 
 
 def proto_mapping_request(protocol):
@@ -163,7 +168,7 @@ def proto_mapping_request(protocol):
         Protocol.ALL: IP,
         Protocol.UDP: UDP,
         Protocol.TCP: TCP,
-        Protocol.CoAP: CoAP,
+        Protocol.COAP: CoAP,
         Protocol.mDNS: DNS,
         Protocol.MQTT: MQTT,
         Protocol.DTLS: DTLS,
@@ -172,7 +177,9 @@ def proto_mapping_request(protocol):
         Protocol.SSDP: HTTPRequest,
         Protocol.HTCPCP: HTTPRequest,
         Protocol.HTTP: HTTPRequest,
+        Protocol.HTTP2: HTTP2Message,
         Protocol.KNX: TCP,
+        Protocol.GRPC: HTTP2Message,
     }[protocol]
 
 

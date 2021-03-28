@@ -28,10 +28,16 @@ try:
     from cotopaxi.device_identification import main
     from .common_test_utils import scrap_output
     from .common_runner import TimerTestRunner
+
+    SKIP_TESTS = False
 except SyntaxError:
-    sys.exit("[!] This set of test must be run using Python 3!")
+    if sys.version_info[0] < 3:
+        SKIP_TESTS = True
+    else:
+        sys.exit("Syntax error on loading dependencies!")
 
 
+@unittest.skipIf(SKIP_TESTS, "Skipped tests for Python3!")
 class TestDeviceIdentification(unittest.TestCase):
     def test_main_empty_neg(self):
         output = scrap_output(main, [])

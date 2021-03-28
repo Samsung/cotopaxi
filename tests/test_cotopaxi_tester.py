@@ -84,7 +84,7 @@ class TestCotopaxiTester(unittest.TestCase):
     def test_protocols_using_pos(self):
         udp_protos = protocols_using(UDP)
         self.assertGreaterEqual(len(udp_protos), 4)
-        self.assertTrue(Protocol.CoAP in udp_protos)
+        self.assertTrue(Protocol.COAP in udp_protos)
         self.assertTrue(Protocol.RTSP not in udp_protos)
         for proto in udp_protos:
             self.assertIsInstance(proto, Protocol)
@@ -93,7 +93,7 @@ class TestCotopaxiTester(unittest.TestCase):
         for proto in tcp_protos:
             self.assertIsInstance(proto, Protocol)
         self.assertTrue(Protocol.RTSP in tcp_protos)
-        self.assertTrue(Protocol.CoAP not in tcp_protos)
+        self.assertTrue(Protocol.COAP not in tcp_protos)
 
 
 if __name__ == "__main__":

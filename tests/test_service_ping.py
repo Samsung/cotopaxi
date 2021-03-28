@@ -94,10 +94,11 @@ class TestServicePing(CotopaxiToolServerTester, unittest.TestCase):
         for server in list_test_servers:
             test_servers_proto[server["protocol"]].append(server)
 
-        for proto in test_servers_proto:
+        for proto in test_servers_proto.copy():
             # print("{} : {}".format(proto, test_servers_proto[proto]))
-            test_params.protocol = Protocol[proto]
-            for server in test_servers_proto[proto]:
+            proto_upper = proto.upper()
+            test_params.protocol = Protocol[proto_upper]
+            for server in test_servers_proto[proto_upper]:
                 if server["ping"]:
                     test_params.dst_endpoint.port = int(server["port"])
                     result = service_ping(test_params)

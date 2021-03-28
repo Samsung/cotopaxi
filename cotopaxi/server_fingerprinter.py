@@ -27,7 +27,7 @@ import sys
 from .coap_utils import CoAPTester, coap_sr1_file
 from .common_utils import Protocol, print_verbose, SCAPY_SSL_TLS_NOT_INSTALLED
 from .cotopaxi_tester import CotopaxiTester, protocol_enabled
-
+from .dtls_utils import dtls_classifier, get_result_string
 
 RESULT_UNKNOWN = "Unknown"
 
@@ -70,42 +70,6 @@ def coap_classifier(test_results):
     elif test_results[1].type == "ACK":
         classification_result = "microcoap"
     return classification_result
-
-
-def dtls_classifier(test_results):
-    """Classifier created as import of WEKA J48 tree."""
-    # packet_4_version = no_response
-    # | packet_9_description = empty: openssl(10.0)
-    # | packet_9_description = protocol_version: libressl(10.0)
-    # | packet_9_description = handshake_failure: tinydtls(10.0)
-    # packet_4_version = empty: matrix(10.0)
-    # packet_4_version = DTLS_1_0: gnutls(10.0)
-    # packet_4_version = DTLS_1_1
-    # | packet_8_version = no_response: goldy(10.0)
-    # | packet_8_version = DTLS_1_1: mbed(10.0)
-    classification_result = RESULT_UNKNOWN
-    if test_results[4].version == "no_response":
-        if test_results[9].description == "empty":
-            classification_result = "openssl"
-        elif test_results[9].description == "protocol_version":
-            classification_result = "libressl"
-        elif test_results[9].description == "handshake_failure":
-            classification_result = "tinydtls"
-    elif test_results[4].version == "empty":
-        classification_result = "matrix"
-    elif test_results[4].version == "DTLS_1_0":
-        classification_result = "gnutls"
-    elif test_results[4].version == "DTLS_1_1":
-        if test_results[8].version == "no_response":
-            classification_result = "mbed TLS (~2.4)"
-        elif test_results[8].version == "DTLS_1_1":
-            classification_result = "mbed TLS (~2.16)"
-    return classification_result
-
-
-def get_result_string(value):
-    """Convert result value into string."""
-    return "alive" if value else "dead"
 
 
 def coap_fingerprint(test_params):
@@ -170,9 +134,9 @@ def coap_fingerprint(test_params):
         classification_result,
     )
     if classification_result != RESULT_UNKNOWN:
-        test_params.test_stats.active_endpoints[Protocol.CoAP].append(addr_port_result)
+        test_params.test_stats.active_endpoints[Protocol.COAP].append(addr_port_result)
     else:
-        test_params.test_stats.potential_endpoints[Protocol.CoAP].append(
+        test_params.test_stats.potential_endpoints[Protocol.COAP].append(
             "{}:{}".format(
                 test_params.dst_endpoint.ip_addr, test_params.dst_endpoint.port
             )
@@ -182,14 +146,14 @@ def coap_fingerprint(test_params):
 
 def service_fingerprint(test_params, test_cases):
     """Check service availability by sending 'ping' packet and waiting for response."""
-    if protocol_enabled(Protocol.CoAP, test_params.protocol):
+    if protocol_enabled(Protocol.COAP, test_params.protocol):
         coap_fingerprint(test_params)
     if protocol_enabled(Protocol.DTLS, test_params.protocol):
         try:
             from .dtls_utils import dtls_fingerprint
 
             dtls_fingerprint(test_params)
-        except (ImportError, ModuleNotFound):
+        except ImportError:
             print(SCAPY_SSL_TLS_NOT_INSTALLED)
 
 

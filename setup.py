@@ -120,7 +120,7 @@ setup(
         "Topic :: System",
         "Topic :: System :: Networking",
     ],
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.9.*, <4',
+    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.9.*, <4",
     project_urls={
         "Bug Reports": "https://github.com/Samsung/cotopaxi/issues",
         "Source Code": "https://github.com/Samsung/cotopaxi",
@@ -128,6 +128,7 @@ setup(
     install_requires=[
         "dnslib>=0.9.7",
         'enum34; python_version < "3.0.0"',
+        "grpcio",
         "hexdump>=3.3",
         "IPy>=0.83",
         "pycryptodomex",
@@ -136,11 +137,7 @@ setup(
         'validators==0.16; python_version < "3.0.0"',
         'validators; python_version < "4.0.0"',
     ],
-    extras_require={
-        "all": EXTRAS_ALL,
-        "dev": EXTRAS_DEV,
-        "ml": EXTRAS_ML,
-    },
+    extras_require={"all": EXTRAS_ALL, "dev": EXTRAS_DEV, "ml": EXTRAS_ML,},
     include_package_data=True,
     zip_safe=False,
 )
