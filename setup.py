@@ -86,7 +86,9 @@ setup(
     description="Set of tools for security testing of Internet of Things"
     " devices using specific network protocols.",
     keywords="IoT, security, network, protocols, fuzzing, fingerprinting, vulnerabilities,"
-    "AMQP, CoAP, DTLS, HTCPCP, KNX, mDNS, MQTT, MQTT-SN, QUIC, RTSP, SSDP",
+    " server, client, DDoS, traffic amplification, security configuration, supported ciphers,"
+    " TCP, UDP, IPv4, IPv6, AMQP, CoAP, DTLS, HTCPCP, HTTP/2, gRPC, KNX, mDNS,"
+    " MQTT, MQTT-SN, QUIC, RTSP, SSDP",
     license="GPLv2",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",

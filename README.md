@@ -32,118 +32,6 @@ Set of tools for security testing of Internet of Things devices using protocols:
 Cotopaxi uses GNU General Public License, version 2:
 https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 
-## Installation using pip:
-
-To install minimal Cotopaxi version (without Machine Learning and development tools): 
-
-```
-pip install cotopaxi
-```
-
-Minimal version + Machine Learning libraries (numpy, pandas, sklearn, xgboost):
-```
-pip install cotopaxi[ml]
-```
-
-Minimal version + development tools:
-```
-pip install cotopaxi[dev]
-```
-
-Almost complete installation (without scapy-ssl_tls):
-```
-pip install cotopaxi[all]
-```
-
-## Installation from source:
-
-1. Clone code from git:
-``` 
-git clone https://github.com/Samsung/cotopaxi 
-```
-2. Enter cotopaxi directory
-```
-cd cotopaxi 
-```
-3. Run installer:
-```
-python setup.py install
-```
-
-Optional:
-
-4. Install extras
-
-(ml - Machine Learning tools, dev - development tools, all - all of the above)
-```
-pip install -e .[ml]
-```
-
-5. Install scapy-ssl_tls (in case of any problems with scapy and scapy-ssl_tls see section below)
-
-Installation of scapy-ssl_tls is OPTIONAL - required only if you want to test endpoints using DTLS protocol. 
-
-For Python 2.7:
- 
-(this will install also scapy in 2.4.2)
-```
-    pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
-```
-For Python 3.6-3.8:
-```
-    git clone https://github.com/kalidasya/scapy-ssl_tls.git
-    cd scapy-ssl_tls
-    git checkout py3_update
-    python3 setup.py install
-```
-
-## Requirements:
-
-Currently Cotopaxi works with Python 2.7.* and with Python 3.6-3.8 (some dependencies like tensorflow do not work on 3.9). 
-
-Installation of required libraries:
-
-### scapy-ssl_tls 
-
-For Python 2.7:
- 
-(this will install also scapy in 2.4.2)
-```
-    pip install git+https://github.com/tintinweb/scapy-ssl_tls@ec5714d560c63ea2e0cce713cec54edc2bfa0833
-```
-Common problems:
-* If you encounter error: `error: [Errno 2] No such file or directory: 'LICENSE'`, try repeating command - surprisingly it works.
-* If you encounter error: `NameError: name 'os' is not defined` - add missing `import os` to `scapy/layers/ssl_tls.py`.
-
-### Manual installation of other requirements:
-
-For Python 2.7:
-
-```
-sudo python2.7 -m pip install -r requirements_python2.txt 
-```
-
-For Python 3.6-3.8:
-
-(for installing MINIMAL set of libraries EXCLUDING large Machine Learning libraries (pandas, sklearn, tensorflow, xgboost) required for device_identification and traffic_analyzer)
-
-```
-sudo python3 -m pip install --upgrade pip
-sudo python3 -m pip install -r requirements_minimal.txt 
-```
-
-(for installing FULL set of libraries INCLUDING large Machine Learning libraries (pandas, sklearn, tensorflow, xgboost) required for device_identification and traffic_analyzer)
-```
-sudo python3 -m pip install --upgrade pip
-sudo python3 -m pip install -r requirements.txt 
-```
-
-All required packages for developement of Cotopaxi (including libraries for unit tests) can be installed using requirements_devel.txt file:
-```
-    pip install -r cotopaxi/requirements_devel.txt
-    pre-commit install
-```
-
 ## Disclaimer
 
 Cotopaxi toolkit is intended to be used only for authorized security testing!
@@ -152,8 +40,23 @@ Some tools (especially vulnerability tester and protocol fuzzer) can cause some 
 -- for example leading to crash or hang of tested entities or flooding with network traffic another entities.
 
 Make sure you have permission from the owners of tested devices or servers before running these tools!
- 
+
 Make sure you check with your local laws before running these tools! 
+
+## Installation
+
+To install minimal Cotopaxi version (without Machine Learning and development tools): 
+
+```
+pip install cotopaxi
+```
+
+Almost complete installation (without scapy-ssl_tls required for DTLS support):
+```
+pip install cotopaxi[all]
+```
+
+For more detailed documentation about installation see: [Installation Guide](docs/installation.md)
 
 ## Acknowlegments
 
@@ -183,579 +86,67 @@ We would like to thank above listed authors for sharing this corpus!
 
 Protocols supported by different tools (left box describes working implementation in Python 2 and right one for Python 3): 
 
-Tool                 | AMQP  | CoAP  | DTLS  | HTCPCP | HTTP/2 | gRPC  |  KNX  |  mDNS | MQTT  |MQTT-SN| QUIC  | RTSP  | SSDP
----------------------|-------|-------|-------|--------|--------|-------|-------|-------|-------|-------|-------|-------|-------
+Tool                 |     AMQP     |      CoAP    |      DTLS    |    HTCPCP    |      HTTP/2  |     gRPC     |      KNX     |     mDNS     |      MQTT    |    MQTT-SN   |     QUIC     |     RTSP     |     SSDP
+---------------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------|--------------
 service_ping         |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-server_fingerprinter |       |&#9745;&#9745;|&#9745;&#9745;|        |        |        |       |       |       |       |       |       |
+server_fingerprinter |&#9744;&#9744;|&#9745;&#9745;|&#9745;&#9745;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;
 device_identification|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
 traffic_analyzer     |&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;|&#9744;&#9745;
-resource_listing     |       |&#9745;&#9745;|  N/A  |        |       |&#9745;&#9745;|       |       |       |&#9745;&#9745;|&#9745;&#9745;
-protocol_fuzzer      |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-client_proto_fuzzer  |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-vulnerability_tester |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-client_vuln_tester   |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745; |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
-amplifier_detector   |  N/A  |&#9745;&#9745;|&#9745;&#9745;  |  N/A  |  N/A  |  N/A  |  N/A  |&#9745;&#9745;|  N/A  |&#9745;&#9745;|&#9745;&#9745;|  N/A  |&#9745;&#9745;
-active_scanner       |       |       |&#9745;&#9745;|        |       |       |       |       |       |       |
-
-
-**cotopaxi.service_ping**
-
-Tool for checking availability of network endpoints at given IP and port ranges
-```
-usage: python -m cotopaxi.service_ping [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                       [--verbose]
-                       [--protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
-                       [--src-ip SRC_IP] [--src-port SRC_PORT]
-                       dest_addr dest_port
-
-positional arguments:
-  dest_addr             destination hostname, IP address or multiple IPs
-                        separated by coma (e.g. '1.1.1.1,2.2.2.2') or given by
-                        CIDR netmask (e.g. '10.0.0.0/22') or both
-
-  dest_port             destination port or multiple ports given by list
-                        separated by coma (e.g. '8080,9090') or port range
-                        (e.g. '1000-2000') or both
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --retries RETRIES, -R RETRIES
-                        number of retries
-  --timeout TIMEOUT, -T TIMEOUT
-                        timeout in seconds
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
-                        protocol to be tested (UDP includes all UDP-based
-                        protocols, while TCP includes all TCP-based protocols,
-                        ALL includes all supported protocols)
-  --src-ip SRC_IP, -SI SRC_IP
-                        source IP address (return result will not be
-                        received!) 
-  --src-port SRC_PORT, -SP SRC_PORT
-                        source port (if not specified random port will be
-                        used)
-
-```
--------------------------------------------------------------------------------
-
-**cotopaxi.server_fingerprinter**
-
-Tool for software fingerprinting of network endpoints at given IP and port ranges
-
-Currently supported servers:
-* CoAP:
-    * aiocoap,
-    * CoAPthon,
-    * FreeCoAP,
-    * libcoap,
-    * MicroCoAP,
-    * Mongoose
-    * Wakaama (formerly liblwm2m)
-* DTLS:
-    *  GnuTLS,
-    *  Goldy,
-    *  LibreSSL,
-    *  MatrixSSL,
-    *  mbed TLS,
-    *  OpenSSL,
-    *  TinyDTLS
-```
-usage: python -m cotopaxi.server_fingerprinter [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                               [--verbose] [--protocol {CoAP,DTLS}]
-                               [--src-ip SRC_IP] [--src-port SRC_PORT]
-                               [--ignore-ping-check]
-                               dest_addr dest_port
-
-positional arguments:
-  dest_addr             destination hostname, IP address or multiple IPs
-                        separated by coma (e.g. '1.1.1.1,2.2.2.2') or given by
-                        CIDR netmask (e.g. '10.0.0.0/22') or both
-
-  dest_port             destination port or multiple ports given by list
-                        separated by coma (e.g. '8080,9090') or port range
-                        (e.g. '1000-2000') or both
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --retries RETRIES, -R RETRIES
-                        number of retries
-  --timeout TIMEOUT, -T TIMEOUT
-                        timeout in seconds
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,DTLS}, -P {CoAP,DTLS}
-                        protocol to be tested
-  --src-ip SRC_IP, -SI SRC_IP
-                        source IP address (return result will not be
-                        received!)
-  --src-port SRC_PORT, -SP SRC_PORT
-                        source port (if not specified random port will be
-                        used)
-  --ignore-ping-check, -Pn
-                        ignore ping check (treat all ports as alive)
-
-```
--------------------------------------------------------------------------------
-
-**cotopaxi.device_identification**
-
-Tool for passive identification of IoT devices using captured network traffic
-
-Currently supported devices:
-* Amazon Cloudcam
-* Amazon Echo Dot
-* Amazon Echo Plus
-* Amazon Echo Spot
-* Amazon Fire TV
-* Amcrest Camera
-* Anova Sousvide
-* Apple TV
-* Blink Camera
-* Blink Security Hub
-* Bosiwo Camera
-* D-Llink Mov Sensor
-* Flux Bulb
-* GE Microwave
-* Google Home
-* Google Home Mini
-* Harman Kardon Allure
-* Harman Kardon Invoke
-* Honeywell Thermostat
-* Insteon Hub
-* Lefun Cam
-* LG Smart TV
-* Luohe Cam
-* Magichome Strip
-* Microseven Camera
-* Nest Thermostat
-* Netatmo Weather Station
-* Osram Lightify Hub
-* Philips Hue (Lightbulb)
-* Philips Hue Hub
-* Ring Doorbell
-* Roku TV
-* Samsung Fridge
-* Samsung Dryer
-* Samsung SmartThings Hub
-* Samsung SmartTV
-* Samsung Washer
-* Sengled Smart Hub
-* Smarter Brewer
-* Smarter Coffee Machine
-* Smarter iKettle
-* TP-Link Bulb
-* TP-Link Smart Plug
-* Wansview Camera
-* WeMo Plug
-* WiMaker Charger Camera
-* Wink Hub 2
-* Xiaomi Mi Cam 2
-* Xiaomi Mi Robot Cleaner
-* Xiaomi Mi Hub
-* Xiaomi Mi Rice Cooker
-* Xiaomi Mi Power Strip
-* Yi Camera
-* Zmodo Greet (doorbell)
-
-```
-usage: python -m cotopaxi.device_identification usage: [-h] [--verbose] [--min MIN] [--max MAX]
-                                [--ip IP] [-S]
-                                pcap
-
-Tool for classifying IoT devices based on captured network traffic
-
-positional arguments:
-  pcap                  Packet capture file (in PCAP or PCAPNG format) with
-                        recorded traffic for device identification
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --verbose, -V, --debug, -D
-                        turn on verbose/debug mode (more messages)
-  --min MIN             minimum number of packets to classify device (devices
-                        with smaller number will not be classified) (default: 3)
-  --max MAX             maximum number of packets used to classify device
-                        (default: 1000)
-  --ip IP, -I IP        use IP filter to identify device
-  -S, --short           display only short result of classification
-
-
-```
-
--------------------------------------------------------------------------------
-
-**cotopaxi.traffic_analyzer**
-
-Tool for passive identification of network protocol using captured network traffic
-
-Currently supported protocols:
-* AMQP
-* BGP
-* CMP
-* CoAP
-* DHCP
-* DLNA
-* DNS
-* DTLS
-* EIGRP
-* FTP
-* GNUTELLA
-* GRE
-* H323
-* HSRP
-* HTTP
-* HTCPCP
-* IGMP
-* IPP
-* IPsec
-* IRC
-* KNX
-* LLMNR
-* mDNS
-* MQTT
-* MQTT-SN
-* MSTP
-* NTLM
-* NTP
-* OCSP
-* OSPF
-* QUIC
-* RADIUS
-* RIP
-* RPC
-* RTSP
-* SIP
-* SMB
-* SMTP
-* SNMP
-* SSDP
-* SSH
-* TACACS
-* TELNET
-* TFTP
-* TLS
-* VRRP
-
-```
-usage: python -m cotopaxi.traffic analyzer usage: [-h] [--verbose] [--min MIN] [--max MAX]
-                                [--ip IP] [-S]
-                                pcap
-
-Tool for classifying network protocols used in traffic flows
-
-positional arguments:
-  pcap                  Packet capture file (in PCAP or PCAPNG format) with
-                        recorded traffic for network protocols identification
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --verbose, -V, --debug, -D
-                        turn on verbose/debug mode (more messages)
-  --min MIN             minimum number of packets to classify
-                        conversation(conversations with smaller number will
-                        not be classified) (default: 3)
-  --max MAX             maximum number of packets used to classify
-                        conversation (default: 1000)
-  --ip IP, -I IP        use IP filter to identify protocol
-  -S, --short           display only short result of classification
-
-
-```
-
--------------------------------------------------------------------------------
-
-**cotopaxi.resource_listing**
-
-Tool for checking availability of resource named url on server at given IP and port ranges.
-Sample URL lists are available in the _urls_ directory
-
-```
-usage: python -m cotopaxi.resource_listing [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                           [--verbose] [--protocol {CoAP,HTTP,mDNS,RTSP,SSDP}]
-                           [--src-ip SRC_IP] [--src-port SRC_PORT]
-                           [--ignore-ping-check]
-                           [--method {GET,POST,PUT,DELETE,ALL} [{GET,POST,PUT,DELETE,ALL} ...]]
-                           dest_addr dest_port names_filepath
-
-positional arguments:
-  dest_addr             destination hostname, IP address or multiple IPs
-                        separated by coma (e.g. '1.1.1.1,2.2.2.2') or given by
-                        CIDR netmask (e.g. '10.0.0.0/22') or both
-
-  dest_port             destination port or multiple ports given by list
-                        separated by coma (e.g. '8080,9090') or port range
-                        (e.g. '1000-2000') or both
-  names_filepath        path to file with list of names (URLs for CoAP or
-                        services for mDNS) to be tested (each name in
-                        separated line)
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --retries RETRIES, -R RETRIES
-                        number of retries
-  --timeout TIMEOUT, -T TIMEOUT
-                        timeout in seconds
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,HTTP,mDNS,RTSP,SSDP}, -P {CoAP,HTTP,mDNS,RTSP,SSDP}
-                        protocol to be tested
-  --src-ip SRC_IP, -SI SRC_IP
-                        source IP address (return result will not be
-                        received!)
-  --src-port SRC_PORT, -SP SRC_PORT
-                        source port (if not specified random port will be
-                        used)
-  --ignore-ping-check, -Pn
-                        ignore ping check (treat all ports as alive)
-  --method {GET,POST,PUT,DELETE,ALL} [{GET,POST,PUT,DELETE,ALL} ...], -M {GET,POST,PUT,DELETE,ALL} [{GET,POST,PUT,DELETE,ALL} ...]
-                        methods to be tested (ALL includes all supported
-                        methods)
-
-```
--------------------------------------------------------------------------------
-
-**cotopaxi.protocol_fuzzer**
-
-Black-box fuzzer for testing protocol servers
-
-```
-usage: python -m cotopaxi.protocol_fuzzer [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                          [--verbose]
-                          [--protocol {CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
-                          [--hide-disclaimer] [--src-ip SRC_IP]
-                          [--src-port SRC_PORT] [--ignore-ping-check]
-                          [--corpus-dir CORPUS_DIR]
-                          [--delay-after-crash DELAY_AFTER_CRASH]
-                          dest_addr dest_port
-
-positional arguments:
-  dest_addr             destination hostname, IP address or multiple IPs
-                        separated by coma (e.g. '1.1.1.1,2.2.2.2') or given by
-                        CIDR netmask (e.g. '10.0.0.0/22') or both
-
-  dest_port             destination port or multiple ports given by list
-                        separated by coma (e.g. '8080,9090') or port range
-                        (e.g. '1000-2000') or both
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --retries RETRIES, -R RETRIES
-                        number of retries
-  --timeout TIMEOUT, -T TIMEOUT
-                        timeout in seconds
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
-                        protocol to be tested
-  --hide-disclaimer, -HD
-                        hides legal disclaimer (shown before starting
-                        intrusive tools)
-  --src-ip SRC_IP, -SI SRC_IP
-                        source IP address (return result will not be
-                        received!)
-  --src-port SRC_PORT, -SP SRC_PORT
-                        source port (if not specified random port will be
-                        used)
-  --ignore-ping-check, -Pn
-                        ignore ping check (treat all ports as alive)
-  --corpus-dir CORPUS_DIR, -C CORPUS_DIR
-                        path to directory with fuzzing payloads (corpus) (each
-                        payload in separated file)
-  --delay-after-crash DELAY_AFTER_CRASH, -DAC DELAY_AFTER_CRASH
-                        number of seconds that fuzzer will wait after crash
-                        for respawning tested server
-```
-
--------------------------------------------------------------------------------
-
-**cotopaxi.client_proto_fuzzer**
-
-Black-box fuzzer for testing protocol clients
-
-```
-usage: (sudo) python -m cotopaxi.client_proto_fuzzer [-h] [--server-ip SERVER_IP]
-                              [--server-port SERVER_PORT] [--verbose]
-                              [--protocol {CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
-                              [--corpus-dir CORPUS_DIR]
-
-(sudo required for listening on ports below 1024)
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --server-ip SERVER_IP, -SI SERVER_IP
-                        IP address, that will be used to set up tester server
-  --server-port SERVER_PORT, -SP SERVER_PORT
-                        port that will be used to set up server
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,DTLS,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
-                        protocol to be tested
-  --corpus-dir CORPUS_DIR, -C CORPUS_DIR
-                        path to directory with fuzzing payloads (corpus) (each
-                        payload in separated file)
-```
-
--------------------------------------------------------------------------------
-
-**cotopaxi.vulnerability_tester**
-
-Tool for checking vulnerability of network endpoints at given IP and port ranges
-```
-usage: python -m cotopaxi.vulnerability_tester -h
-usage: vulnerability_tester.py [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                               [--verbose]
-                               [--protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
-                               [--hide-disclaimer] [--src-ip SRC_IP]
-                               [--src-port SRC_PORT] [--ignore-ping-check]
-                               [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
-                               [--cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]]
-                               [--list]
-                               dest_addr dest_port
-
-positional arguments:
-  dest_addr             destination hostname, IP address or multiple IPs
-                        separated by coma (e.g. '1.1.1.1,2.2.2.2') or given by
-                        CIDR netmask (e.g. '10.0.0.0/22') or both
-
-  dest_port             destination port or multiple ports given by list
-                        separated by coma (e.g. '8080,9090') or port range
-                        (e.g. '1000-2000') or both
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --retries RETRIES, -R RETRIES
-                        number of retries
-  --timeout TIMEOUT, -T TIMEOUT
-                        timeout in seconds
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {ALL,UDP,TCP,CoAP,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
-                        protocol to be tested (UDP includes all UDP-based
-                        protocols, while TCP includes all TCP-based protocols,
-                        ALL includes all supported protocols)
-  --hide-disclaimer, -HD
-                        hides legal disclaimer (shown before starting
-                        intrusive tools)
-  --src-ip SRC_IP, -SI SRC_IP
-                        source IP address (return result will not be
-                        received!)
-  --src-port SRC_PORT, -SP SRC_PORT
-                        source port (if not specified random port will be
-                        used)
-  --ignore-ping-check, -Pn
-                        ignore ping check (treat all ports as alive)
-  --vuln {ALL,BEWARD_000,BOTAN_000,...} ...]
-                        list of vulnerabilities to be tested (by SOFT_NUM id)
-  --cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]
-                        list of vulnerabilities to be tested (by CVE id)
-  --list, -L            display lists of all vulnerabilities supported by this
-                        tool with detailed description
-
-```
--------------------------------------------------------------------------------
-
-**cotopaxi.client_vuln_tester**
-
-Tool for checking vulnerability of network clients connecting to server provided by this tool
-
-```
-usage: (sudo) python -m cotopaxi.client_vuln_tester [-h] [--server-ip SERVER_IP]
-                             [--server-port SERVER_PORT] [--verbose]
-                             [--protocol {CoAP,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}]
-                             [--vuln {ALL,BEWARD_000,BOTAN_000,...} ...]]
-                             [--cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]]
-                             [--list]
-
-(sudo required for listening on ports below 1024)
-optional arguments:
-  -h, --help            show this help message and exit
-  --server-ip SERVER_IP, -SI SERVER_IP
-                        IP address, that will be used to set up tester server
-  --server-port SERVER_PORT, -SP SERVER_PORT
-                        port that will be used to set up server
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {CoAP,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}, -P {CoAP,HTCPCP,HTTP,HTTP2,gRPC,KNX,mDNS,MQTT,QUIC,RTSP,SSDP}
-                        protocol to be tested
-  --vuln {ALL,BEWARD_000,BOTAN_000,...} ...]
-                        list of vulnerabilities to be tested (by SOFT_NUM id)
-  --cve {ALL,CVE-2014-4878,CVE-2014-4879,...} ...]
-                        list of vulnerabilities to be tested (by CVE id)
-  --list, -L            display lists of all vulnerabilities supported by this
-                        tool with detailed description
-
-```
-
--------------------------------------------------------------------------------
-
-**cotopaxi.amplifier_detector**
-
-Tool for detection of network devices amplifying reflected traffic
-by observing size of incoming and outgoing size of packets
-```
-usage: sudo python -m cotopaxi.amplifier_detector [-h] [--port PORT] [--nr NR] [--verbose] dest_addr
-
-positional arguments:
-  dest_addr               destination IP address
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --interval INTERVAL, -I INTERVAL
-                        minimal interval in sec between displayed status
-                        messages (default: 1 sec)
-  --port PORT, --dest_port PORT, -P PORT
-                        destination port
-  --nr NR, -N NR        number of packets to be sniffed (default: 9999999)
-  --verbose, -V, --debug, -D
-                        turn on verbose/debug mode (more messages)
-
-```
-
--------------------------------------------------------------------------------
-
-**cotopaxi.active_scanner**
-
-Tool for checking security properties of network endpoints at given IP and port ranges
-
-```
-usage: python -m cotopaxi.active_scanner [-h] [--retries RETRIES] [--timeout TIMEOUT]
-                         [--verbose] [--protocol {DTLS}] [--src-ip SRC_IP]
-                         [--src-port SRC_PORT] [--ignore-ping-check]
-                         dest_addr dest_port
-
-positional arguments:
-  dest_addr             destination hostname, IP address or multiple IPs
-                        separated by coma (e.g. '1.1.1.1,2.2.2.2') or given by
-                        CIDR netmask (e.g. '10.0.0.0/22') or both
-
-  dest_port             destination port or multiple ports given by list
-                        separated by coma (e.g. '8080,9090') or port range
-                        (e.g. '1000-2000') or both
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --retries RETRIES, -R RETRIES
-                        number of retries
-  --timeout TIMEOUT, -T TIMEOUT
-                        timeout in seconds
-  --verbose, -V, --debug, -D
-                        Turn on verbose/debug mode (more messages)
-  --protocol {DTLS}, -P {DTLS}
-                        protocol to be tested
-  --src-ip SRC_IP, -SI SRC_IP
-                        source IP address (return result will not be
-                        received!)
-  --src-port SRC_PORT, -SP SRC_PORT
-                        source port (if not specified random port will be
-                        used)
-  --ignore-ping-check, -Pn
-                        ignore ping check (treat all ports as alive)
-
-```
-
-
--------------------------------------------------------------------------------
+resource_listing     |&#9744;&#9744;|&#9745;&#9745;|     N/A      |&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9745;&#9745;|&#9744;&#9744;|&#9744;&#9744;|     N/A      |&#9745;&#9745;|&#9745;&#9745;
+protocol_fuzzer      |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+client_proto_fuzzer  |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+vulnerability_tester |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+client_vuln_tester   |&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;|&#9745;&#9745;
+amplifier_detector   |     N/A      |&#9745;&#9745;|&#9745;&#9745;|     N/A      |     N/A      |     N/A      |     N/A      |&#9745;&#9745;|     N/A      |&#9745;&#9745;|&#9745;&#9745;|     N/A      |&#9745;&#9745;
+active_scanner       |&#9744;&#9744;|&#9744;&#9744;|&#9745;&#9745;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;|&#9744;&#9744;
+
+For more detailed documentation of each tool see: [Tools](docs/tools.md)
+
+## Supported vulnerabilites
+
+Vulnerabilities identified by Cotopaxi team, that can be tested using Cotopaxi:
+* [BOTAN_000](https://github.com/randombit/botan/issues/1833)
+* [COAPTHON_000 (CVE-2018-12679)](https://github.com/Tanganelli/CoAPthon/issues/135)
+* [COAPTHON3_000 (CVE-2018-12679)](https://github.com/Tanganelli/CoAPthon3/issues/16)
+* [CONTIKI_000 (CVE-2018-19417)](https://github.com/contiki-ng/contiki-ng/issues/600)
+* [FLUENTBIT_000 (CVE-2019-9749)](https://github.com/fluent/fluent-bit/issues/1135)
+* [IOTIVITY_000 (CVE-2019-9750)](https://jira.iotivity.org/browse/IOT-3267)
+* [MADMAZE-HTCPCP_000](https://github.com/madmaze/HTCPCP/issues/13)
+* [MATRIXSSL_000](https://github.com/matrixssl/matrixssl/issues/31)
+* [MATRIXSSL_001 (CVE-2019-14431)](https://github.com/matrixssl/matrixssl/issues/30)
+* [MATRIXSSL_002](https://github.com/matrixssl/matrixssl/issues/32)
+* [MATRIXSSL_003](https://github.com/matrixssl/matrixssl/issues/33)
+* [SSDP-RESPONDER_000 (CVE-2019-14323)](https://github.com/troglobit/ssdp-responder/issues/1)
+* [TINYDTLS_001](https://bugs.eclipse.org/bugs/show_bug.cgi?id=544819)
+* [TINYDTLS_002](https://bugs.eclipse.org/bugs/show_bug.cgi?id=544824)
+* [TINYDTLS_003](https://www.eclipse.org/lists/tinydtls-dev/msg00206.html)
+* [TINYSVCMDNS_002 (CVE-2019-9747)](https://bitbucket.org/geekman/tinysvcmdns/issues/11/denial-of-service-vulnerability-infinite)
+* [WAKAAMA_000 (CVE-2019-9004)](https://github.com/eclipse/wakaama/issues/425)
+* ZYXEL_000
+
+Other vulnerabilities supported by Cotopaxi:
+* [ER_COAP_000](https://github.com/contiki-os/contiki/issues/2240)
+* [ER_COAP_001](https://github.com/contiki-os/contiki/issues/2238)
+* [ER_COAP_002](https://github.com/contiki-os/contiki/issues/2239)
+* [TINYDTLS_000 (CVE-2017-7243)](https://www.cvedetails.com/cve/CVE-2017-7243/)
+* [TINYSVCMDNS_000 (CVE-2017-12087)](https://nvd.nist.gov/vuln/detail/CVE-2017-12087)
+* [TINYSVCMDNS_001 (CVE-2017-12130)](https://nvd.nist.gov/vuln/detail/CVE-2017-12130)
+* [TP-LINK_000 (CVE-2018-18428](https://www.exploit-db.com/exploits/45632)
+* [TP-LINK_001](https://www.zeroscience.mk/en/vulnerabilities/ZSL-2013-5135.php)
+* [FLIR_000](https://www.zeroscience.mk/en/vulnerabilities/ZSL-2018-5492.php)
+* [FOSCAM_000 (CVE-2018-19077)](https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt)
+* [FOSCAM_001 (CVE-2018-19067)](https://sintonen.fi/advisories/foscam-ip-camera-multiple-vulnerabilities.txt)
+* [HIKVISION_000 (CVE-2014-4878)](https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/)
+* [HIKVISION_001 (CVE-2014-4879)](https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/)
+* [HIKVISION_002 (CVE-2014-4880)](https://blog.rapid7.com/2014/11/19/r7-2014-18-hikvision-dvr-devices-multiple-vulnerabilities/)
+* [UBIQUITTI_000 (CVE-2019-12727)](https://github.com/X-C3LL/PoC-CVEs/blob/master/Aircam-DoS/Aircam-DoS.py)
+* [GSTREAMER_000 (CVE-2019-9928)](https://gstreamer.freedesktop.org/security/sa-2019-0001.html)
+* [NETFLIX_000 (CVE-2019-10028)](https://blog.forallsecure.com/forallsecure-uncovers-vulnerability-in-netflix-dial-software)
+* [BEWARD_000](https://www.zeroscience.mk/en/vulnerabilities/ZSL-2019-5509.php)
+* [FALCON_000](https://github.com/sbaresearch/advisories/tree/public/2015/knAx_20150101)
+
+New vulnerabilities can be easily added to the database in [vulnerabilities.yaml](./cotopaxi/vulnerabilities/vulnerabilities.yaml) 
+and payloads in [cotopaxi/vulnerabilities/<protocol>/<payload.raw>](cotopaxi/vulnerabilities/).
 
 ## Known issues / limitations
 
@@ -765,66 +156,9 @@ There are some known issues or limitations caused by using scapy as network libr
 * multiple tools running against the same target can result in interference between them 
 (packets may be indicated as a response to another request).
 
-
 See more at:
 https://scapy.readthedocs.io/en/latest/troubleshooting.html#
 
-## Source code quality
+## Development
 
-Before uploading your contribution using github Pull Request please check your code using tools listed below:
-
-```
-black -t py36 cotopaxi
-black -t py36 tests
-
-pydocstyle cotopaxi
-
-python -m pylint cotopaxi --rcfile=.pylintrc
-python -m pylint tests --rcfile=tests/.pylintrc
-
-bandit -r cotopaxi
-```
-
-## Unit tests
-
-To run all unit tests using unittest use (from upper cotopaxi dir):
-```
-    sudo python -m unittest discover -v
-```
-
-To run all unit tests using unittest with coverage analysis run (from upper cotopaxi dir):
-```
-    sudo coverage run --source cotopaxi -m unittest discover
-    coverage html
-    firefox htmlcov/index.html
-```
-
-To run all unit tests using pytest with coverage analysis and branch analysis run (from upper cotopaxi dir):
-
-```
-    sudo python2.7 -m coverage run --source cotopaxi --branch -m pytest -v
-    sudo python2.7 -m coverage html
-    firefox htmlcov/index.html
-
-    sudo python3 -m coverage run --source cotopaxi --branch -m pytest -v
-    sudo python3 -m coverage html
-    firefox htmlcov/index.html
-```
-
-To run unit tests for one of tools run (from upper cotopaxi dir):
-```
-    python -m tests.test_active_scanner
-    sudo python -m tests.test_amplifier_detector
-    python -m tests.test_client_proto_fuzzer
-    python -m tests.test_device_identification
-    python -m tests.test_traffic_analyzer
-    python -m tests.test_protocol_fuzzer
-    sudo python -m tests.test_resource_listing
-    python -m tests.test_server_fingerprinter
-    python -m tests.test_service_ping
-    python -m tests.test_vulnerability_tester
-```
-
-Most of the tests are performed against remote tests servers and require preparing test environment, 
-providing settings in tests/test_config.ini and tests/test_servers.yaml.
-
+For more detailed information about development of Cotopaxi see: [Development guide](docs/development.md)
