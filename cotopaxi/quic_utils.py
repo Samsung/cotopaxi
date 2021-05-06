@@ -151,12 +151,18 @@ class QUICTester(UDPBasedProtocolTester):
             if not response:
                 continue
             if ICMP in response and response[ICMP].type == 3:
-                print_verbose(test_params, "Received ICMP dest-unreachable")
+                print_verbose(
+                    test_params, "[!] QUIC ping: Received ICMP dest-unreachable"
+                )
                 continue
-            if 50 < len(response) < 70 or 1000 < len(response) < 2000:
+            if 50 < len(response) < 100 or 1000 < len(response) < 2000:
                 return True
             else:
-                print("Received unknown message len: {}".format(len(response)))
+                print(
+                    "[!] QUIC ping: Received unknown message len: {}".format(
+                        len(response)
+                    )
+                )
             # parsed_response = scrap_response(test_params, response)
             # if check_dtls_response(test_params, parsed_response):
             #     return True

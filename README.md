@@ -12,18 +12,25 @@ Y88b  d88P Y88..88P Y88b. Y88..88P 888 d88P 888  888 .d8""8b. 888
                                    888
 ```
 
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
-![GitHub top language](https://img.shields.io/github/languages/top/Samsung/cotopaxi)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cotopaxi)
-![LGTM Grade](https://img.shields.io/lgtm/grade/python/github/Samsung/cotopaxi)
-![Lines of code](https://img.shields.io/tokei/lines/github/samsung/cotopaxi)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-![GitHub search hit counter](https://img.shields.io/github/search/Samsung/cotopaxi/*)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/Samsung/cotopaxi)
-![GitHub issues](https://img.shields.io/github/issues/Samsung/cotopaxi)
-<!---![PyPI - Downloads](https://img.shields.io/pypi/dm/cotopaxi) --->
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg?style=plastic)](LICENSE)
+![GitHub top language](https://img.shields.io/github/languages/top/Samsung/cotopaxi?style=plastic)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cotopaxi?style=plastic)
+![LGTM Grade](https://img.shields.io/lgtm/grade/python/github/Samsung/cotopaxi?style=plastic)
+![Lines of code](https://img.shields.io/tokei/lines/github/samsung/cotopaxi?style=plastic)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=plastic)](https://github.com/psf/black)
+![GitHub search hit counter](https://img.shields.io/github/search/Samsung/cotopaxi/*?style=plastic)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Samsung/cotopaxi?style=plastic)
+![GitHub issues](https://img.shields.io/github/issues/Samsung/cotopaxi?style=plastic)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/cotopaxi?style=plastic)
 <!---![GitHub all releases](https://img.shields.io/github/downloads/Samsung/cotopaxi/total)--->
 
+[![Black Hat Arsenal](https://img.shields.io/badge/Black%20Hat%20Arsenal-ASIA%202019-1E90FF?style=plastic)](https://www.blackhat.com/asia-19/arsenal/schedule/#cotopaxi-iot-protocols-security-testing-toolkit-14325)
+[![Black Hat Arsenal](https://img.shields.io/badge/Black%20Hat%20Arsenal-USA%202019-1E90FF?style=plastic)](https://www.blackhat.com/us-19/arsenal/schedule/#cotopaxi-iot-protocols-security-testing-toolkit-17034)
+[![DEF CON 27](https://img.shields.io/badge/DEF%20CON%C2%AE%2027%20%E2%88%92%20Demo%20Labs-2019-ff0000?style=plastic)](https://www.defcon.org/html/defcon-27/dc-27-demolabs.html#Cotopaxi)
+[![Black Hat Arsenal](https://img.shields.io/badge/Black%20Hat%20Arsenal-EU%202019-1E90FF?style=plastic)](https://www.blackhat.com/eu-19/arsenal/schedule/index.html#cotopaxi-iot-protocols-security-testing-toolkit-18201)
+[![DEF CON 28](https://img.shields.io/badge/DEF%20CON%C2%AE%2028%20%E2%88%92%20Demo%20Labs-2020-ff0000?style=plastic)](https://www.defcon.org/html/defcon-safemode/dc-safemode-demolabs.html#Cotopaxi)
+[![Black Hat Arsenal](https://img.shields.io/badge/Black%20Hat%20Arsenal-USA%202020-1E90FF?style=plastic)](https://www.blackhat.com/us-20/arsenal/schedule/#cotopaxi-iot-protocols-security-testing-toolkit-21082)
+[![Black Hat Arsenal](https://img.shields.io/badge/Black%20Hat%20Arsenal-EU%202020-1E90FF?style=plastic)](https://www.blackhat.com/eu-20/arsenal/schedule/#cotopaxi-iot-protocols-security-testing-toolkit-21757)
 
 Set of tools for security testing of Internet of Things devices using protocols: AMQP, CoAP, DTLS, HTCPCP, HTTP, HTTP/2, gRPC, KNX, mDNS, MQTT, MQTT-SN, QUIC, RTSP, SSDP.
 
@@ -57,6 +64,10 @@ pip install cotopaxi[all]
 ```
 
 For more detailed documentation about installation see: [Installation Guide](docs/installation.md)
+
+## Integration with Metasploit
+
+If you want to use Cotopaxi tools from Metasploit see: [Metasploit integration](docs/metasploit.md)
 
 ## Acknowlegments
 
@@ -152,7 +163,7 @@ and payloads in [cotopaxi/vulnerabilities/<protocol>/<payload.raw>](cotopaxi/vul
 
 There are some known issues or limitations caused by using scapy as network library:
 
-* testing services running on the same machine can results in issues occurred by not delivering some packets,
+* testing services running on the same machine can result in issues occurred by not delivering some packets,
 * multiple tools running against the same target can result in interference between them 
 (packets may be indicated as a response to another request).
 

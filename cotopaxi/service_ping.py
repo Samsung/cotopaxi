@@ -49,19 +49,19 @@ def service_ping(test_params, show_result=False):
                 else:
                     ping_result = "does NOT respond"
                 if show_result:
+                    ping_message = '[+] Host {}:{} {} to {} "protocol ping" message'.format(
+                        test_params.dst_endpoint.ip_addr,
+                        test_params.dst_endpoint.port,
+                        ping_result,
+                        PROTOCOL_TESTERS[protocol].protocol_short_name(),
+                    )
                     if ping_result == "responds":
                         endpoints = test_params.test_stats.active_endpoints
+                        print(ping_message)
                     else:
                         endpoints = test_params.test_stats.inactive_endpoints
+                        print_verbose(test_params, ping_message)
                     endpoints[protocol].append(endpoint_string(test_params))
-                    print(
-                        '[+] Host {}:{} {} to {} "protocol ping" message'.format(
-                            test_params.dst_endpoint.ip_addr,
-                            test_params.dst_endpoint.port,
-                            ping_result,
-                            PROTOCOL_TESTERS[protocol].protocol_short_name(),
-                        )
-                    )
         if ping_result == "responds":
             return True
     except socket.error as type_exception:
