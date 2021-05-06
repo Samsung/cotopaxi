@@ -80,7 +80,7 @@ EXTRAS_ALL = EXTRAS_DEV + EXTRAS_ML
 
 setup(
     name="cotopaxi",
-    version="1.5.2",
+    version="1.6.0",
     author="Jakub Botwicz",
     author_email="cotopaxi.tool@protonmail.com",
     description="Set of tools for security testing of Internet of Things"
