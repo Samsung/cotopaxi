@@ -21,8 +21,8 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import codecs
 import socket
-from hexdump import dehex
 from scapy.contrib.mqtt import CONTROL_PACKET_TYPE, MQTT, MQTTConnack, RETURN_CODE
 
 from .common_utils import print_verbose, show_verbose, tcp_sr1
@@ -104,7 +104,7 @@ class MQTTTester(TCPBasedProtocolTester):
             return None
         # MQTT ping is using Connect message
         for packet_hex in [MQTT_CONN_MQTT, MQTT_CONN_MQISDP]:
-            packet_data = dehex(packet_hex)
+            packet_data = codecs.decode(packet_hex, "hex")
             out_packet = MQTT(packet_data)
             if mqtt_request(test_params, out_packet):
                 return True

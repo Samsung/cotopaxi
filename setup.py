@@ -80,7 +80,7 @@ EXTRAS_ALL = EXTRAS_DEV + EXTRAS_ML
 
 setup(
     name="cotopaxi",
-    version="1.6.0",
+    version="1.7.0",
     author="Jakub Botwicz",
     author_email="cotopaxi.tool@protonmail.com",
     description="Set of tools for security testing of Internet of Things"
@@ -131,7 +131,6 @@ setup(
         "dnslib>=0.9.7",
         'enum34; python_version < "3.0.0"',
         "grpcio",
-        "hexdump>=3.3",
         "IPy>=0.83",
         "pycryptodomex",
         "PyYAML>=3.12",

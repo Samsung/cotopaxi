@@ -24,7 +24,6 @@
 import codecs
 import socket
 import struct
-from hexdump import dehex
 from scapy.all import UDP
 from scapy.contrib.mqtt import MQTT
 
@@ -125,7 +124,7 @@ class MQTTSNTester(UDPBasedProtocolTester):
             return None
         # MQTT-SN ping is using Search Gateway message
         for packet_hex in [MQTTSN_SEARCH_GATEWAY]:
-            packet_data = dehex(packet_hex)
+            packet_data = codecs.decode(packet_hex, "hex")
             out_packet = MQTT(packet_data)
             if mqttsn_request(test_params, out_packet):
                 return True

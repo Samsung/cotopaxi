@@ -1,6 +1,5 @@
 dnslib>=0.9.7
 grpcio
-hexdump>=3.3
 IPy>=0.83
 pycryptodomex
 PyYAML>=3.12

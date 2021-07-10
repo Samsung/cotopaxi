@@ -21,10 +21,10 @@
 #    along with Cotopaxi.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import codecs
 import random
 import sys
 
-from hexdump import dehex
 from scapy.all import IP, UDP
 from scapy.contrib.coap import CoAP
 
@@ -111,7 +111,9 @@ def coap_check_url(test_params, method, url):
         if code != "Empty":
             print(
                 "SENT size:{} RECV size:{} AMPLIFICATION FACTOR:{:0.2f}%".format(
-                    in_size, out_size, amplification_factor(in_size, out_size),
+                    in_size,
+                    out_size,
+                    amplification_factor(in_size, out_size),
                 )
             )
             return code
@@ -253,7 +255,7 @@ class CoAPTester(UDPBasedProtocolTester):
             return None
         coap_ping_packets = [COAP_PING_1_RAW, COAP_PING_2_RAW]
         for coap_ping_raw in coap_ping_packets:
-            packet_raw = dehex(coap_ping_raw)
+            packet_raw = codecs.decode(coap_ping_raw, "hex")
             response = udp_sr1(test_params, packet_raw, test_params.wrap_secure_layer)
             if response:
                 for response_packet in response:
