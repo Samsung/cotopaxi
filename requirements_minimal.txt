@@ -1,6 +1,7 @@
 dnslib>=0.9.7
 grpcio
 IPy>=0.83
+protobuf>=3.13.0
 pycryptodomex
 PyYAML>=3.12
 scapy>=2.4.3
