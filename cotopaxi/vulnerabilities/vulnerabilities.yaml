@@ -327,3 +327,22 @@
   url: https://github.com/sbaresearch/advisories/tree/public/2015/knAx_20150101
   credit: Aljosha Judmayer (SBA Research)
   payload_file: knx/payload_cve-2015-8299_crash.raw
+- name: GRPCIO_000
+  type: Crash 
+  cve_id:
+  description: GRPC server (grpc.io) is vulnerable to Denial of Service attacks 
+    by opening large number of connections when underlying operating system 
+    is limiting number of opened files (in Linux this limit is by default set to 1024).
+  url:
+  credit: Jakub Botwicz
+  nr_packets: 1025
+  payload_file: grpc/payload_grpcio_000.raw
+- name: IKEA_000
+  type: Crash
+  cve_id:
+  description: IKEA Tradfri Hub is vulnerable to Denial of Service attacks
+    by sending malformed DTLS packets. After sending single packet the device 
+    is unavailable for around 8 seconds. This affects only devices from 2018-2019 with not updated software.
+  url:
+  credit: Jakub Botwicz
+  payload_file: dtls/payload_tradfri_000.raw
