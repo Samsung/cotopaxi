@@ -22,6 +22,7 @@
 #
 
 import os
+import random
 import struct
 import sys
 import time
@@ -181,18 +182,10 @@ def perform_protocol_fuzzing(test_params, test_cases):
         print(prepare_separator("-"))
 
 
-def load_corpus(tester, args):
+def load_corpus(tester, corpus_dir_path):
     """Provide corpus of payloads based on options provided by args."""
-    options = tester.parse_args(args)
-    test_params = tester.test_params
 
-    print_verbose(test_params, "corpus_dir: {}".format(options.corpus_dir))
-    if options.corpus_dir:
-        corpus_dir_path = options.corpus_dir
-    else:
-        corpus_dir_path = os.path.dirname(__file__) + "/fuzzing_corpus/"
-        if test_params.protocol.name != "ALL":
-            corpus_dir_path += test_params.protocol.name.lower()
+    test_params = tester.test_params
     print_verbose(test_params, prepare_separator())
     testcases = []
     for root, _, files in os.walk(corpus_dir_path):
@@ -203,8 +196,89 @@ def load_corpus(tester, args):
             "Cannot load testcases from provided path: {}\n"
             "Testing stopped!".format(corpus_dir_path)
         )
+    print_verbose(test_params, "corpus_dir: {}".format(corpus_dir_path))
     print_verbose(test_params, "Loaded corpus of {} testcases".format(len(testcases)))
     return testcases
+
+
+def mutate_testcase(filename, content, mutation_nr, mutation_index, mutation_data):
+    """Mutate single testcase."""
+
+    mutation_nr = mutation_nr % 5
+    if len(content) == 0:
+        content = bytes(
+            mutation_data,
+        )
+    mutation_index = mutation_index % len(content)
+    mutation_data = mutation_data % 255
+    filename_split = filename.split(".")
+    # 0 - remove single byte (index given by mutation_index)
+    # 1 - cut content after mutation index
+    # 2 - change character at mutation_index to mutation data
+    # 3 - insert character mutation data at mutation_index
+    # 4 - duplicate character at mutation_index
+    if mutation_nr == 0:
+        mutation_description = "_rem_" + str(mutation_index)
+        new_content = content[:mutation_index] + content[mutation_index + 1 :]
+    elif mutation_nr == 1:
+        mutation_description = "_cut_" + str(mutation_index)
+        new_content = content[:mutation_index]
+    elif mutation_nr == 2:
+        mutation_description = "_flip_" + str(mutation_index)
+        new_content = (
+            content[:mutation_index]
+            + bytes(
+                mutation_data,
+            )
+            + content[mutation_index + 1 :]
+        )
+    elif mutation_nr == 3:
+        mutation_description = "_ins_" + str(mutation_index)
+        new_content = (
+            content[:mutation_index]
+            + bytes(
+                mutation_data,
+            )
+            + content[mutation_index:]
+        )
+    else:
+        mutation_description = "_dup_" + str(mutation_index)
+        new_content = (
+            content[:mutation_index]
+            + (content[mutation_index:mutation_index])
+            + content[mutation_index:]
+        )
+    if len(new_content) == 0:
+        new_content = bytes(
+            mutation_data,
+        )
+    if len(filename_split) > 1:
+        filename_split[-1] += mutation_description
+    else:
+        filename_split[0] += mutation_description
+    return ".".join(filename_split), new_content
+
+
+def mutate_testcases(testcases, new_corpus_dir):
+    """Mutate set of testcases."""
+
+    if not os.path.exists(new_corpus_dir):
+        os.makedirs(new_corpus_dir)
+    for testcase in testcases:
+        with open(testcase.payload_file, "rb") as file_handle:
+            testcase_payload = file_handle.read()
+        _, original_filename = os.path.split(testcase.payload_file)
+        new_filename, new_content = mutate_testcase(
+            original_filename,
+            testcase_payload,
+            random.randint(0, 5),
+            random.randint(0, 9223372036854775807),
+            random.randint(0, 255),
+        )
+        if len(new_filename) > 60:
+            new_filename = new_filename[:20] + "___" + new_filename[40:]
+        with open(os.path.join(new_corpus_dir, new_filename), "wb") as file:
+            file.write(new_content)
 
 
 def main(args):
@@ -234,9 +308,41 @@ def main(args):
         " for respawning tested server",
     )
 
-    testcases = load_corpus(tester, args)
+    tester.argparser.add_argument(
+        "--fuzzing-iterations",
+        "-FI",
+        action="store",
+        type=int,
+        default=0,
+        help="number fuzzing iterations (mutations of corpus)",
+    )
 
+    options = tester.parse_args(args)
+    if options.corpus_dir:
+        corpus_dir_path = options.corpus_dir
+        corpus_dir_base = options.corpus_dir + "_"
+    else:
+        corpus_dir_path = os.path.dirname(__file__) + "/fuzzing_corpus/"
+        if tester.test_params.protocol.name != "ALL":
+            corpus_dir_path += tester.test_params.protocol.name.lower()
+        corpus_dir_base = os.getcwd() + "/fuzzing_corpus_"
+    testcases = load_corpus(tester, corpus_dir_path)
     tester.perform_testing("protocol fuzzing", perform_protocol_fuzzing, testcases)
+
+    max_iteration_len = len(str(options.fuzzing_iterations))
+    for i in range(options.fuzzing_iterations):
+        print(
+            prepare_separator(
+                "#", post_separator_text="\n\t\tStarting round {}\n".format(i + 2)
+            )
+        )
+        str_i = str(i)
+        corpus_new_dir = (
+            corpus_dir_base + "0" * (max_iteration_len - len(str_i)) + str_i
+        )
+        mutate_testcases(testcases, corpus_new_dir)
+        testcases = load_corpus(tester, corpus_new_dir)
+        tester.perform_testing("protocol fuzzing", perform_protocol_fuzzing, testcases)
 
 
 if __name__ == "__main__":
