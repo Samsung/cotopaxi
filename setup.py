@@ -89,7 +89,7 @@ setup(
     " server, client, DDoS, traffic amplification, security configuration, supported ciphers,"
     " TCP, UDP, IPv4, IPv6, AMQP, CoAP, DTLS, HTCPCP, HTTP/2, gRPC, KNX, mDNS,"
     " MQTT, MQTT-SN, QUIC, RTSP, SSDP",
-    license="GPLv2",
+    license="GPLv2+",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/Samsung/cotopaxi",
@@ -112,7 +112,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
-        "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+        "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
         "Operating System :: OS Independent",
         "Topic :: Internet",
         "Topic :: Scientific/Engineering",
