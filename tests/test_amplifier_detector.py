@@ -44,7 +44,6 @@ class TestAmplifierDetector(unittest.TestCase):
             )
 
     def test_reflector_sniffer_pos(self):
-
         args = ["8.8.8.8", "-I", "0"]
         options = amplifier_parse_args(args)
         sniffer = ReflectorSniffer(options)
