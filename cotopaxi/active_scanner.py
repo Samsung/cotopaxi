@@ -855,7 +855,7 @@ class DTLSScanner(object):
             resp1 = client.recvall(timeout=0.5)
             self.test_params.report_received_packet(sent_time)
             pkt = DTLSRecord(version=version) / TLSHeartBeat(
-                length=2 ** 14 - 1, data="bleed..."
+                length=2**14 - 1, data="bleed..."
             )
             sent_time = self.test_params.report_sent_packet()
             client.sendall(str(pkt))

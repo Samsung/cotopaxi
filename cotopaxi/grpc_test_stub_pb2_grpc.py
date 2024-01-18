@@ -27,6 +27,7 @@ import grpc
 
 import cotopaxi.grpc_test_stub_pb2 as test__stub__pb2
 
+
 # pylint: disable=no-self-use, too-few-public-methods, too-many-arguments, unused-argument
 class PingServiceStub(object):
     """Missing associated documentation comment in .proto file."""

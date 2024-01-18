@@ -186,6 +186,7 @@ class TestProtocolFuzzer(CotopaxiToolServerTester, unittest.TestCase):
         # print "\n" + 30 * "-" + "\n" + output + "\n" + 30 * "-" + "\n"
         self.assertIn("Fuzzing stopped", output)
 
+
 """
 print(mutate_testcase("test.txt", "abcd", 0, 0, 88))
 print(mutate_testcase("test.txt", "abcd", 0, 1, 88))

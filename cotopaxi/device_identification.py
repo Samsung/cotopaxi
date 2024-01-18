@@ -333,7 +333,7 @@ def load_packets(pcap_filename, limit_packets=1000):
     start_time = time.time()
     packets = []
     try:
-        if os.path.getsize(pcap_filename) > 100 * 2 ** 20:
+        if os.path.getsize(pcap_filename) > 100 * 2**20:
             print(
                 "[!] Provided pcap file is bigger than 100MB, so loading can take a while!\n"
                 "[!] You can interrupt loading at any time using CTRL+C and classification "

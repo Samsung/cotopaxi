@@ -346,3 +346,10 @@
   url:
   credit: Jakub Botwicz
   payload_file: dtls/payload_tradfri_000.raw
+- name: D3D_000
+  type: Access
+  cve_id:
+  description: Accessing the user and enabling camera rotation is achieved by sending a GET request with the specified parameters.
+  url:
+  credit: Pranav Krishna 
+  payload_file: http/payload_d3d_000_request.raw
