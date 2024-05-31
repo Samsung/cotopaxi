@@ -198,7 +198,6 @@ class DTLSClient(object):
         self.test_params = test_params
 
         if confirm_hello_verify:
-
             pkt = DTLSRecord(
                 version=dtls_version, sequence=0, content_type=TLSContentType.HANDSHAKE
             ) / DTLSHandshakes(

@@ -76,7 +76,6 @@ class TestCotopaxiTester(unittest.TestCase):
         self.assertIn("Could not parse port: invalid literal for int", output)
 
     def test_parse_port_pos(self):
-
         result = parse_port("1")
         expected = 1
         self.assertEqual(result, expected)

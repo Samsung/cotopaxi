@@ -125,7 +125,7 @@ def classify_traffic(
     """Classify traffic based on provided network packets."""
     result_class = None
     packets_bins_port = split_packets(packets, ip_addr)
-    for (src_port, dst_ip, dst_port) in packets_bins_port:
+    for src_port, dst_ip, dst_port in packets_bins_port:
         packets = packets_bins_port[(src_port, dst_ip, dst_port)]
         data = df_from_scapy(packets, ip_addr, limit_packets=max_packets)
         if data is None:

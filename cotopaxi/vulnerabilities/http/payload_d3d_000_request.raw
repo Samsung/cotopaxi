@@ -1,0 +1,2 @@
+GET /web/cgi-bin/hi3510/ptzctrl.cgi?-step=0&-act=right 
+Authorization: Basic YWRtaW46YWRtaW4=

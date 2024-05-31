@@ -454,7 +454,7 @@ class TestParams(object):
                     )
                 )
             potential_results = []
-            for (proto, proto_results) in self.test_stats.potential_endpoints.items():
+            for proto, proto_results in self.test_stats.potential_endpoints.items():
                 if proto_results:
                     potential_results.append(
                         "    For {}: {}".format(proto, proto_results)

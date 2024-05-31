@@ -98,7 +98,11 @@ class TestTrafficAnalyzer(unittest.TestCase):
     def test_main_max_packets_pos(self):
         output = scrap_output(
             main,
-            ["tests/traffic_samples/chrissanders.org_http_post.pcapng", "--max", "10",],
+            [
+                "tests/traffic_samples/chrissanders.org_http_post.pcapng",
+                "--max",
+                "10",
+            ],
         )
         self.assertIn("Loaded 21 packets from the provided file", output)
         self.assertIn("Found 10 packets", output)
